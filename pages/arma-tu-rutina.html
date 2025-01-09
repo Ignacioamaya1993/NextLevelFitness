@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arma tus Rutinas - Next Level Fitness</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/arma-tu-rutina.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="/assets/images/logos/logo.png" alt="Next Level Fitness Logo">
+        </div>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Inicio</a></li>
+                <li><a href="arma-tu-rutina.html" class="active">Arma tus Rutinas</a></li>
+                <li><a href="tus-rutinas.html">Tus Rutinas</a></li>
+                <li><a href="contactos.html">Contactos</a></li>
+                <li><a href="registro.html">Registrarse</a></li>
+                <li><a href="login.html">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="access-restricted" id="restricted-message">
+            <h2>Para armar tus rutinas debes estar registrado e iniciar sesión</h2>
+            <p><a href="login.html" class="cta-button">Inicia Sesión</a> o <a href="registro.html" class="cta-button">Regístrate</a></p>
+        </section>
+
+        <section class="routine-builder hidden" id="routine-builder">
+            <h2>Arma tu rutina</h2>
+            <div class="filters">
+                <select id="category-filter">
+                    <option value="all">Todos los grupos musculares</option>
+                    <option value="upper-body">Parte Superior</option>
+                    <option value="lower-body">Parte Inferior</option>
+                    <option value="cardio">Cardio</option>
+                </select>
+                <input type="text" id="search-bar" placeholder="Buscar ejercicio...">
+            </div>
+            <div class="exercise-grid" id="exercise-grid">
+                <!-- Aquí se mostrarán los ejercicios cargados dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Next Level Fitness. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="../scripts/arma-tu-rutina.js"></script>
+</body>
+</html>

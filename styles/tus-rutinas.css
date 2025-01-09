@@ -1,0 +1,41 @@
+/* Estilos específicos para la página "Tus Rutinas" */
+main {
+    padding: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+.access-restricted {
+    text-align: center;
+    padding: 50px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.access-restricted h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.access-restricted .cta-button {
+    margin: 5px;
+}
+
+.routine-viewer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#routine-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+}

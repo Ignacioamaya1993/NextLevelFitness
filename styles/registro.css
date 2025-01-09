@@ -1,0 +1,106 @@
+/* Contenedor principal */
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f9fa;
+    padding: 0 20px;
+}
+
+/* Contenedor del formulario */
+form {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    width: 100%;
+    max-width: 600px; /* Más ancho para acomodar dos columnas */
+}
+
+/* Título del formulario */
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Contenedor para las columnas */
+.form-columns {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+/* Cada columna */
+.column {
+    width: 48%; /* Dos columnas que ocupan el espacio al 50% menos el gap */
+}
+
+/* Etiquetas y campos de entrada */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Estilo de campos al enfocarse */
+input:focus, select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+/* Botón de envío */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #6f42c1;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #563d7c;
+}
+
+/* Mensajes de validación */
+#mensaje {
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#mensaje.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+#mensaje.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Clase para ocultar elementos */
+.hidden {
+    display: none;
+}

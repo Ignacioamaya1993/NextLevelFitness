@@ -1,0 +1,20 @@
+[
+    {
+        "email": "ignacioamaya04@gmail.com",
+        "password": "contraseña1",
+        "routines": [
+            {
+                "days": ["Lunes", "Miércoles", "Viernes"],
+                "exercises": [
+                    { "name": "Press de Banca", "series": 4, "repetitions": 10, "weight": 80 },
+                    { "name": "Sentadillas", "series": 4, "repetitions": 12, "weight": 100 }
+                ]
+            }
+        ]
+    },
+    {
+        "email": "soutrelleagustin64@gmail.com",
+        "password": "contraseña2",
+        "routines": []
+    }
+]
