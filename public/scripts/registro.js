@@ -1,23 +1,9 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";  // Asegúrate de importar esta función
+import app from "./firebaseConfig.js"; // Importa la configuración de Firebase
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-// Tu configuración de Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyAyyZYcW9s1REMP5kn0XZeISfLIjZQsCJU",
-    authDomain: "next-level-fitness-52989.firebaseapp.com",
-    projectId: "next-level-fitness-52989",
-    storageBucket: "next-level-fitness-52989.firebasestorage.app",
-    messagingSenderId: "35987157867",
-    appId: "1:35987157867:web:cbc810334c47aac36e522e",
-    measurementId: "G-T1HDKGPH2S"
-};
-
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);  // Asegúrate de inicializar Firebase
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 
 // Selección de elementos del formulario
 const registroForm = document.getElementById("registro-form");
@@ -26,9 +12,7 @@ const mensaje = document.getElementById("mensaje");
 // Manejar el envío del formulario
 registroForm.addEventListener("submit", async (event) => {
     event.preventDefault(); // Evita que se recargue la página
-
-    console.log("Formulario de registro enviado");  // Verificar si el formulario se está enviando
-
+    console.log("Formulario de registro enviado");
 
     // Obtener los valores de los campos
     const nombre = document.getElementById("nombre").value.trim();
@@ -52,14 +36,13 @@ registroForm.addEventListener("submit", async (event) => {
     }
 
     try {
-        // Registrar el usuario con correo y contraseña en Firebase Authentication
+        // Registrar el usuario con Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        console.log("Usuario registrado:", user);  // Verificar que el usuario se haya registrado correctamente
+        console.log("Usuario registrado:", user);
 
-
-        // Crear un nuevo usuario en la colección "usuarios" de Firestore
+        // Crear un nuevo usuario en Firestore
         const nuevoUsuario = {
             uid: user.uid,
             nombre,
@@ -67,21 +50,30 @@ registroForm.addEventListener("submit", async (event) => {
             edad,
             genero,
             peso,
-            email
+            email,
         };
 
-        // Guardar el nuevo usuario en Firestore
         await addDoc(collection(db, "usuarios"), nuevoUsuario);
 
-        // Mostrar mensaje de éxito
         mostrarMensaje("Registro exitoso. ¡Ahora puedes iniciar sesión!", "success");
-
-        // Reiniciar el formulario
         registroForm.reset();
-
     } catch (error) {
         console.error("Error al registrar al usuario:", error);
-        mostrarMensaje("Hubo un problema al registrar al usuario. Intenta nuevamente.", "error");
+
+        // Manejo de errores comunes
+        switch (error.code) {
+            case "auth/email-already-in-use":
+                mostrarMensaje("El correo ya está registrado. Por favor, inicia sesión.", "error");
+                break;
+            case "auth/invalid-email":
+                mostrarMensaje("Correo inválido. Por favor, verifica y vuelve a intentarlo.", "error");
+                break;
+            case "auth/weak-password":
+                mostrarMensaje("La contraseña es muy débil. Usa al menos 6 caracteres.", "error");
+                break;
+            default:
+                mostrarMensaje("Hubo un problema al registrar al usuario. Intenta nuevamente.", "error");
+        }
     }
 });
 
