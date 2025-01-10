@@ -1,11 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrarse - Next Level Fitness</title>
     <link rel="stylesheet" href="../styles/global.css">
     <link rel="stylesheet" href="../styles/registro.css">
+
+    <!-- Importar Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // Tu configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyyZYcW9s1REMP5kn0XZeISfLIjZQsCJU",
+            authDomain: "next-level-fitness-52989.firebaseapp.com",
+            projectId: "next-level-fitness-52989",
+            storageBucket: "next-level-fitness-52989.firebasestorage.app",
+            messagingSenderId: "35987157867",
+            appId: "1:35987157867:web:cbc810334c47aac36e522e",
+            measurementId: "G-T1HDKGPH2S"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+    </script>
 </head>
 <body>
     <header>
@@ -73,6 +96,7 @@
         <p>&copy; 2025 Next Level Fitness. Todos los derechos reservados.</p>
     </footer>
 
+    <!-- Enlazar el script de registro.js al final -->
     <script src="../scripts/registro.js"></script>
 </body>
 </html>
