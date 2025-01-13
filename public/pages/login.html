@@ -35,7 +35,9 @@
 <body>
     <header>
         <div class="logo">
-            <img src="/assets/images/logos/logo.png" alt="Next Level Fitness Logo">
+            <a href="/public/index.html">
+                <img src="../assets/images/logos/nextlevel1.png" alt="Next Level Fitness Logo">
+            </a>
         </div>
 
         <nav>
@@ -46,6 +48,7 @@
                 <li><a href="contactos.html">Contactos</a></li>
                 <li><a href="registro.html">Registrarse</a></li>
                 <li><a href="login.html" class="active">Iniciar Sesión</a></li>
+                <li><a href="mi-cuenta.html" style="display: none;">Mi Cuenta</a></li>
             </ul>
         </nav>
     </header>
@@ -67,7 +70,7 @@
                 </div>
 
                 <button type="submit">Iniciar Sesión</button>
-                <div class="forgot-password">¿Olvidaste tu contraseña?</div>
+                <div id="forgotPassword" class="forgot-password">¿Olvidaste tu contraseña?</div>
             </form>
         </div>
     </main>
@@ -77,6 +80,8 @@
     </footer>
     
     <!-- Enlazar el script de login.js al final -->
-    <script src="../scripts/login.js"></script>
+    <script type="module" src="../scripts/login.js"></script>
+    <script type="module" src="../scripts/auth.js"></script>
+
 </body>
 </html>

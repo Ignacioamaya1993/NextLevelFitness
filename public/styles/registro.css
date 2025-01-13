@@ -11,8 +11,8 @@ main {
 /* Contenedor del formulario */
 form {
     background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px; /* Asegúrate de que los bordes sean uniformes */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
     padding: 30px;
     width: 100%;
     max-width: 600px; /* Más ancho para acomodar dos columnas */

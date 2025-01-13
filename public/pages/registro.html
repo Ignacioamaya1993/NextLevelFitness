@@ -7,33 +7,13 @@
     <link rel="stylesheet" href="../styles/global.css">
     <link rel="stylesheet" href="../styles/registro.css">
 
-    <!-- Importar Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-
-        // Tu configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyAyyZYcW9s1REMP5kn0XZeISfLIjZQsCJU",
-            authDomain: "next-level-fitness-52989.firebaseapp.com",
-            projectId: "next-level-fitness-52989",
-            storageBucket: "next-level-fitness-52989.firebasestorage.app",
-            messagingSenderId: "35987157867",
-            appId: "1:35987157867:web:cbc810334c47aac36e522e",
-            measurementId: "G-T1HDKGPH2S"
-        };
-
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-    </script>
 </head>
 <body>
     <header>
         <div class="logo">
-            <img src="/assets/images/logos/logo.png" alt="Next Level Fitness Logo">
+            <a href="/public/index.html">
+                <img src="../assets/images/logos/nextlevel1.png" alt="Next Level Fitness Logo">
+            </a>
         </div>
         <nav>
             <ul class="nav-menu">
@@ -42,6 +22,7 @@
                 <li><a href="tus-rutinas.html">Tus Rutinas</a></li>
                 <li><a href="contactos.html">Contactos</a></li>
                 <li><a href="registro.html" class="active">Registrarse</a></li>
+                <li><a href="mi-cuenta.html" style="display: none;">Mi Cuenta</a></li>
                 <li><a href="login.html">Iniciar Sesión</a></li>
             </ul>
         </nav>
@@ -97,6 +78,9 @@
     </footer>
 
     <!-- Enlazar el script de registro.js al final -->
-    <script src="../scripts/registro.js"></script>
+    <script type="module" src="../scripts/registro.js"></script>
+    <script type="module" src="../scripts/auth.js"></script>
+
+    
 </body>
 </html>

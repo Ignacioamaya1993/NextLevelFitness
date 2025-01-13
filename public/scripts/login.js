@@ -1,5 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+
 
 // Tu configuración de Firebase (la misma que usas en el registro)
 const firebaseConfig = {
@@ -31,6 +33,18 @@ loginForm.addEventListener("submit", async (event) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
+         // Verificar si el correo está verificado
+        if (!user.emailVerified) {
+            // Si no está verificado, cerrar sesión y mostrar mensaje
+            Swal.fire({
+                icon: "warning",
+                title: "Correo no verificado",
+                text: "Por favor, verifica tu correo antes de iniciar sesión.",
+                confirmButtonColor: "#6f42c1",
+            });
+            return; // Salir del flujo si no está verificado
+        }
+
         // Si la autenticación es exitosa, guarda la información en localStorage
         const currentUser = {
             isLoggedIn: true,
@@ -38,9 +52,6 @@ loginForm.addEventListener("submit", async (event) => {
             uid: user.uid,
         };
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
-        // Verificar si la información se guardó correctamente
-        console.log(localStorage.getItem("currentUser"));  // Aquí agregas la línea
 
         // Redirigir al usuario a "Tus Rutinas"
         window.location.href = "tus-rutinas.html";
@@ -93,3 +104,58 @@ function togglePasswordVisibility() {
         toggleIcon.classList.add("fa-eye-slash");
     }
 }
+
+// Seleccionar el enlace o botón de "¿Olvidaste tu contraseña?"
+const forgotPasswordLink = document.getElementById("forgotPassword");
+
+forgotPasswordLink.addEventListener("click", async () => {
+    const { value: email } = await Swal.fire({
+        title: "Recuperar contraseña",
+        input: "email",
+        inputLabel: "Ingresa tu correo electrónico",
+        inputPlaceholder: "ejemplo@correo.com",
+        confirmButtonText: "Enviar",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        inputValidator: (value) => {
+            if (!value) {
+                return "¡Debes ingresar un correo!";
+            }
+            // Validar formato de correo
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                return "Por favor, ingresa un correo válido.";
+            }
+        },
+    });
+
+    if (email) {
+        try {
+            // Enviar correo de recuperación de contraseña
+            await sendPasswordResetEmail(auth, email);
+            Swal.fire({
+                icon: "success",
+                title: "Correo enviado",
+                text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
+                confirmButtonColor: "#6f42c1",
+            });
+        } catch (error) {
+            console.error("Error al enviar el correo de recuperación:", error);
+            if (error.code === "auth/user-not-found") {
+                Swal.fire({
+                    icon: "error",
+                    title: "Usuario no encontrado",
+                    text: `No existe una cuenta registrada con el correo: ${email}`,
+                    confirmButtonColor: "#6f42c1",
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.",
+                    confirmButtonColor: "#6f42c1",
+                });
+            }
+        }
+    }
+});

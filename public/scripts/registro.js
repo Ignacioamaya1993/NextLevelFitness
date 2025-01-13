@@ -1,6 +1,8 @@
-import app from "./firebaseConfig.js"; // Importa la configuración de Firebase
+import app from './firebaseConfig.js';
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -38,9 +40,20 @@ registroForm.addEventListener("submit", async (event) => {
     try {
         // Registrar el usuario con Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+      // Verificar si userCredential contiene un objeto válido
+    if (!userCredential || !userCredential.user) {
+        throw new Error("Error al registrar el usuario: Credenciales inválidas.");
+    }
 
-        console.log("Usuario registrado:", user);
+    const user = userCredential.user; // Obtener el usuario registrado
+    console.log("Usuario registrado exitosamente:", user);
+
+    // Intentar enviar el correo de verificación
+    await sendEmailVerification(user);
+    console.log("Correo de verificación enviado a:", user.email);
+
+    // Mostrar mensaje indicando que el correo de verificación fue enviado
+    mostrarMensaje("Registro exitoso. Verifica tu correo antes de iniciar sesión.", "success");
 
         // Crear un nuevo usuario en Firestore
         const nuevoUsuario = {
@@ -55,8 +68,7 @@ registroForm.addEventListener("submit", async (event) => {
 
         await addDoc(collection(db, "usuarios"), nuevoUsuario);
 
-        mostrarMensaje("Registro exitoso. ¡Ahora puedes iniciar sesión!", "success");
-        registroForm.reset();
+    registroForm.reset();
     } catch (error) {
         console.error("Error al registrar al usuario:", error);
 

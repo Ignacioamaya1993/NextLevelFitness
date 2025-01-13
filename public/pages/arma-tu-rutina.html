@@ -10,7 +10,9 @@
 <body>
     <header>
         <div class="logo">
-            <img src="/assets/images/logos/logo.png" alt="Next Level Fitness Logo">
+            <a href="/public/index.html">
+                <img src="../assets/images/logos/nextlevel1.png" alt="Next Level Fitness Logo">
+            </a>
         </div>
         <nav>
             <ul class="nav-menu">
@@ -20,6 +22,7 @@
                 <li><a href="contactos.html">Contactos</a></li>
                 <li><a href="registro.html">Registrarse</a></li>
                 <li><a href="login.html">Iniciar Sesión</a></li>
+                <li><a href="mi-cuenta.html" style="display: none;">Mi Cuenta</a></li>
             </ul>
         </nav>
     </header>
@@ -27,7 +30,10 @@
     <main>
         <section class="access-restricted" id="restricted-message">
             <h2>Para armar tus rutinas debes estar registrado e iniciar sesión</h2>
-            <p><a href="login.html" class="cta-button">Inicia Sesión</a> o <a href="registro.html" class="cta-button">Regístrate</a></p>
+            <p>
+                <a href="login.html" class="cta-button">Inicia Sesión</a> o 
+                <a href="registro.html" class="cta-button">Regístrate</a>
+            </p>
         </section>
 
         <section class="routine-builder hidden" id="routine-builder">
@@ -51,6 +57,9 @@
         <p>&copy; 2025 Next Level Fitness. Todos los derechos reservados.</p>
     </footer>
 
-    <script src="../scripts/arma-tu-rutina.js"></script>
+    <!-- Importación de scripts -->
+    <script type="module" src="../scripts/arma-tu-rutina.js"></script>
+    <script type="module" src="../scripts/auth.js"></script>
+
 </body>
 </html>

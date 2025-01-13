@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta</title>
+    <link rel="stylesheet" href="../styles/mi-cuenta.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="/public/index.html">
+                <img src="../assets/images/logos/nextlevel1.png" alt="Next Level Fitness Logo">
+            </a>
+        </div>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Inicio</a></li>
+                <li><a href="arma-tu-rutina.html">Arma tus Rutinas</a></li>
+                <li><a href="tus-rutinas.html">Tus Rutinas</a></li>
+                <li><a href="contactos.html">Contactos</a></li>
+                <li><a href="registro.html">Registrarse</a></li>
+                <li><a href="login.html">Iniciar Sesión</a></li>
+                <li><a href="mi-cuenta.html" style="display: none;">Mi Cuenta</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="account-details">
+            <h2>Detalles de la Cuenta</h2>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <p><strong>Peso:</strong> <span id="weight"></span> kg</p>
+        </section>
+
+        <section class="edit-section">
+            <h2>Editar Información</h2>
+            <form id="update-form">
+                <label for="new-email">Nuevo Email:</label>
+                <input type="email" id="new-email" placeholder="Nuevo email">
+
+                <label for="new-weight">Peso:</label>
+                <input type="number" id="new-weight" placeholder="Peso (kg)">
+
+                <label for="new-password">Nueva Contraseña:</label>
+                <input type="password" id="new-password" placeholder="Nueva contraseña">
+
+                <button type="submit">Actualizar</button>
+            </form>
+        </section>
+
+        <!-- Botón de logout agregado -->
+        <section class="logout-section">
+            <button id="logout-btn">Cerrar sesión</button>
+        </section>
+
+        <section class="verify-email"></section>
+        <button id="verify-email-btn" style="display: none;">Verificar correo electrónico</button>
+    </section>
+
+    </main>
+
+    <script type="module" src="../scripts/mi-cuenta.js"></script>
+    <script type="module" src="../scripts/auth.js"></script>
+</body>
+</html>
