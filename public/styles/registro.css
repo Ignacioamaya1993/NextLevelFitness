@@ -56,6 +56,32 @@ input, select {
     box-sizing: border-box;
 }
 
+/* Estilo para el campo de fecha */
+input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    box-sizing: border-box;
+    color: #555;
+    background-color: white;
+    appearance: none; /* Elimina los estilos predeterminados del navegador */
+}
+
+input[type="date"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+/* Placeholder personalizado para el campo de fecha */
+input[type="date"]::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
 /* Estilo de campos al enfocarse */
 input:focus, select:focus {
     outline: none;
@@ -103,4 +129,29 @@ button:hover {
 /* Clase para ocultar elementos */
 .hidden {
     display: none;
+}
+
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 40px; /* Espacio para el icono */
+}
+
+.password-container .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%; /* Alineado verticalmente */
+    transform: translateY(-87%); /* Ajusta este valor para subirlo */
+    cursor: pointer;
+    font-size: 18px;
+    color: #888;
+}
+
+.password-container .toggle-password:hover {
+    color: #555;
 }

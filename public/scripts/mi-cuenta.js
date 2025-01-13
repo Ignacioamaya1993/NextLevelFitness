@@ -16,8 +16,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (!user.emailVerified) {
                 const verifyEmailButton = document.getElementById("verify-email-btn");
-                verifyEmailButton.style.display = "block";
-            
+                verifyEmailButton.classList.remove("hidden");
+
                 verifyEmailButton.addEventListener("click", async () => {
                     try {
                         await user.sendEmailVerification();
@@ -42,13 +42,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                // Muestra el peso desde Firestore
-                weightField.textContent = data.peso || "No especificado";
+                console.log("Datos del documento:", data); // Verifica los datos
+                // Verifica si el campo 'peso' está presente
+                if (data.peso !== undefined) {
+                    weightField.textContent = data.peso || "No especificado";
+                } else {
+                    weightField.textContent = "No especificado"; // Si no hay campo 'peso'
+                }
             } else {
-                // Crear documento en caso de no existir (muy raro si ya están los datos)
-                await setDoc(userDoc, { peso: 0 });
+                weightField.textContent = "No especificado"; // Si el documento no existe
             }
-
+            
+            
+            
             // Mostrar el botón de logout
             const logoutButton = document.getElementById("logout-btn");
             logoutButton.style.display = "block";
@@ -94,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const newEmail = document.getElementById("new-email").value;
-        const newWeight = document.getElementById("new-weight").value;
+        const newWeight = parseFloat(document.getElementById("new-weight").value);
         const newPassword = document.getElementById("new-password").value;
     
         const user = auth.currentUser;
@@ -112,70 +118,62 @@ document.addEventListener("DOMContentLoaded", async () => {
                 },
                 showCancelButton: true,
                 confirmButtonText: 'Confirmar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => result.value); // Obtiene el valor ingresado
-    
-            if (!password) throw new Error("La reautenticación fue cancelada.");
-    
+                cancelButtonText: 'Cancelar',
+                preConfirm: async (password) => {   
+                    if (!password) {
+                        throw new Error("La reautenticación fue cancelada.");
+                    }
+
+            // Reautenticación con la contraseña proporcionada
             const credential = EmailAuthProvider.credential(user.email, password);
             await reauthenticateWithCredential(user, credential);
     
+            // Intentar actualizar el correo si el nuevo correo está definido
             if (newEmail) {
-                // Verifica si el email actual está verificado
-                console.log("Correo actual verificado:", user.emailVerified);
+                try {
+                    console.log("Intentando actualizar el correo...");
+            
+                    // Enviar correo de verificación al nuevo correo
+                    await updateEmail(user, newEmail); // Cambiar correo aquí
 
-                if (!user.emailVerified) {
-                    await Swal.fire(
-                        "Error",
-                        "Debes verificar tu correo electrónico actual antes de poder cambiarlo. Revisa tu bandeja de entrada.",
-                        "error"
-                    );
+                    // Mostrar el SweetAlert2 para enviar verificación
+                    const result = await Swal.fire({
+                        title: 'Correo actualizado',
+                        text: "Ahora enviaremos un correo de verificación al nuevo correo. ¿Deseas enviarlo?",
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Enviar Verificación',
+                        cancelButtonText: 'Cancelar',
+                    });
+
+                    if (result.isConfirmed) {
+                    // Enviar correo de verificación al nuevo correo
+                    await user.sendEmailVerification();            
+                    // Notificar al usuario que debe verificar el nuevo correo
+                    Swal.fire("Correo de verificación enviado", "Por favor, revisa tu bandeja de entrada y verifica el nuevo correo antes de continuar.", "info");
+                }
+            } catch (error) {
+                console.error("Error al actualizar el correo:", error);
+                if (error.code === "auth/email-already-in-use") {
+                    Swal.fire("Error", "El nuevo correo electrónico ya está siendo usado por otra cuenta.", "error");
+                } else if (error.code === "auth/requires-recent-login") {
+                    Swal.fire("Error", "Debes volver a iniciar sesión para realizar este cambio.", "error");
                 } else {
-                    // Verifica que el nuevo correo no esté vacío
-                    console.log("Nuevo correo:", newEmail);
-                    if (!newEmail || newEmail === user.email) {
-                        console.error("El nuevo correo no es válido o no ha cambiado.");
-                        throw new Error("El nuevo correo no es válido o no ha cambiado.");
-                    }
-
-                    // Intenta actualizar el email
-                    try {
-                        console.log("Intentando actualizar el correo...");
-                        await updateEmail(user, newEmail);
-                        
-                        // Enviar correo de verificación al nuevo email
-                        await user.sendEmailVerification();
-                        console.log("Correo actualizado, se envió correo de verificación.");
-                        Swal.fire("Éxito", "Email actualizado correctamente. Revisa tu bandeja de entrada para verificar el nuevo correo.", "success");
-                    } catch (error) {
-                        console.error("Error al actualizar el correo:", error);
-                        if (error.code === "auth/email-already-in-use") {
-                            Swal.fire(
-                                "Error",
-                                "El nuevo correo electrónico ya está siendo usado por otra cuenta.",
-                                "error"
-                            );
-                        } else if (error.code === "auth/requires-recent-login") {
-                            Swal.fire(
-                                "Error",
-                                "Debes volver a iniciar sesión para realizar este cambio.",
-                                "error"
-                            );
-                        } else {
-                            Swal.fire(
-                                "Error",
-                                "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.",
-                                "error"
-                            );
-                        }
-                    }
+                    Swal.fire("Error", "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.", "error");
                 }
             }
+        }
+    }
+}).then((result) => result.value);
+
+    if (!password) throw new Error("La reautenticación fue cancelada.");
 
             if (newPassword) {
                 console.log("Nuevo password:", newPassword);
                 await updatePassword(user, newPassword);
                 await Swal.fire('Éxito', 'Contraseña actualizada correctamente', 'success');
+                window.location.reload(); // Recargar la página
+
             }
     
             if (newWeight) {
@@ -183,6 +181,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const userDoc = doc(db, "usuarios", user.uid);
                 await setDoc(userDoc, { peso: parseFloat(newWeight) }, { merge: true });
                 await Swal.fire('Éxito', 'Peso actualizado correctamente', 'success');
+                window.location.reload(); // Recargar la página
+
             }
     
         } catch (error) {

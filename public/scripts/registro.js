@@ -3,13 +3,26 @@ import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Selección de elementos del formulario
 const registroForm = document.getElementById("registro-form");
 const mensaje = document.getElementById("mensaje");
+
+// Función para calcular la edad a partir de la fecha de nacimiento
+const calcularEdad = (fechaNacimiento) => {
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+
+    // Ajustar si no ha cumplido años este año
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--;
+    }
+    return edad;
+};
 
 // Manejar el envío del formulario
 registroForm.addEventListener("submit", async (event) => {
@@ -19,7 +32,7 @@ registroForm.addEventListener("submit", async (event) => {
     // Obtener los valores de los campos
     const nombre = document.getElementById("nombre").value.trim();
     const apellido = document.getElementById("apellido").value.trim();
-    const edad = parseInt(document.getElementById("edad").value.trim(), 10);
+    const fechaNacimiento = document.getElementById("fecha-nacimiento").value.trim();
     const genero = document.getElementById("genero").value;
     const peso = parseFloat(document.getElementById("peso").value.trim());
     const email = document.getElementById("email").value.trim();
@@ -27,7 +40,7 @@ registroForm.addEventListener("submit", async (event) => {
     const confirmarPassword = document.getElementById("confirmar-password").value;
 
     // Validaciones básicas
-    if (!nombre || !apellido || !edad || !genero || !peso || !email || !password || !confirmarPassword) {
+    if (!nombre || !apellido || !fechaNacimiento || !genero || !peso || !email || !password || !confirmarPassword) {
         mostrarMensaje("Por favor, completa todos los campos.", "error");
         return;
     }
@@ -37,30 +50,31 @@ registroForm.addEventListener("submit", async (event) => {
         return;
     }
 
+    const edad = calcularEdad(fechaNacimiento);
+    if (edad < 18) {
+        mostrarMensaje("Debes tener al menos 18 años para registrarte.", "error");
+        return;
+    }
+
     try {
         // Registrar el usuario con Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      // Verificar si userCredential contiene un objeto válido
-    if (!userCredential || !userCredential.user) {
-        throw new Error("Error al registrar el usuario: Credenciales inválidas.");
-    }
+        const user = userCredential.user; // Obtener el usuario registrado
+        console.log("Usuario registrado exitosamente:", user);
 
-    const user = userCredential.user; // Obtener el usuario registrado
-    console.log("Usuario registrado exitosamente:", user);
+        // Enviar correo de verificación
+        await sendEmailVerification(user);
+        console.log("Correo de verificación enviado a:", user.email);
 
-    // Intentar enviar el correo de verificación
-    await sendEmailVerification(user);
-    console.log("Correo de verificación enviado a:", user.email);
-
-    // Mostrar mensaje indicando que el correo de verificación fue enviado
-    mostrarMensaje("Registro exitoso. Verifica tu correo antes de iniciar sesión.", "success");
+        // Mostrar mensaje indicando que el correo de verificación fue enviado
+        mostrarMensaje("Registro exitoso. Verifica tu correo antes de iniciar sesión.", "success");
 
         // Crear un nuevo usuario en Firestore
         const nuevoUsuario = {
             uid: user.uid,
             nombre,
             apellido,
-            edad,
+            fechaNacimiento,
             genero,
             peso,
             email,
@@ -68,7 +82,7 @@ registroForm.addEventListener("submit", async (event) => {
 
         await addDoc(collection(db, "usuarios"), nuevoUsuario);
 
-    registroForm.reset();
+        registroForm.reset();
     } catch (error) {
         console.error("Error al registrar al usuario:", error);
 
@@ -96,3 +110,23 @@ function mostrarMensaje(texto, tipo) {
     mensaje.classList.add(tipo); // Agregar clase correspondiente (success o error)
     mensaje.classList.remove("hidden");
 }
+
+// Función para alternar la visibilidad de las contraseñas
+document.querySelectorAll('.toggle-password').forEach(icon => {
+    icon.addEventListener('click', () => {
+        const targetId = icon.getAttribute('data-target'); // ID del campo asociado
+        const passwordField = document.getElementById(targetId);
+        const passwordType = passwordField.getAttribute('type');
+
+        // Alternar entre 'password' y 'text'
+        if (passwordType === 'password') {
+            passwordField.setAttribute('type', 'text');
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            passwordField.setAttribute('type', 'password');
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    });
+});

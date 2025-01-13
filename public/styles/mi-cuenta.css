@@ -169,3 +169,21 @@ button#logout-btn:disabled {
     background-color: #f5b7b1; /* Color más claro cuando está deshabilitado */
     cursor: not-allowed;
 }
+
+.hidden {
+    display: none;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #08c3f1;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #17ecda;
+}

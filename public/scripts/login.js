@@ -105,6 +105,9 @@ function togglePasswordVisibility() {
     }
 }
 
+// Hacer la función accesible globalmente
+window.togglePasswordVisibility = togglePasswordVisibility;
+
 // Seleccionar el enlace o botón de "¿Olvidaste tu contraseña?"
 const forgotPasswordLink = document.getElementById("forgotPassword");
 
