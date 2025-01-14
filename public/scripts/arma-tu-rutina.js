@@ -1,12 +1,9 @@
 import app from './firebaseConfig.js';
-import { getFirestore, collection, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, query } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-// Se ejecuta cuando el DOM está completamente cargado
 document.addEventListener("DOMContentLoaded", async () => {
-    // Inicializamos la base de datos de Firebase
     const db = getFirestore(app);
 
-    // Elementos del DOM
     const user = JSON.parse(localStorage.getItem("currentUser"));
     const restrictedMessage = document.getElementById("restricted-message");
     const routineBuilder = document.getElementById("routine-builder");
@@ -14,12 +11,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const exerciseGrid = document.getElementById("exercise-grid");
     const searchBar = document.getElementById("search-bar");
 
-    // Verificar si el usuario está logueado
     if (user && user.isLoggedIn) {
         restrictedMessage.classList.add("hidden");
         routineBuilder.classList.remove("hidden");
 
-        // Cargar ejercicios desde Firestore
+        // Cargar categorías en el filtro
+        await loadCategories(db, categoryFilter);
+
+        // Cargar ejercicios iniciales
         await loadExercises(db, exerciseGrid);
 
         // Filtros de categoría y búsqueda
@@ -38,61 +37,65 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-// Función para cargar los ejercicios desde Firestore
-async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "") {
-    exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
+async function loadCategories(db, categoryFilter) {
+    try {
+        const categoriesRef = collection(db, "categories");
+        const categoriesSnapshot = await getDocs(categoriesRef);
 
-    const categoriesCollection = collection(db, "categories");
-    let exercisesQuery;
-
-    // Filtrar por categoría si no es "all"
-    if (category !== "all") {
-        exercisesQuery = query(categoriesCollection, where("__name__", "==", category));
-    } else {
-        exercisesQuery = categoriesCollection;
-    }
-
-    const categoryDocs = await getDocs(exercisesQuery);
-
-    // Iterar sobre las categorías y sus ejercicios
-    for (const categoryDoc of categoryDocs.docs) {
-        const categoryName = categoryDoc.id;
-        const exercisesRef = collection(db, `categories/${categoryName}`);
-        const exerciseDocs = await getDocs(exercisesRef);
-
-        exerciseDocs.forEach((exerciseDoc) => {
-            const exercise = exerciseDoc.data();
-            const exerciseName = exerciseDoc.id;
-
-            // Filtrar por búsqueda
-            if (searchQuery && !exerciseName.toLowerCase().includes(searchQuery.toLowerCase())) {
-                return;
-            }
-
-            // Crear el elemento HTML para el ejercicio
-            const exerciseCard = document.createElement("div");
-            exerciseCard.classList.add("exercise-card");
-            exerciseCard.innerHTML = `
-                <img src="${exercise.imagen}" alt="${exercise.nombre}">
-                <h3>${exercise.nombre}</h3>
-                <button onclick="showExerciseDetails('${exercise.nombre}', '${exercise.video}', '${exercise.instrucciones}')">Ver más</button>
-            `;
-            exerciseGrid.appendChild(exerciseCard);
+        categoriesSnapshot.forEach((categoryDoc) => {
+            const categoryName = categoryDoc.id;
+            const option = document.createElement("option");
+            option.value = categoryName;
+            option.textContent = categoryName;
+            categoryFilter.appendChild(option);
         });
+
+        console.log("Categorías cargadas correctamente.");
+    } catch (error) {
+        console.error("Error al cargar categorías:", error);
     }
 }
 
-// Función para mostrar los detalles de un ejercicio
-function showExerciseDetails(name, video, instructions) {
-    Swal.fire({
-        title: name,
-        html: `
-            <video controls>
-                <source src="${video}" type="video/mp4">
-                Tu navegador no soporta el video.
-            </video>
-            <p>${instructions}</p>
-        `,
-        confirmButtonText: "Cerrar",
-    });
+async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "") {
+    exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
+
+    try {
+        const categoriesRef = collection(db, "categories");
+        const categoriesSnapshot = await getDocs(categoriesRef);
+
+        for (const categoryDoc of categoriesSnapshot.docs) {
+            const categoryName = categoryDoc.id;
+
+            if (category !== "all" && category !== categoryName) {
+                continue;
+            }
+
+            const exercisesRef = collection(db, `categories/${categoryName}`);
+            const exercisesSnapshot = await getDocs(exercisesRef);
+
+            exercisesSnapshot.forEach((exerciseDoc) => {
+                const exercise = exerciseDoc.data();
+                const exerciseName = exerciseDoc.id;
+
+                // Filtrar por búsqueda
+                if (searchQuery && !exerciseName.toLowerCase().includes(searchQuery.toLowerCase())) {
+                    return;
+                }
+
+                // Crear el elemento HTML para el ejercicio
+                const exerciseCard = document.createElement("div");
+                exerciseCard.classList.add("exercise-card");
+                exerciseCard.innerHTML = `
+                    <img src="${exercise.imagen}" alt="${exercise.nombre}">
+                    <h3>${exercise.nombre}</h3>
+                    <button onclick="showExerciseDetails('${exercise.nombre}', '${exercise.video}', '${exercise.instrucciones}')">Ver más</button>
+                `;
+                exerciseGrid.appendChild(exerciseCard);
+            });
+        }
+
+        console.log("Ejercicios cargados correctamente.");
+    } catch (error) {
+        console.error("Error al cargar ejercicios:", error);
+    }
 }
