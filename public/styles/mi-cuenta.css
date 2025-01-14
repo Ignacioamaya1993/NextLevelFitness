@@ -1,34 +1,20 @@
-/* Estilos generales */
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef); /* Fondo degradado */
+/* Fondo del contenedor principal */
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    background: linear-gradient(135deg, #f9fafb, #f4f4f4); /* Fondo degradado suave */
 }
 
 header {
-    background-color: #2c3e50; /* Fondo oscuro para la barra de navegación */
-    color: #fff;
+    background-color: #34495e; /* Azul grisáceo oscuro */
+    color: #ecf0f1; /* Blanco suave */
     padding: 0;
     margin: 0;
 }
 
-header .logo {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-}
-
-header .logo img {
-    max-width: 263px; /* Ajuste del tamaño del logo */
-}
-
-nav {
-    background-color: #2c3e50;
-}
-
-nav .nav-menu {
+.nav-menu {
     display: flex;
     justify-content: center;
     gap: 30px; /* Espaciado uniforme entre los elementos */
@@ -37,32 +23,25 @@ nav .nav-menu {
     margin: 0;
 }
 
-nav .nav-menu li {
+.nav-menu li {
     display: inline-block;
 }
 
-nav .nav-menu a {
-    color: #fff;
+.nav-menu li a {
     text-decoration: none;
+    color: #ecf0f1; /* Blanco suave */
     font-weight: bold;
     text-transform: uppercase;
     font-size: 0.9rem;
     padding: 10px 15px;
-    transition: color 0.3s, transform 0.2s;
+    transition: color 0.3s, background-color 0.3s;
 }
 
-nav .nav-menu a:hover, nav .nav-menu a.active {
-    color: #6f42c1; /* Morado principal */
-    transform: scale(1.1); /* Ligero acercamiento */
-}
-
-/* Fondo del contenedor principal */
-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 30px;
-    background: linear-gradient(135deg, #f9fafb, #f4f4f4); /* Fondo degradado suave */
+.nav-menu li a:hover,
+.nav-menu li a.active {
+    color: #34495e; /* Azul gris oscuro */
+    background-color: #ecf0f1; /* Blanco suave para contraste */
+    border-radius: 5px;
 }
 
 /* Sección de detalles de la cuenta */
