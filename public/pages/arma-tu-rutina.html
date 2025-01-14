@@ -19,10 +19,9 @@
                 <li><a href="../index.html">Inicio</a></li>
                 <li><a href="arma-tu-rutina.html" class="active">Arma tus Rutinas</a></li>
                 <li><a href="tus-rutinas.html">Tus Rutinas</a></li>
-                <li><a href="contactos.html">Contactos</a></li>
                 <li><a href="registro.html">Registrarse</a></li>
-                <li><a href="login.html">Iniciar Sesión</a></li>
-                <li><a href="mi-cuenta.html" style="display: none;">Mi Cuenta</a></li>
+                <li><a href="../pages/login.html" id="iniciar-sesion-link">Iniciar Sesión</a></li>
+                <li><a href="../pages/mi-cuenta.html" id="mi-cuenta-link" style="display: none;">Mi Cuenta</a></li>   
             </ul>
         </nav>
     </header>
@@ -54,12 +53,32 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 Next Level Fitness. Todos los derechos reservados.</p>
+        <div class="footer-container">
+            <div class="footer-info">
+                <p>&copy; 2025 Next Level Fitness. Todos los derechos reservados.</p>
+                <p>Email: <a href="mailto:soutrelleagustin64@gmail.com">soutrelleagustin64@gmail.com</a></p>
+            </div>
+            <div class="footer-social">
+                <a href="https://www.instagram.com" target="_blank" class="social-icon" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.facebook.com" target="_blank" class="social-icon" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://wa.me/5492284235832" target="_blank" class="social-icon" aria-label="WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+            <div class="footer-design">
+                <p>Design by Ignacio Amaya</p>
+            </div>
+        </div>
     </footer>
 
     <!-- Importación de scripts -->
     <script type="module" src="../scripts/arma-tu-rutina.js"></script>
     <script type="module" src="../scripts/auth.js"></script>
+    <script type="module" src="../scripts/firebaseConfig.js"></script>
 
 </body>
 </html>

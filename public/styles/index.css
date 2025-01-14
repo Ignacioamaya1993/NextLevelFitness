@@ -2,21 +2,35 @@
 .hero {
     text-align: center;
     padding: 50px 20px;
-    background: linear-gradient(to right, #1abc9c, #2ecc71);
-    color: #fff;
+    background: linear-gradient(to right, #a8dadc, #457b9d); /* Degradado moderno en tonos azules */
+    color: #f1faee; /* Blanco suave */
 }
 
 .hero h1 {
     font-size: 2.5rem;
+    font-weight: bold;
     margin-bottom: 15px;
+    color: #1d3557; /* Azul oscuro para un contraste moderno */
 }
 
 .hero p {
     font-size: 1.2rem;
     margin-bottom: 25px;
+    color: #f1faee; /* Blanco suave */
 }
 
 .hero .cta-button {
     font-size: 1rem;
     padding: 15px 30px;
+    background-color: #1d3557; /* Azul oscuro para el botón */
+    color: #f1faee; /* Blanco para el texto */
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.hero .cta-button:hover {
+    background-color: #457b9d; /* Azul intermedio para hover */
+    transform: scale(1.05); /* Pequeño efecto de agrandamiento */
 }

@@ -4,26 +4,35 @@ main {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef); /* Degradado sutil para un fondo moderno */
     padding: 0 20px;
 }
 
 /* Contenedor del formulario */
 form {
-    background: white;
-    border-radius: 8px; /* Asegúrate de que los bordes sean uniformes */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
+    margin-top: 60px;
+    background: #ffffff;
+    border-radius: 10px; /* Bordes más suaves */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Sombra más ligera */
     padding: 30px;
     width: 100%;
-    max-width: 600px; /* Más ancho para acomodar dos columnas */
+    max-width: 600px; /* Acomoda dos columnas */
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom: 60px;
+}
+
+form:hover {
+    transform: translateY(-5px); /* Ligera elevación */
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
 }
 
 /* Título del formulario */
 h2 {
     text-align: center;
     margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
+    font-size: 2rem;
+    color: #1d3557; /* Morado moderno */
+    font-weight: bold;
 }
 
 /* Contenedor para las columnas */
@@ -35,7 +44,7 @@ h2 {
 
 /* Cada columna */
 .column {
-    width: 48%; /* Dos columnas que ocupan el espacio al 50% menos el gap */
+    width: 48%;
 }
 
 /* Etiquetas y campos de entrada */
@@ -43,69 +52,69 @@ label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
-    color: #555;
+    color: #495057; /* Gris moderno */
 }
 
 input, select {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-bottom: 15px;
     border-radius: 5px;
-    border: 1px solid #ddd;
+    border: 1px solid #ced4da; /* Borde gris suave */
     font-size: 1rem;
     box-sizing: border-box;
+    background-color: #f9f9f9; /* Fondo claro */
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+input:hover, select:hover {
+    transform: scale(1.03); /* Efecto de acercamiento */
+    border-color: #6f42c1;
+    box-shadow: 0 0 8px rgba(111, 66, 193, 0.4);
+}
+
+input:focus, select:focus {
+    outline: none;
+    transform: scale(1.03); /* Persistir efecto al enfocar */
+    border-color: #6f42c1;
+    box-shadow: 0 0 8px rgba(111, 66, 193, 0.5);
 }
 
 /* Estilo para el campo de fecha */
 input[type="date"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    font-size: 1rem;
-    box-sizing: border-box;
-    color: #555;
-    background-color: white;
+    color: #1d3557;
+    background-color: #ffffff;
     appearance: none; /* Elimina los estilos predeterminados del navegador */
 }
 
-input[type="date"]:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+input[type="date"]:hover {
+    transform: scale(1.03);
 }
 
-/* Placeholder personalizado para el campo de fecha */
-input[type="date"]::placeholder {
-    color: #aaa;
+/* Placeholder personalizado */
+input::placeholder {
+    color: #adb5bd; /* Gris claro */
     font-style: italic;
-}
-
-/* Estilo de campos al enfocarse */
-input:focus, select:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
 }
 
 /* Botón de envío */
 button {
     width: 100%;
-    padding: 10px;
-    background-color: #6f42c1;
-    color: white;
+    padding: 12px;
+    background-color: #1d3557;
+    color: #ffffff;
     font-weight: bold;
     border: none;
     border-radius: 5px;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
     margin-top: 20px;
 }
 
 button:hover {
-    background-color: #563d7c;
+    background-color: #5a3794; /* Morado más oscuro */
+    transform: scale(1.02); /* Pequeña ampliación */
 }
 
 /* Mensajes de validación */
@@ -114,16 +123,17 @@ button:hover {
     margin-top: 15px;
     padding: 10px;
     border-radius: 5px;
+    font-size: 1rem;
 }
 
 #mensaje.success {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #d4edda; /* Verde claro */
+    color: #155724; /* Verde oscuro */
 }
 
 #mensaje.error {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: #f8d7da; /* Rojo claro */
+    color: #721c24; /* Rojo oscuro */
 }
 
 /* Clase para ocultar elementos */
@@ -131,6 +141,7 @@ button:hover {
     display: none;
 }
 
+/* Contenedor de la contraseña */
 .password-container {
     position: relative;
     display: flex;
@@ -140,18 +151,24 @@ button:hover {
 .password-container input {
     width: 100%;
     padding-right: 40px; /* Espacio para el icono */
+    transition: transform 0.3s; /* Transición para el efecto de acercamiento */
+}
+
+.password-container input:hover {
+    transform: scale(1.03); /* Efecto de acercamiento */
 }
 
 .password-container .toggle-password {
     position: absolute;
     right: 10px;
-    top: 50%; /* Alineado verticalmente */
-    transform: translateY(-87%); /* Ajusta este valor para subirlo */
+    top: 50%;
+    transform: translateY(-87%); /* Centrado vertical */
     cursor: pointer;
     font-size: 18px;
-    color: #888;
+    color: #1d3557;
+    transition: color 0.3s;
 }
 
 .password-container .toggle-password:hover {
-    color: #555;
+    color: #5a3794;
 }

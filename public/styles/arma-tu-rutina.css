@@ -6,18 +6,33 @@ main {
 .access-restricted {
     text-align: center;
     padding: 50px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    background-color: #f1f3f5; /* Gris claro y suave */
+    border: 1px solid #e0e0e0; /* Gris muy tenue */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera para profundidad */
 }
 
 .access-restricted h2 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: bold;
     margin-bottom: 20px;
+    color: #1d3557; /* Azul oscuro moderno */
 }
 
 .access-restricted .cta-button {
     margin: 5px;
+    background-color: #457b9d; /* Azul intermedio */
+    color: #f1faee; /* Blanco suave */
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.access-restricted .cta-button:hover {
+    background-color: #1d3557; /* Azul más oscuro para hover */
+    transform: scale(1.05); /* Agrandamiento suave */
 }
 
 .routine-builder {
@@ -29,28 +44,39 @@ main {
 .filters {
     display: flex;
     justify-content: space-between;
-    gap: 10px;
+    gap: 15px; /* Espaciado mayor para una apariencia más limpia */
 }
 
 #category-filter, #search-bar {
-    padding: 10px;
+    padding: 12px;
     font-size: 1rem;
     width: 100%;
     max-width: 300px;
+    border: 1px solid #e0e0e0; /* Borde tenue */
+    border-radius: 5px;
+    background-color: #f8f9fa; /* Gris muy claro */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
 }
 
 .exercise-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Aumenta el tamaño mínimo de las tarjetas */
     gap: 20px;
 }
 
 .exercise-grid div {
     padding: 15px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    background-color: #ffffff; /* Blanco puro */
+    border: 1px solid #e0e0e0; /* Gris tenue */
+    border-radius: 8px;
     text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera para profundidad */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.exercise-grid div:hover {
+    transform: translateY(-5px); /* Desplazamiento hacia arriba */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
 }
 
 .hidden {

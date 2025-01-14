@@ -1,9 +1,9 @@
 /* Estilos generales */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef); /* Fondo degradado */
 }
 
 header {
@@ -48,11 +48,12 @@ nav .nav-menu a {
     text-transform: uppercase;
     font-size: 0.9rem;
     padding: 10px 15px;
-    transition: color 0.3s;
+    transition: color 0.3s, transform 0.2s;
 }
 
 nav .nav-menu a:hover, nav .nav-menu a.active {
-    color: #6f42c1; /* Color resaltado al pasar el mouse */
+    color: #6f42c1; /* Morado principal */
+    transform: scale(1.1); /* Ligero acercamiento */
 }
 
 /* Fondo del contenedor principal */
@@ -61,69 +62,87 @@ main {
     flex-direction: column;
     align-items: center;
     padding: 30px;
-    background-color: #f4f4f4;
+    background: linear-gradient(135deg, #f9fafb, #f4f4f4); /* Fondo degradado suave */
 }
 
 /* Sección de detalles de la cuenta */
 .account-details {
-    background-color: #fff;
+    background-color: #ffffff;
     padding: 20px;
     width: 100%;
     max-width: 600px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Sombra refinada */
     margin-bottom: 30px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.account-details:hover {
+    transform: translateY(-5px); /* Elevación al pasar el mouse */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
 }
 
 .account-details h2 {
-    color: #333;
+    color: #1d3557; /* Morado principal */
     border-bottom: 2px solid #6f42c1;
     padding-bottom: 5px;
     margin-bottom: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* Sección de editar información */
 .edit-section {
-    background-color: #fff;
+    background-color: #ffffff;
     padding: 20px;
     width: 100%;
     max-width: 600px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.edit-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .edit-section h2 {
-    color: #333;
+    color: #1d3557; /* Morado principal */
     border-bottom: 2px solid #6f42c1;
     padding-bottom: 5px;
     margin-bottom: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px; /* Más espacio entre los campos */
 }
 
 form label {
-    font-size: 0.9rem;
-    color: #555;
+    font-size: 1rem;
+    color: #495057; /* Gris moderno */
     text-align: left;
 }
 
 form input {
     padding: 12px;
     font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
+    border: 1px solid #ced4da; /* Gris suave */
+    border-radius: 8px; /* Bordes más suaves */
+    width: 95%; /* Asegura que los campos estén dentro del contenedor */
     background-color: #f9f9f9;
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 form input:focus {
     border-color: #6f42c1;
-    box-shadow: 0 0 5px rgba(111, 66, 193, 0.5);
+    box-shadow: 0 0 8px rgba(111, 66, 193, 0.5); /* Sombra morada al enfocar */
     outline: none;
 }
 
@@ -131,59 +150,46 @@ form button {
     padding: 12px;
     font-size: 1rem;
     border: none;
-    border-radius: 5px;
-    background-color: #6f42c1;
+    border-radius: 8px;
+    background-color: #1d3557;
     color: white;
     cursor: pointer;
     font-weight: bold;
+    text-transform: uppercase;
     transition: background-color 0.3s, transform 0.2s;
 }
 
 form button:hover {
-    background-color: #5a3794;
-    transform: scale(1.02);
+    background-color: #5a3794; /* Morado más oscuro */
+    transform: scale(1.05); /* Ligero acercamiento */
 }
 
-/* Estilo para el botón de cerrar sesión */
+/* Botón de cerrar sesión */
 button#logout-btn {
+    margin-top: 10px;
     padding: 12px;
     font-size: 1rem;
     border: none;
-    border-radius: 5px;
-    background-color: #e74c3c; /* Color rojo para indicar acción importante */
+    border-radius: 8px;
+    background-color: #e74c3c; /* Rojo para acción importante */
     color: white;
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.3s, transform 0.2s;
-    width: 100%; /* Ajusta el botón al ancho de su contenedor */
+    width: 100%;
     text-align: center;
 }
 
 button#logout-btn:hover {
-    background-color: #c0392b; /* Rojo más oscuro al hacer hover */
-    transform: scale(1.02);
+    background-color: #c0392b; /* Rojo más oscuro */
+    transform: scale(1.05);
 }
 
-/* Estilo para el botón de cerrar sesión en estado deshabilitado */
 button#logout-btn:disabled {
-    background-color: #f5b7b1; /* Color más claro cuando está deshabilitado */
+    background-color: #f5b7b1; /* Color más claro para deshabilitado */
     cursor: not-allowed;
 }
 
 .hidden {
     display: none;
-}
-
-button {
-    padding: 10px 20px;
-    background-color: #08c3f1;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #17ecda;
 }
