@@ -47,7 +47,7 @@ main {
     gap: 15px; /* Espaciado mayor para una apariencia más limpia */
 }
 
-#category-filter, #search-bar {
+#category-filter {
     padding: 12px;
     font-size: 1rem;
     width: 100%;
@@ -56,6 +56,19 @@ main {
     border-radius: 5px;
     background-color: #f8f9fa; /* Gris muy claro */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    text-transform: capitalize; /* Hacer que los nombres se vean mejor */
+    min-width: 200px; /* Asegurar un tamaño mínimo */
+}
+
+#search-bar {
+    padding: 12px;
+    font-size: 1rem;
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .exercise-grid {
@@ -77,6 +90,50 @@ main {
 .exercise-grid div:hover {
     transform: translateY(-5px); /* Desplazamiento hacia arriba */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
+}
+
+.exercise-grid div img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.exercise-grid div img:empty {
+    content: url('../assets/images/placeholder.png'); /* Ruta a tu imagen de respaldo */
+    opacity: 0.7; /* Indica que es un placeholder */
+}
+
+.exercise-grid div h3 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #1d3557;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.exercise-grid div button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #457b9d; /* Azul consistente con el diseño */
+    color: #f1faee; /* Blanco suave */
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.exercise-grid div button:hover {
+    background-color: #1d3557; /* Azul más oscuro */
+    transform: scale(1.05); /* Pequeño zoom al hover */
+}
+
+.loading-message, .empty-message {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #6c757d; /* Gris medio */
+    margin-top: 20px;
 }
 
 .hidden {
