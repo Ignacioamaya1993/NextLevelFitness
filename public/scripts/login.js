@@ -48,7 +48,7 @@ loginForm.addEventListener("submit", async (event) => {
                 message = "Contraseña incorrecta. Verifica tu contraseña e intenta nuevamente.";
                 break;
             case "auth/user-not-found":
-                message = `No existe una cuenta registrada con el correo: ${email}`;
+                message = "No existe una cuenta registrada con el correo: ${email};"
                 break;
             default:
                 message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
