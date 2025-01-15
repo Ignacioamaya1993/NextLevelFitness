@@ -39,23 +39,22 @@ loginForm.addEventListener("submit", async (event) => {
     
         // Redirigir al usuario a "Tus Rutinas"
         window.location.href = "tus-rutinas.html";
-    } catch (error) {
-        console.error("Error al iniciar sesión:", error); // Agregado para depuración
-    
-       // Manejar errores comunes de autenticación
-       switch (error.code) {
-        case "auth/wrong-password":
-            mostrarAlerta("Contraseña incorrecta", "Por favor, verifica tu contraseña e intenta nuevamente.", "error");
-            break;
-        case "auth/user-not-found":
-            mostrarAlerta("Usuario no encontrado", `No existe una cuenta registrada con el correo: ${email}`, "warning");
-            break;
-        case "auth/invalid-email":
-            mostrarAlerta("Correo inválido", "El formato del correo ingresado no es válido.", "error");
-            break;
-        default:
-            mostrarAlerta("Error", "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.", "error");
-            break;
+        } catch (error) {
+            console.error("Error al actualizar datos:", error);
+        
+            // Verifica el código del error de Firebase
+            let errorMessage = "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
+        
+            if (error.code === "auth/wrong-password") {
+                errorMessage = "Contraseña incorrecta. Por favor, verifica tu contraseña e intenta nuevamente.";
+            } else if (error.code === "auth/user-not-found") {
+                errorMessage = "Usuario no encontrado", `No existe una cuenta registrada con el correo: ${email}`;
+            } else if (error.code === "auth/invalid-email") {
+                errorMessage = "Correo inválido", "El formato del correo ingresado no es válido.";
+
+        
+            // Muestra el mensaje personalizado con SweetAlert2
+            await Swal.fire('Error', errorMessage, 'error');
     }
 }
 });

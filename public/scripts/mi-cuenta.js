@@ -43,15 +43,41 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 console.log("Datos del documento:", data); // Verifica los datos
+            
+                // Mostrar el nombre completo
+                const fullNameField = document.getElementById("full-name");
+                const fullName = `${data.nombre || ""} ${data.apellido || ""}`.trim();
+                fullNameField.textContent = fullName || "No especificado";
+            
                 // Verifica si el campo 'peso' está presente
                 if (data.peso !== undefined) {
                     weightField.textContent = data.peso || "No especificado";
                 } else {
                     weightField.textContent = "No especificado"; // Si no hay campo 'peso'
                 }
+            
+                // Calcular y mostrar la edad
+                const ageField = document.getElementById("age");
+                if (data.fechaDeNacimiento) {
+                    const birthDate = new Date(data.fechaDeNacimiento);
+                    const age = new Date().getFullYear() - birthDate.getFullYear();
+                    const monthDiff = new Date().getMonth() - birthDate.getMonth();
+            
+                    // Ajustar la edad si aún no ha cumplido años este año
+                    const adjustedAge =
+                        monthDiff < 0 || (monthDiff === 0 && new Date().getDate() < birthDate.getDate())
+                            ? age - 1
+                            : age;
+                    ageField.textContent = adjustedAge;
+                } else {
+                    ageField.textContent = "No especificada";
+                }
             } else {
                 weightField.textContent = "No especificado"; // Si el documento no existe
-            }         
+                document.getElementById("full-name").textContent = "No especificado";
+                document.getElementById("age").textContent = "No especificada";
+            }
+                 
             
             // Mostrar el botón de logout
             const logoutButton = document.getElementById("logout-btn");
@@ -93,7 +119,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Redirige al login si no hay usuario autenticado
             window.location.href = "login.html";
         }
-    });
+});
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
