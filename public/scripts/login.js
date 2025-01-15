@@ -17,7 +17,7 @@ loginForm.addEventListener("submit", async (event) => {
         // Iniciar sesión con Firebase Authentication
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
+    
         // Verificar si el correo está verificado
         if (!user.emailVerified) {
             Swal.fire({
@@ -28,7 +28,7 @@ loginForm.addEventListener("submit", async (event) => {
             });
             return;
         }
-
+    
         // Guardar información del usuario en localStorage
         const currentUser = {
             isLoggedIn: true,
@@ -36,17 +36,25 @@ loginForm.addEventListener("submit", async (event) => {
             uid: user.uid,
         };
         localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
+    
         // Redirigir al usuario a "Tus Rutinas"
         window.location.href = "tus-rutinas.html";
     } catch (error) {
-        console.error("Error al iniciar sesión:", error);
-        let message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
-        if (error.code === "auth/wrong-password") {
-            message = "Contraseña incorrecta. Verifica tu contraseña e intenta nuevamente.";
-        } else if (error.code === "auth/user-not-found") {
-            message = `No existe una cuenta registrada con el correo: ${email}`;
+        console.error("Error al iniciar sesión:", error); // Agregado para depuración
+    
+        let message;
+        switch (error.code) {
+            case "auth/wrong-password":
+                message = "Contraseña incorrecta. Verifica tu contraseña e intenta nuevamente.";
+                break;
+            case "auth/user-not-found":
+                message = `No existe una cuenta registrada con el correo: ${email}`;
+                break;
+            default:
+                message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
+                break;
         }
+    
         Swal.fire({
             icon: error.code === "auth/user-not-found" ? "warning" : "error",
             title: "Error",
@@ -54,8 +62,7 @@ loginForm.addEventListener("submit", async (event) => {
             confirmButtonColor: "#6f42c1",
         });
     }
-});
-
+    
 // Función para alternar la visibilidad de la contraseña
 function togglePasswordVisibility() {
     const passwordInput = document.getElementById("password");
