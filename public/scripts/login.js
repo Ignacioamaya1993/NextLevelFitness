@@ -42,27 +42,33 @@ loginForm.addEventListener("submit", async (event) => {
     } catch (error) {
         console.error("Error al iniciar sesión:", error); // Agregado para depuración
     
-        let message;
-        switch (error.code) {
-            case "auth/wrong-password":
-                message = "Contraseña incorrecta. Verifica tu contraseña e intenta nuevamente.";
-                break;
-            case "auth/user-not-found":
-                message = "No existe una cuenta registrada con el correo: ${email};"
-                break;
-            default:
-                message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
-                break;
-        }
-    
-        Swal.fire({
-            icon: error.code === "auth/user-not-found" ? "warning" : "error",
-            title: "Error",
-            text: message,
-            confirmButtonColor: "#6f42c1",
-        });
+       // Manejar errores comunes de autenticación
+       switch (error.code) {
+        case "auth/wrong-password":
+            mostrarAlerta("Contraseña incorrecta", "Por favor, verifica tu contraseña e intenta nuevamente.", "error");
+            break;
+        case "auth/user-not-found":
+            mostrarAlerta("Usuario no encontrado", `No existe una cuenta registrada con el correo: ${email}`, "warning");
+            break;
+        case "auth/invalid-email":
+            mostrarAlerta("Correo inválido", "El formato del correo ingresado no es válido.", "error");
+            break;
+        default:
+            mostrarAlerta("Error", "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.", "error");
+            break;
     }
+}
 });
+
+// Función para mostrar alertas utilizando SweetAlert2
+function mostrarAlerta(titulo, texto, icono) {
+Swal.fire({
+    icon: icono,
+    title: titulo,
+    text: texto,
+    confirmButtonColor: "#6f42c1",
+});
+}
     
 // Función para alternar la visibilidad de la contraseña
 function togglePasswordVisibility() {
