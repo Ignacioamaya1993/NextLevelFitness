@@ -62,6 +62,7 @@ loginForm.addEventListener("submit", async (event) => {
             confirmButtonColor: "#6f42c1",
         });
     }
+});
     
 // Función para alternar la visibilidad de la contraseña
 function togglePasswordVisibility() {
