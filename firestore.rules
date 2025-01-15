@@ -1,13 +1,19 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Regla para acceder a las categorías y ejercicios
-    match /categories/{category}/{exerciseId} {
-      allow read, write: if true; // Permitir lectura y escritura para todos (ajusta según tus necesidades)
+    // Reglas para la colección "categories"
+    match /categories/{category} {
+      allow read: if request.auth != null; // Permitir lectura de categorías para usuarios autenticados
+
+      // Reglas para subcolecciones (e.g., /categories/Biceps/CurlDeBiceps/CurlDeBiceps)
+      match /{exerciseId}/{exerciseDocId} {
+        allow read: if request.auth != null; // Permitir lectura de documentos en subcolecciones
+      }
     }
 
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    // Reglas para la colección "users"
+    match /usuarios/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId; // Solo propietarios
     }
   }
 }

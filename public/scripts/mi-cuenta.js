@@ -1,4 +1,4 @@
-import app from "./firebaseconfig.js"; // Ajusta la ruta según tu estructura
+import app from "../scripts/firebaseConfig.js"; // Importa la instancia de Firebase desde firebaseConfig.js
 import { getAuth, updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
@@ -51,9 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             } else {
                 weightField.textContent = "No especificado"; // Si el documento no existe
-            }
-            
-            
+            }         
             
             // Mostrar el botón de logout
             const logoutButton = document.getElementById("logout-btn");
@@ -70,7 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     reverseButtons: true
                 });
 
-                // Si el usuario confirma el cierre de sesión
+                 // Si el usuario confirma el cierre de sesión
                 if (result.isConfirmed) {
                     try {
                         await signOut(auth);
@@ -82,14 +80,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                             confirmButtonText: 'OK'
                         });
 
-                        // Redirige al login
+                        // La redirección se manejará automáticamente desde el mensaje
                         window.location.href = "login.html"; 
                     } catch (error) {
                         console.error("Error al cerrar sesión:", error);
                         Swal.fire("Error", "No se pudo cerrar sesión. Intenta de nuevo.", "error");
                     }
                 }
-            });
+});
 
         } else {
             // Redirige al login si no hay usuario autenticado

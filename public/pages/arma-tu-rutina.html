@@ -6,13 +6,14 @@
     <title>Arma tus Rutinas - Next Level Fitness</title>
     <link rel="stylesheet" href="../styles/global.css">
     <link rel="stylesheet" href="../styles/arma-tu-rutina.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
 </head>
 <body>
     <header>
         <div class="logo">
-            <a href="/public/index.html">
                 <img src="../assets/images/logos/nextlevel1.png" alt="Next Level Fitness Logo">
-            </a>
         </div>
         <nav>
             <ul class="nav-menu">
@@ -20,8 +21,8 @@
                 <li><a href="arma-tu-rutina.html" class="active">Arma tus Rutinas</a></li>
                 <li><a href="tus-rutinas.html">Tus Rutinas</a></li>
                 <li><a href="registro.html">Registrarse</a></li>
-                <li><a href="../pages/login.html" id="iniciar-sesion-link">Iniciar Sesión</a></li>
-                <li><a href="../pages/mi-cuenta.html" id="mi-cuenta-link" style="display: none;">Mi Cuenta</a></li>
+                <li><a href="login.html" id="iniciar-sesion-link">Iniciar Sesión</a></li>
+                <li><a href="mi-cuenta.html" id="mi-cuenta-link" style="display: none;">Mi Cuenta</a></li>
             </ul>
         </nav>
     </header>
@@ -38,13 +39,11 @@
         <section class="routine-builder hidden" id="routine-builder">
             <h2>Arma tu rutina</h2>
             <div class="filters">
-                <select id="category-filter">
-                    <option value="all">Todos los grupos musculares</option>
-                </select>
+                <select id="category-filter"></select>
                 <input type="text" id="search-bar" placeholder="Buscar ejercicio...">
             </div>
             <div class="exercise-grid" id="exercise-grid">
-                <!-- Aquí se mostrarán los ejercicios cargados dinámicamente -->
+                <!-- Aquí se cargarán dinámicamente los ejercicios -->
             </div>
         </section>
     </main>
@@ -72,9 +71,8 @@
         </div>
     </footer>
 
-    <!-- Importación de scripts -->
-    <script type="module" src="../scripts/arma-tu-rutina.js"></script>
-    <script type="module" src="../scripts/auth.js"></script>
-    <script type="module" src="../scripts/firebaseConfig.js"></script>
-</body>
+    <script type="module" src="../scripts/arma-tu-rutina.js"></script> 
+    <script type="module" src="../scripts/auth.js"></script> 
+    <script type="module" src="../scripts/firebaseConfig.js"></script></body>
+
 </html>

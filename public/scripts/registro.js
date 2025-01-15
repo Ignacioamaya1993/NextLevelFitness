@@ -1,7 +1,9 @@
-import app from './firebaseConfig.js';
+import app from "../scripts/firebaseConfig.js"; // Importa la instancia de Firebase desde firebaseConfig.js
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -9,20 +11,6 @@ const db = getFirestore(app);
 // Selección de elementos del formulario
 const registroForm = document.getElementById("registro-form");
 const mensaje = document.getElementById("mensaje");
-
-// Función para calcular la edad a partir de la fecha de nacimiento
-const calcularEdad = (fechaNacimiento) => {
-    const hoy = new Date();
-    const nacimiento = new Date(fechaNacimiento);
-    let edad = hoy.getFullYear() - nacimiento.getFullYear();
-    const mes = hoy.getMonth() - nacimiento.getMonth();
-
-    // Ajustar si no ha cumplido años este año
-    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
-        edad--;
-    }
-    return edad;
-};
 
 // Manejar el envío del formulario
 registroForm.addEventListener("submit", async (event) => {
@@ -50,26 +38,19 @@ registroForm.addEventListener("submit", async (event) => {
         return;
     }
 
-    const edad = calcularEdad(fechaNacimiento);
-    if (edad < 18) {
-        mostrarMensaje("Debes tener al menos 18 años para registrarte.", "error");
-        return;
-    }
-
     try {
-        // Registrar el usuario con Firebase Authentication
+        // Registrar el usuario
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user; // Obtener el usuario registrado
+        const user = userCredential.user;
         console.log("Usuario registrado exitosamente:", user);
-
+    
+        // Mostrar mensaje de registro exitoso
+        mostrarMensaje("Registro exitoso. Verifica tu correo antes de iniciar sesión.", "success");
+    
         // Enviar correo de verificación
         await sendEmailVerification(user);
-        console.log("Correo de verificación enviado a:", user.email);
-
-        // Mostrar mensaje indicando que el correo de verificación fue enviado
-        mostrarMensaje("Registro exitoso. Verifica tu correo antes de iniciar sesión.", "success");
-
-        // Crear un nuevo usuario en Firestore
+    
+        // Guardar el usuario en Firestore usando su UID como ID del documento
         const nuevoUsuario = {
             uid: user.uid,
             nombre,
@@ -79,14 +60,19 @@ registroForm.addEventListener("submit", async (event) => {
             peso,
             email,
         };
-
-        await addDoc(collection(db, "usuarios"), nuevoUsuario);
-
+    
+        await setDoc(doc(db, "usuarios", user.uid), nuevoUsuario); // Usar el UID como ID del documento
+        console.log("Usuario guardado en Firestore correctamente.");
+    
+        // Cerrar sesión después de registrar
+        await signOut(auth);
+        console.log("Usuario desconectado después del registro.");
+        
         registroForm.reset();
     } catch (error) {
         console.error("Error al registrar al usuario:", error);
-
-        // Manejo de errores comunes
+    
+        // Manejo de errores
         switch (error.code) {
             case "auth/email-already-in-use":
                 mostrarMensaje("El correo ya está registrado. Por favor, inicia sesión.", "error");
@@ -101,7 +87,7 @@ registroForm.addEventListener("submit", async (event) => {
                 mostrarMensaje("Hubo un problema al registrar al usuario. Intenta nuevamente.", "error");
         }
     }
-});
+}); // Cerrar el bloque del addEventListener
 
 // Función para mostrar mensajes de error o éxito
 function mostrarMensaje(texto, tipo) {

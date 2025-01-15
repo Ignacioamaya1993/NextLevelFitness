@@ -1,5 +1,5 @@
 import app from './firebaseConfig.js';
-import { getFirestore, collection, doc, getDocs, query } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const db = getFirestore(app);
@@ -42,6 +42,10 @@ async function loadCategories(db, categoryFilter) {
         const categoriesRef = collection(db, "categories");
         const categoriesSnapshot = await getDocs(categoriesRef);
 
+        // Limpiar opciones previas
+        categoryFilter.innerHTML = "<option value='all'>Todas las categorías</option>";
+
+        // Agregar categorías al filtro
         categoriesSnapshot.forEach((categoryDoc) => {
             const categoryName = categoryDoc.id;
             const option = document.createElement("option");
@@ -59,42 +63,60 @@ async function loadCategories(db, categoryFilter) {
 async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "") {
     exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
 
+    const categoriesRef = collection(db, "categories");
+
     try {
-        const categoriesRef = collection(db, "categories");
-        const categoriesSnapshot = await getDocs(categoriesRef);
+        let categoriesQuerySnapshot;
+        if (category === "all") {
+            // Recuperar todas las categorías
+            categoriesQuerySnapshot = await getDocs(categoriesRef);
+        } else {
+            // Recuperar una categoría específica
+            const categoryDocRef = doc(categoriesRef, category);
+            const categoryDocSnapshot = await getDoc(categoryDocRef);
 
-        for (const categoryDoc of categoriesSnapshot.docs) {
-            const categoryName = categoryDoc.id;
-
-            if (category !== "all" && category !== categoryName) {
-                continue;
+            if (!categoryDocSnapshot.exists()) {
+                console.error(`Categoría ${category} no encontrada.`);
+                return;
             }
 
-            const exercisesRef = collection(db, `categories/${categoryName}`);
-            const exercisesSnapshot = await getDocs(exercisesRef);
+            // Simular una lista con un solo documento para la iteración
+            categoriesQuerySnapshot = { docs: [categoryDocSnapshot] };
+        }
 
-            exercisesSnapshot.forEach((exerciseDoc) => {
-                const exercise = exerciseDoc.data();
-                const exerciseName = exerciseDoc.id;
+        // Iterar sobre las categorías
+        for (const categoryDoc of categoriesQuerySnapshot.docs) {
+            const categoryId = categoryDoc.id;
+
+            // Obtener las subcolecciones de ejercicios
+            const exercisesSnapshot = await getDocs(collection(db, `categories/${categoryId}/exercises`));
+
+            for (const exerciseDoc of exercisesSnapshot.docs) {
+                const exerciseId = exerciseDoc.id;
+
+                // Acceder al documento dentro de la subcolección
+                const exerciseDataSnapshot = await getDoc(doc(db, `categories/${categoryId}/exercises`, exerciseId));
+
+                if (!exerciseDataSnapshot.exists()) continue;
+
+                const exercise = exerciseDataSnapshot.data();
 
                 // Filtrar por búsqueda
-                if (searchQuery && !exerciseName.toLowerCase().includes(searchQuery.toLowerCase())) {
-                    return;
+                if (searchQuery && !exercise.Nombre.toLowerCase().includes(searchQuery.toLowerCase())) {
+                    continue;
                 }
 
                 // Crear el elemento HTML para el ejercicio
                 const exerciseCard = document.createElement("div");
                 exerciseCard.classList.add("exercise-card");
                 exerciseCard.innerHTML = `
-                    <img src="${exercise.imagen}" alt="${exercise.nombre}">
-                    <h3>${exercise.nombre}</h3>
-                    <button onclick="showExerciseDetails('${exercise.nombre}', '${exercise.video}', '${exercise.instrucciones}')">Ver más</button>
+                    <img src="${exercise.Imagen}" alt="${exercise.Nombre}">
+                    <h3>${exercise.Nombre}</h3>
+                    <button onclick="showExerciseDetails('${exercise.Nombre}', '${exercise.Video}', '${exercise.Instrucciones}')">Ver más</button>
                 `;
                 exerciseGrid.appendChild(exerciseCard);
-            });
+            }
         }
-
-        console.log("Ejercicios cargados correctamente.");
     } catch (error) {
         console.error("Error al cargar ejercicios:", error);
     }
