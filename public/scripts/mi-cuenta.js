@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             let errorMessage = "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
         
             if (error.code === "auth/invalid-credential") {
-                errorMessage = "Contraseña incorrecta. Por favor, verifica tus credenciales.";
+                errorMessage = "Contraseña incorrecta. Por favor, verifica tu contraseña e intenta nuevamente.";
             } else if (error.code === "auth/email-already-in-use") {
                 errorMessage = "El email ya está siendo usado por otra cuenta.";
             } else if (error.code === "auth/weak-password") {
