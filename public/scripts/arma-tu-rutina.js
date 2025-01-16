@@ -1,5 +1,5 @@
 import app from './firebaseConfig.js';
-import { getFirestore, collection, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const db = getFirestore(app);
@@ -129,9 +129,15 @@ async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "
     }
 }
 
-// Modifica la función showExerciseDetails para mostrar el popup con la información completa del ejercicio
+// Modifica la función para incluir la lógica de guardar en Firestore
 function showExerciseDetails(nombre, video, instrucciones) {
-    // Crear el contenido HTML para el popup
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+
+    if (!user || !user.isLoggedIn) {
+        Swal.fire("Error", "Debes estar logueado para guardar rutinas.", "error");
+        return;
+    }
+
     const contentHTML = ` 
         <div style="text-align: center;">
             <h3>${nombre}</h3>
@@ -162,22 +168,46 @@ function showExerciseDetails(nombre, video, instrucciones) {
         </div>
     `;
 
-    // Mostrar el popup usando SweetAlert2
+    // Mostrar el popup
     Swal.fire({
         title: "Detalles del ejercicio",
         html: contentHTML,
         showCancelButton: true,
-        confirmButtonText: 'Guardar',
-        cancelButtonText: 'Cancelar',
-        preConfirm: () => {
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        preConfirm: async () => {
             const series = document.getElementById('series').value;
             const repeticiones = document.getElementById('repeticiones').value;
             const dia = document.getElementById('dias').value;
 
-            // Aquí puedes hacer lo que necesites con los datos (enviar a la base de datos, por ejemplo)
-            console.log('Series:', series);
-            console.log('Repeticiones:', repeticiones);
-            console.log('Día:', dia);
-        }
+            // Validar que todos los campos estén completos
+            if (!series || !repeticiones || !dia) {
+                Swal.showValidationMessage("Por favor, completa todos los campos.");
+                return;
+            }
+
+            try {
+                // Guardar en Firestore
+                const db = getFirestore(app);
+                const routinesRef = collection(db, "routines");
+
+                await addDoc(routinesRef, {
+                    userId: user.uid, // ID del usuario autenticado
+                    day: dia,
+                    exercise: {
+                        name: nombre,
+                        series: parseInt(series, 10),
+                        repetitions: parseInt(repeticiones, 10),
+                        video: video,
+                        instructions: instrucciones,
+                    },
+                });
+
+                Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina.", "success");
+            } catch (error) {
+                console.error("Error al guardar la rutina:", error);
+                Swal.fire("Error", "Hubo un problema al guardar la rutina. Inténtalo de nuevo.", "error");
+            }
+        },
     });
 }
