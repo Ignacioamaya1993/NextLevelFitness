@@ -146,7 +146,7 @@ function showExerciseDetails(nombre, video, instrucciones) {
             </div>
             <p>${instrucciones}</p>
 
-            <!-- Formulario para agregar las series, repeticiones y días -->
+            <!-- Formulario para agregar las series, repeticiones, día y peso -->
             <form id="exercise-form">
                 <label for="series">Series:</label>
                 <input type="number" id="series" min="1" required>
@@ -164,6 +164,10 @@ function showExerciseDetails(nombre, video, instrucciones) {
                     <option value="sábado">Sábado</option>
                     <option value="domingo">Domingo</option>
                 </select>
+
+                <!-- Campo para el peso -->
+                <label for="peso">Peso (kg):</label>
+                <input type="number" id="peso" min="0" step="0.1" required>
             </form>
         </div>
     `;
@@ -179,9 +183,10 @@ function showExerciseDetails(nombre, video, instrucciones) {
             const series = document.getElementById('series').value;
             const repeticiones = document.getElementById('repeticiones').value;
             const dia = document.getElementById('dias').value;
+            const peso = document.getElementById('peso').value; // Capturando el valor de peso
 
             // Validar que todos los campos estén completos
-            if (!series || !repeticiones || !dia) {
+            if (!series || !repeticiones || !dia || !peso) {
                 Swal.showValidationMessage("Por favor, completa todos los campos.");
                 return;
             }
@@ -198,6 +203,7 @@ function showExerciseDetails(nombre, video, instrucciones) {
                         name: nombre,
                         series: parseInt(series, 10),
                         repetitions: parseInt(repeticiones, 10),
+                        weight: parseFloat(peso), // Guardar el peso
                         video: video,
                         instructions: instrucciones,
                     },
