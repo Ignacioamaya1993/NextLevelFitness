@@ -109,11 +109,18 @@ async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "
                 // Crear el elemento HTML para el ejercicio
                 const exerciseCard = document.createElement("div");
                 exerciseCard.classList.add("exercise-card");
+
+                // Crear botón y añadir listener
+                const button = document.createElement("button");
+                button.textContent = "Ver más";
+                button.addEventListener("click", () => showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones));
+
                 exerciseCard.innerHTML = `
                     <img src="${exercise.Imagen}" alt="${exercise.Nombre}">
                     <h3>${exercise.Nombre}</h3>
-                    <button onclick="showExerciseDetails('${exercise.Nombre}', '${exercise.Video}', '${exercise.Instrucciones}')">Ver más</button>
                 `;
+                exerciseCard.appendChild(button);
+
                 exerciseGrid.appendChild(exerciseCard);
             }
         }
@@ -122,55 +129,55 @@ async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "
     }
 }
 
-function showExerciseDetails(name, videoUrl, imageUrl, instructions) {
-    // Crear el contenido del pop-up
-    const content = `
-        <h2>${name}</h2>
-        <img src="${imageUrl}" alt="${name}" style="max-width: 100%; height: auto;">
-        <div>
-            <video controls style="width: 100%; height: auto;">
-                <source src="${videoUrl}" type="video/mp4">
-                Tu navegador no soporta el elemento de video.
-            </video>
+// Modifica la función showExerciseDetails para mostrar el popup con la información completa del ejercicio
+function showExerciseDetails(nombre, video, instrucciones) {
+    // Crear el contenido HTML para el popup
+    const contentHTML = ` 
+        <div style="text-align: center;">
+            <h3>${nombre}</h3>
+            <div>
+                <img src="${video}" alt="${nombre}" style="max-width: 100%; height: auto; margin-bottom: 15px;">
+            </div>
+            <p>${instrucciones}</p>
+
+            <!-- Formulario para agregar las series, repeticiones y días -->
+            <form id="exercise-form">
+                <label for="series">Series:</label>
+                <input type="number" id="series" min="1" required>
+
+                <label for="repeticiones">Repeticiones:</label>
+                <input type="number" id="repeticiones" min="1" required>
+
+                <label for="dias">Día de la semana:</label>
+                <select id="dias" required>
+                    <option value="lunes">Lunes</option>
+                    <option value="martes">Martes</option>
+                    <option value="miércoles">Miércoles</option>
+                    <option value="jueves">Jueves</option>
+                    <option value="viernes">Viernes</option>
+                    <option value="sábado">Sábado</option>
+                    <option value="domingo">Domingo</option>
+                </select>
+            </form>
         </div>
-        <p><strong>Instrucciones:</strong><br>${instructions}</p>
-        <form id="exercise-form">
-            <label for="series">Series:</label>
-            <input type="number" id="series" name="series" required min="1"><br><br>
-
-            <label for="repeticiones">Repeticiones:</label>
-            <input type="number" id="repeticiones" name="repeticiones" required min="1"><br><br>
-
-            <label for="dia">Día:</label>
-            <select id="dia" name="dia" required>
-                <option value="lunes">Lunes</option>
-                <option value="martes">Martes</option>
-                <option value="miércoles">Miércoles</option>
-                <option value="jueves">Jueves</option>
-                <option value="viernes">Viernes</option>
-                <option value="sábado">Sábado</option>
-                <option value="domingo">Domingo</option>
-            </select><br><br>
-
-            <button type="submit">Guardar en rutina</button>
-        </form>
     `;
 
-    // Mostrar el pop-up usando SweetAlert
+    // Mostrar el popup usando SweetAlert2
     Swal.fire({
-        html: content,
+        title: "Detalles del ejercicio",
+        html: contentHTML,
         showCancelButton: true,
         confirmButtonText: 'Guardar',
-        cancelButtonText: 'Cerrar',
-        focusConfirm: false,
+        cancelButtonText: 'Cancelar',
         preConfirm: () => {
-            const form = document.getElementById("exercise-form");
-            const series = document.getElementById("series").value;
-            const repeticiones = document.getElementById("repeticiones").value;
-            const dia = document.getElementById("dia").value;
+            const series = document.getElementById('series').value;
+            const repeticiones = document.getElementById('repeticiones').value;
+            const dia = document.getElementById('dias').value;
 
-            // Aquí deberías manejar el guardado de los datos (en Firestore o en el lugar que prefieras)
-            console.log('Ejercicio guardado:', { name, series, repeticiones, dia });
+            // Aquí puedes hacer lo que necesites con los datos (enviar a la base de datos, por ejemplo)
+            console.log('Series:', series);
+            console.log('Repeticiones:', repeticiones);
+            console.log('Día:', dia);
         }
     });
 }
