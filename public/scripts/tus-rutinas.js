@@ -50,35 +50,32 @@ function displayUserRoutines(routines) {
     routineList.innerHTML = "";
 
     routines.forEach((routine, index) => {
-        // Verifica si 'days' y 'exercises' son arreglos antes de procesarlos
-        if (Array.isArray(routine.days) && Array.isArray(routine.exercises)) {
-            const routineCard = document.createElement("div");
-            routineCard.classList.add("routine-card");
+        const routineCard = document.createElement("div");
+        routineCard.classList.add("routine-card");
 
-            routineCard.innerHTML = `
-                <h3>Rutina para ${routine.days.join(", ")}</h3>
-                <p>Fecha: ${routine.date}</p>
-                <ul>
-                    ${routine.exercises
-                        .map(
-                            (exercise) => ` 
-                        <li>
-                            ${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg
-                        </li>`
-                        )
-                        .join("")}
-                </ul>
-                <button class="edit-button" data-index="${index}">Editar</button>
-                <button class="delete-button" data-index="${index}">Eliminar</button>
-            `;
+        // Cambiar el acceso a 'day' (ahora es una cadena, no un arreglo)
+        const daysText = routine.day ? routine.day : "Día no especificado";
 
-            routineList.appendChild(routineCard);
-        } else {
-            console.log("Datos de rutina incompletos o mal formateados");
-        }
+        // Cambiar el acceso a 'exercise' (ahora es un objeto, no un arreglo)
+        const exercisesList = routine.exercise ? 
+            `<ul>
+                <li>
+                    ${routine.exercise.name} - ${routine.exercise.series} series, ${routine.exercise.repetitions} reps, ${routine.exercise.weight} kg
+                </li>
+            </ul>` : 
+            "<p>No hay ejercicios disponibles.</p>";
+
+        routineCard.innerHTML = `
+            <h3>Rutina para ${daysText}</h3>
+            <p>Fecha: ${routine.date}</p>
+            ${exercisesList}
+            <button class="edit-button" data-index="${index}">Editar</button>
+            <button class="delete-button" data-index="${index}">Eliminar</button>
+        `;
+
+        routineList.appendChild(routineCard);
     });
 
-    // Agregar funcionalidad a los botones de editar y eliminar
     const editButtons = routineList.querySelectorAll(".edit-button");
     const deleteButtons = routineList.querySelectorAll(".delete-button");
 
