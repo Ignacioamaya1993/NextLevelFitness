@@ -145,46 +145,25 @@ forgotPasswordLink.addEventListener("click", async () => {
         console.log("Correo ingresado para recuperación:", email);
 
         try {
-            // Verificar si el correo está registrado
-            console.log("Verificando métodos de inicio de sesión para el correo...");
-            const methods = await fetchSignInMethodsForEmail(auth, email);
-
-            if (methods.length === 0) {
-                console.log("El correo no está registrado:", email);
-                Swal.fire({
-                    icon: "error",
-                    title: "Correo no registrado",
-                    text: "El correo ingresado no está asociado a ninguna cuenta. Verifica el correo e intenta nuevamente.",
-                    confirmButtonColor: "#6f42c1",
-                });
-            } else {
-                console.log("Correo registrado, enviando enlace de recuperación...");
-                await sendPasswordResetEmail(auth, email);
-                console.log("Correo de recuperación enviado correctamente.");
-                Swal.fire({
-                    icon: "success",
-                    title: "Correo enviado",
-                    text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
-                    confirmButtonColor: "#6f42c1",
-                });
-            }
+            console.log("Intentando enviar correo de recuperación...");
+            await sendPasswordResetEmail(auth, email.trim());
+            console.log("Correo enviado correctamente.");
+            Swal.fire({
+                icon: "success",
+                title: "Correo enviado",
+                text: "Revisa tu bandeja de entrada para recuperar tu contraseña.",
+                confirmButtonColor: "#6f42c1",
+            });
         } catch (error) {
-            console.error("Error al enviar el correo de recuperación:", error);
-            console.log("Código de error:", error.code);
-            console.log("Mensaje de error:", error.message);
-
-            let message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
-            if (error.code === "auth/user-not-found") {
-                message = `No existe una cuenta registrada con el correo: ${email}`;
-            }
-
+            console.error("Error al enviar correo de recuperación:", error);
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: message,
+                text: "Hubo un problema al enviar el correo. Intenta más tarde.",
                 confirmButtonColor: "#6f42c1",
             });
         }
+        
     } else {
         console.log("El usuario canceló el diálogo de recuperación.");
     }
