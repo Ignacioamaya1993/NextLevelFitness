@@ -118,6 +118,8 @@ window.togglePasswordVisibility = togglePasswordVisibility;
 const forgotPasswordLink = document.getElementById("forgotPassword");
 
 forgotPasswordLink.addEventListener("click", async () => {
+    console.log("Se hizo clic en el enlace de 'Olvidé mi contraseña'");
+
     const { value: email } = await Swal.fire({
         title: "Recuperar contraseña",
         input: "email",
@@ -128,21 +130,27 @@ forgotPasswordLink.addEventListener("click", async () => {
         cancelButtonText: "Cancelar",
         inputValidator: (value) => {
             if (!value) {
+                console.log("No se ingresó ningún correo.");
                 return "¡Debes ingresar un correo!";
             }
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(value)) {
+                console.log("Correo inválido ingresado:", value);
                 return "Por favor, ingresa un correo válido.";
             }
         },
     });
 
     if (email) {
+        console.log("Correo ingresado para recuperación:", email);
+
         try {
             // Verificar si el correo está registrado
+            console.log("Verificando métodos de inicio de sesión para el correo...");
             const methods = await fetchSignInMethodsForEmail(auth, email);
+
             if (methods.length === 0) {
-                // Si no hay métodos de inicio de sesión asociados al correo, es decir, el correo no está registrado
+                console.log("El correo no está registrado:", email);
                 Swal.fire({
                     icon: "error",
                     title: "Correo no registrado",
@@ -150,8 +158,9 @@ forgotPasswordLink.addEventListener("click", async () => {
                     confirmButtonColor: "#6f42c1",
                 });
             } else {
-                // Si el correo está registrado, proceder con el envío del enlace de recuperación
+                console.log("Correo registrado, enviando enlace de recuperación...");
                 await sendPasswordResetEmail(auth, email);
+                console.log("Correo de recuperación enviado correctamente.");
                 Swal.fire({
                     icon: "success",
                     title: "Correo enviado",
@@ -161,17 +170,12 @@ forgotPasswordLink.addEventListener("click", async () => {
             }
         } catch (error) {
             console.error("Error al enviar el correo de recuperación:", error);
-            let message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
+            console.log("Código de error:", error.code);
+            console.log("Mensaje de error:", error.message);
 
-            switch (error.code) {
-                case "auth/invalid-email":
-                    message = "El correo ingresado no tiene un formato válido. Verifica e intenta nuevamente.";
-                    break;
-                case "auth/network-request-failed":
-                    message = "Hubo un problema con la conexión. Verifica tu red e intenta nuevamente.";
-                    break;
-                default:
-                    console.warn("Error no controlado:", error.code);
+            let message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
+            if (error.code === "auth/user-not-found") {
+                message = `No existe una cuenta registrada con el correo: ${email}`;
             }
 
             Swal.fire({
@@ -181,5 +185,7 @@ forgotPasswordLink.addEventListener("click", async () => {
                 confirmButtonColor: "#6f42c1",
             });
         }
+    } else {
+        console.log("El usuario canceló el diálogo de recuperación.");
     }
 });
