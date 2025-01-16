@@ -118,7 +118,7 @@ function openEditPopup(day, routines) {
     // Filtrar las rutinas para obtener las correspondientes al día
     const routine = routines.find(routine => routine.day === day);
 
-    if (!routine || !routine.exercise || routine.exercise.length === 0) {
+    if (!routine || !routine.exercise || !Array.isArray(routine.exercise) || routine.exercise.length === 0) {
         // Si no hay ejercicios para esa rutina, mostrar un mensaje
         popupContent.innerHTML = `<p>No hay ejercicios para la rutina de ${day}</p>`;
         popup.classList.remove("hidden");
