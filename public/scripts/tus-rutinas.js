@@ -47,7 +47,7 @@ async function getUserRoutines(userId) {
 
 function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
-    routineList.innerHTML = "";
+    routineList.innerHTML = ""; // Limpiar lista de rutinas
 
     // Agrupar rutinas por día
     const groupedRoutines = groupRoutinesByDay(routines);
@@ -69,19 +69,21 @@ function displayUserRoutines(routines) {
             <ul>
                 ${exercisesList}
             </ul>
-            <button class="edit-button" data-day="${day}">Editar</button>  <!-- Aquí se añade data-day -->
+            <button class="edit-button" data-day="${day}">Editar</button> 
             <button class="delete-button">Eliminar</button>
         `;
 
         routineList.appendChild(routineCard);
     });
 
+    // Asegúrate de añadir los event listeners después de añadir los botones
     const editButtons = routineList.querySelectorAll(".edit-button");
     const deleteButtons = routineList.querySelectorAll(".delete-button");
 
     editButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
-            const day = e.target.dataset.day;  // Ahora se pasa correctamente el valor de data-day
+            const day = e.target.dataset.day;
+            console.log("Editando rutina para el día:", day); // Añadir un console.log para verificar
             openEditPopup(day, routines);
         })
     );
@@ -92,6 +94,7 @@ function displayUserRoutines(routines) {
         })
     );
 }
+
 
 function groupRoutinesByDay(routines) {
     const grouped = {};
@@ -115,11 +118,12 @@ function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
     const popupContent = document.getElementById("popup-content");
 
+    console.log("Abriendo popup para el día:", day); // Añadir log aquí
+
     // Filtrar las rutinas para obtener las correspondientes al día
     const routine = routines.find(routine => routine.day === day);
 
     if (!routine || !routine.exercise || !Array.isArray(routine.exercise) || routine.exercise.length === 0) {
-        // Si no hay ejercicios para esa rutina, mostrar un mensaje
         popupContent.innerHTML = `<p>No hay ejercicios para la rutina de ${day}</p>`;
         popup.classList.remove("hidden");
         return;  // Salir de la función si no hay ejercicios
