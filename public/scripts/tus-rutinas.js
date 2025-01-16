@@ -59,7 +59,7 @@ function displayUserRoutines(routines) {
             <ul>
                 ${routine.exercises
                     .map(
-                        (exercise) => `
+                        (exercise) => ` 
                     <li>
                         ${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg
                     </li>`
