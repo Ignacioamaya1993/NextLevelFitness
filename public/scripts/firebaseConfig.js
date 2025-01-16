@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -12,5 +13,6 @@ const firebaseConfig = {
 
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app); // Obtención de Firestore
 
-export default app;
+export { db };  // Exporta solo la referencia de Firestore

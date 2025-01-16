@@ -1,4 +1,7 @@
-document.addEventListener("DOMContentLoaded", () => {
+import { db } from './firebaseConfig.js';  // Importa solo db
+import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
     const user = JSON.parse(localStorage.getItem("currentUser"));
     const restrictedMessage = document.getElementById("restricted-message");
     const routineViewer = document.getElementById("routine-viewer");
@@ -9,13 +12,18 @@ document.addEventListener("DOMContentLoaded", () => {
         restrictedMessage.classList.add("hidden");
         routineViewer.classList.remove("hidden");
 
-        if (user.routines && user.routines.length > 0) {
-            // Mostrar rutinas creadas
-            noRoutinesMessage.classList.add("hidden");
-            displayUserRoutines(user.routines);
-        } else {
-            // Mostrar mensaje: no hay rutinas creadas
-            noRoutinesMessage.classList.remove("hidden");
+        try {
+            const routines = await getUserRoutines(user.uid);
+            if (routines && routines.length > 0) {
+                // Mostrar rutinas creadas
+                noRoutinesMessage.classList.add("hidden");
+                displayUserRoutines(routines);
+            } else {
+                // Mostrar mensaje: no hay rutinas creadas
+                noRoutinesMessage.classList.remove("hidden");
+            }
+        } catch (error) {
+            console.error("Error al obtener las rutinas: ", error);
         }
     } else {
         // Usuario no logueado: mostrar mensaje restrictivo
@@ -23,6 +31,19 @@ document.addEventListener("DOMContentLoaded", () => {
         routineViewer.classList.add("hidden");
     }
 });
+
+async function getUserRoutines(userId) {
+    const routinesRef = collection(db, "routines"); // Asegúrate de que la colección se llama "routines"
+    const q = query(routinesRef, where("userId", "==", userId));
+    const querySnapshot = await getDocs(q);
+
+    const routines = [];
+    querySnapshot.forEach((doc) => {
+        routines.push(doc.data());
+    });
+
+    return routines;
+}
 
 function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
@@ -34,6 +55,7 @@ function displayUserRoutines(routines) {
 
         routineCard.innerHTML = `
             <h3>Rutina para ${routine.days.join(", ")}</h3>
+            <p>Fecha: ${routine.date}</p>
             <ul>
                 ${routine.exercises
                     .map(
