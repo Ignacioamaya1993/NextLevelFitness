@@ -81,13 +81,14 @@ function displayUserRoutines(routines) {
 
     editButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
-            alert(`Editar rutina para ${e.target.closest('.routine-card').querySelector('h3').textContent}`);
+            const day = e.target.dataset.day;
+            openEditPopup(day, routines);
         })
     );
 
     deleteButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
-            alert(`Eliminar rutina para ${e.target.closest('.routine-card').querySelector('h3').textContent}`);
+            alert("Eliminar rutina (falta implementar)");
         })
     );
 }
@@ -107,4 +108,93 @@ function groupRoutinesByDay(routines) {
     });
 
     return grouped;
+}
+
+// Función para abrir el popup de edición
+function openEditPopup(day, routines) {
+    const popup = document.getElementById("edit-popup");
+    const popupContent = document.getElementById("popup-content");
+    const exercises = routines.filter(routine => routine.day === day)[0].exercise;
+
+    popupContent.innerHTML = `
+        <h3>Editar Rutina para ${day}</h3>
+        <ul id="exercises-list">
+            ${exercises.map((exercise, index) => `
+                <li>
+                    <div>
+                        <span>${exercise.name}</span> 
+                        <input type="number" value="${exercise.series}" id="series-${index}" placeholder="Series">
+                        <input type="number" value="${exercise.repetitions}" id="reps-${index}" placeholder="Repeticiones">
+                        <input type="number" value="${exercise.weight}" id="weight-${index}" placeholder="Peso">
+                        <button class="delete-exercise" data-index="${index}">Eliminar</button>
+                    </div>
+                </li>
+            `).join('')}
+        </ul>
+        <button id="save-changes">Guardar cambios</button>
+        <button id="close-popup">Cerrar</button>
+    `;
+
+    popup.classList.remove("hidden");
+
+    // Eventos para eliminar un ejercicio
+    const deleteButtons = popup.querySelectorAll(".delete-exercise");
+    deleteButtons.forEach(button => {
+        button.addEventListener("click", async (e) => {
+            const index = e.target.dataset.index;
+            await deleteExerciseFromRoutine(day, index, exercises);
+        });
+    });
+
+    // Evento para guardar los cambios
+    document.getElementById("save-changes").addEventListener("click", () => {
+        saveChanges(day, exercises);
+    });
+
+    // Evento para cerrar el popup
+    document.getElementById("close-popup").addEventListener("click", () => {
+        popup.classList.add("hidden");
+    });
+}
+
+// Eliminar ejercicio de la rutina
+async function deleteExerciseFromRoutine(day, index, exercises) {
+    const exercise = exercises[index];
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    const routinesRef = collection(db, "routines");
+    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (doc) => {
+        const routineDoc = doc.id;
+        await updateDoc(doc.ref, {
+            exercise: arrayRemove(exercise)
+        });
+    });
+
+    alert(`Ejercicio "${exercise.name}" eliminado`);
+}
+
+// Guardar cambios realizados en los ejercicios
+async function saveChanges(day, exercises) {
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    const routinesRef = collection(db, "routines");
+    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (doc) => {
+        const routineDoc = doc.id;
+        const updatedExercises = exercises.map((exercise, index) => ({
+            ...exercise,
+            series: document.getElementById(`series-${index}`).value,
+            repetitions: document.getElementById(`reps-${index}`).value,
+            weight: document.getElementById(`weight-${index}`).value
+        }));
+
+        await updateDoc(doc.ref, {
+            exercise: updatedExercises
+        });
+    });
+
+    alert("Cambios guardados");
 }
