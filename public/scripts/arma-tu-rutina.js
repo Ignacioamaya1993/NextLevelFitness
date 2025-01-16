@@ -154,6 +154,9 @@ function showExerciseDetails(nombre, video, instrucciones) {
                 <label for="repeticiones">Repeticiones:</label>
                 <input type="number" id="repeticiones" min="1" required>
 
+                <label for="peso">Peso (kg):</label>
+                <input type="number" id="peso" min="0" step="0.1" required>
+
                 <label for="dias">Día de la semana:</label>
                 <select id="dias" required>
                     <option value="lunes">Lunes</option>
@@ -162,12 +165,7 @@ function showExerciseDetails(nombre, video, instrucciones) {
                     <option value="jueves">Jueves</option>
                     <option value="viernes">Viernes</option>
                     <option value="sábado">Sábado</option>
-                    <option value="domingo">Domingo</option>
-                </select>
-
-                <!-- Campo para el peso -->
-                <label for="peso">Peso (kg):</label>
-                <input type="number" id="peso" min="0" step="0.1" required>
+                </select>               
             </form>
         </div>
     `;

@@ -49,28 +49,28 @@ function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = "";
 
-    routines.forEach((routine, index) => {
+    // Agrupar rutinas por día
+    const groupedRoutines = groupRoutinesByDay(routines);
+
+    // Iterar sobre los días y mostrar los ejercicios agrupados
+    Object.keys(groupedRoutines).forEach(day => {
         const routineCard = document.createElement("div");
         routineCard.classList.add("routine-card");
 
-        // Cambiar el acceso a 'day' (ahora es una cadena, no un arreglo)
-        const daysText = routine.day ? routine.day : "Día no especificado";
-
-        // Cambiar el acceso a 'exercise' (ahora es un objeto, no un arreglo)
-        const exercisesList = routine.exercise ? 
-            `<ul>
-                <li>
-                    ${routine.exercise.name} - ${routine.exercise.series} series, ${routine.exercise.repetitions} reps, ${routine.exercise.weight} kg
-                </li>
-            </ul>` : 
-            "<p>No hay ejercicios disponibles.</p>";
+        // Título con el día de la rutina
+        const exercisesList = groupedRoutines[day].map(exercise => {
+            return `<li>
+                        ${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg
+                    </li>`;
+        }).join('');
 
         routineCard.innerHTML = `
-            <h3>Rutina para ${daysText}</h3>
-            <p>Fecha: ${routine.date}</p>
-            ${exercisesList}
-            <button class="edit-button" data-index="${index}">Editar</button>
-            <button class="delete-button" data-index="${index}">Eliminar</button>
+            <h3>Rutina para ${day}</h3>
+            <ul>
+                ${exercisesList}
+            </ul>
+            <button class="edit-button">Editar</button>
+            <button class="delete-button">Eliminar</button>
         `;
 
         routineList.appendChild(routineCard);
@@ -81,15 +81,30 @@ function displayUserRoutines(routines) {
 
     editButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
-            const index = e.target.dataset.index;
-            alert(`Editar rutina en posición ${index}`);
+            alert(`Editar rutina para ${e.target.closest('.routine-card').querySelector('h3').textContent}`);
         })
     );
 
     deleteButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
-            const index = e.target.dataset.index;
-            alert(`Eliminar rutina en posición ${index}`);
+            alert(`Eliminar rutina para ${e.target.closest('.routine-card').querySelector('h3').textContent}`);
         })
     );
+}
+
+function groupRoutinesByDay(routines) {
+    const grouped = {};
+
+    routines.forEach(routine => {
+        const day = routine.day || "Día no especificado"; // Si no tiene día, asignar un valor por defecto
+
+        if (!grouped[day]) {
+            grouped[day] = [];
+        }
+
+        // Añadir el ejercicio al grupo correspondiente
+        grouped[day].push(routine.exercise);
+    });
+
+    return grouped;
 }
