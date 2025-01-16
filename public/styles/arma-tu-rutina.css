@@ -139,3 +139,23 @@ main {
 .hidden {
     display: none;
 }
+
+#exercise-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#exercise-form label {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+#exercise-form input,
+#exercise-form select {
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
