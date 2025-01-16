@@ -114,7 +114,16 @@ function groupRoutinesByDay(routines) {
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
     const popupContent = document.getElementById("popup-content");
-    const exercises = routines.filter(routine => routine.day === day)[0].exercise;
+
+    // Filtra las rutinas para encontrar la del día seleccionado
+    const routineForDay = routines.find(routine => routine.day === day);
+
+    if (!routineForDay || !routineForDay.exercise) {
+        alert(`No hay ejercicios para la rutina de ${day}`);
+        return;  // Si no se encuentra la rutina o los ejercicios, no continuamos.
+    }
+
+    const exercises = routineForDay.exercise;
 
     popupContent.innerHTML = `
         <h3>Editar Rutina para ${day}</h3>
