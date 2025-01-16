@@ -1,5 +1,5 @@
 import app from "../scripts/firebaseConfig.js"; // Importa la instancia de Firebase desde firebaseConfig.js
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
 // Obtén la instancia de autenticación desde la app importada
 const auth = getAuth(app);
@@ -162,9 +162,18 @@ forgotPasswordLink.addEventListener("click", async () => {
         } catch (error) {
             console.error("Error al enviar el correo de recuperación:", error);
             let message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
-            if (error.code === "auth/user-not-found") {
-                message = `No existe una cuenta registrada con el correo: ${email}`;
+
+            switch (error.code) {
+                case "auth/invalid-email":
+                    message = "El correo ingresado no tiene un formato válido. Verifica e intenta nuevamente.";
+                    break;
+                case "auth/network-request-failed":
+                    message = "Hubo un problema con la conexión. Verifica tu red e intenta nuevamente.";
+                    break;
+                default:
+                    console.warn("Error no controlado:", error.code);
             }
+
             Swal.fire({
                 icon: "error",
                 title: "Error",
