@@ -122,6 +122,7 @@ function openEditPopup(day, routines) {
 
     // Filtrar las rutinas para obtener las correspondientes al día
     const routine = routines.find(routine => routine.day === day);
+    console.log("Rutina encontrada:", routine); // Verifica que la rutina exista
 
     if (!routine || !routine.exercise || !Array.isArray(routine.exercise) || routine.exercise.length === 0) {
         popupContent.innerHTML = `<p>No hay ejercicios para la rutina de ${day}</p>`;
@@ -130,6 +131,7 @@ function openEditPopup(day, routines) {
     }
 
     const exercises = routine.exercise;
+    console.log("Ejercicios para editar:", exercises); // Verifica que los ejercicios estén presentes
 
     popupContent.innerHTML = `
         <h3>Editar Rutina para ${day}</h3>
@@ -151,6 +153,7 @@ function openEditPopup(day, routines) {
     `;
 
     popup.classList.remove("hidden");
+    console.log("Popup debería estar visible ahora");
 
     // Eventos para eliminar un ejercicio
     const deleteButtons = popup.querySelectorAll(".delete-exercise");
