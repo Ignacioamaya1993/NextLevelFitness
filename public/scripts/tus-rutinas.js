@@ -115,15 +115,17 @@ function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
     const popupContent = document.getElementById("popup-content");
 
-    // Filtra las rutinas para encontrar la del día seleccionado
-    const routineForDay = routines.find(routine => routine.day === day);
+    // Filtrar las rutinas para obtener las correspondientes al día
+    const routine = routines.find(routine => routine.day === day);
 
-    if (!routineForDay || !routineForDay.exercise) {
-        alert(`No hay ejercicios para la rutina de ${day}`);
-        return;  // Si no se encuentra la rutina o los ejercicios, no continuamos.
+    if (!routine || !routine.exercise || routine.exercise.length === 0) {
+        // Si no hay ejercicios para esa rutina, mostrar un mensaje
+        popupContent.innerHTML = `<p>No hay ejercicios para la rutina de ${day}</p>`;
+        popup.classList.remove("hidden");
+        return;  // Salir de la función si no hay ejercicios
     }
 
-    const exercises = routineForDay.exercise;
+    const exercises = routine.exercise;
 
     popupContent.innerHTML = `
         <h3>Editar Rutina para ${day}</h3>
