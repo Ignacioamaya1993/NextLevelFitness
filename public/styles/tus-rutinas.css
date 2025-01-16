@@ -61,3 +61,89 @@ main {
     transform: translateY(-5px); /* Elevación ligera */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
 }
+
+/* Estilos para el popup de edición */
+#edit-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 500px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Sombra ligera */
+    display: none; /* Ocultarlo por defecto */
+}
+
+#edit-popup.hidden {
+    display: none;
+}
+
+#popup-content {
+    margin-bottom: 20px;
+}
+
+#close-popup {
+    display: block;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: #f44336; /* Rojo para cerrar */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#close-popup:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos para el contenido del popup */
+#popup-content h3 {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #1d3557; /* Azul oscuro */
+}
+
+#popup-content p {
+    font-size: 1.2rem;
+    color: #555; /* Gris oscuro */
+}
+
+/* Estilos para el botón de edición en la lista de rutinas */
+.edit-button {
+    background-color: #ff9800; /* Naranja */
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-button:hover {
+    background-color: #e68900; /* Naranja oscuro */
+}
+
+/* Estilos para la lista de rutinas (botones dentro de las rutinas) */
+.routine-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.routine-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.routine-item .edit-button {
+    margin-left: 15px;
+}
