@@ -69,7 +69,7 @@ function displayUserRoutines(routines) {
             <ul>
                 ${exercisesList}
             </ul>
-            <button class="edit-button">Editar</button>
+            <button class="edit-button" data-day="${day}">Editar</button>  <!-- Aquí se añade data-day -->
             <button class="delete-button">Eliminar</button>
         `;
 
@@ -81,7 +81,7 @@ function displayUserRoutines(routines) {
 
     editButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
-            const day = e.target.dataset.day;
+            const day = e.target.dataset.day;  // Ahora se pasa correctamente el valor de data-day
             openEditPopup(day, routines);
         })
     );
