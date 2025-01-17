@@ -49,13 +49,16 @@ function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = ""; // Limpiar lista de rutinas
 
-    // Agrupar rutinas por día
-    const groupedRoutines = groupRoutinesByDay(routines);
+    const dayOrder = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
-    // Iterar sobre los días y mostrar los ejercicios agrupados
-    Object.keys(groupedRoutines).forEach(day => {
-        const routineCard = document.createElement("div");
-        routineCard.classList.add("routine-card");
+   // Ordenar rutinas por el orden de los días
+   const sortedRoutines = routines.sort((a, b) => {
+    return dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+});
+
+sortedRoutines.forEach((routine) => {
+    const routineCard = document.createElement("div");
+    routineCard.classList.add("routine-card");
 
         // Título con el día de la rutina
         const exercisesList = groupedRoutines[day].map(exercise => {
@@ -65,12 +68,16 @@ function displayUserRoutines(routines) {
         }).join('');
 
         routineCard.innerHTML = `
-            <h3>Rutina para ${day}</h3>
+            <h3>${routine.day}</h3>
             <ul>
-                ${exercisesList}
+                ${routine.exercises
+                    .map(
+                        (exercise) =>
+                            `<li>${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg</li>`
+                    )
+                    .join("")}
             </ul>
-            <button class="edit-button" data-day="${day}">Editar</button> 
-            <button class="delete-button">Eliminar</button>
+            <button class="edit-button" data-day="${routine.day}">Editar</button>
         `;
 
         routineList.appendChild(routineCard);

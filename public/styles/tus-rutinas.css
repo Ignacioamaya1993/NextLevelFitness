@@ -46,7 +46,7 @@ main {
 }
 
 #routine-list {
-    display: flex;
+    display: grid;
     flex-direction: column;
     gap: 20px;
     background-color: #ffffff; /* Blanco puro */
@@ -55,6 +55,16 @@ main {
     padding: 20px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
     transition: transform 0.2s, box-shadow 0.2s;
+    grid-template-columns: repeat(3, 1fr); /* Tres columnas */
+}
+
+.routine-card {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 #routine-list:hover {
