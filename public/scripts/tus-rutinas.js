@@ -174,22 +174,31 @@ async function deleteExerciseFromRoutine(day, index, exercises) {
     try {
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach(async (doc) => {
+            // Actualiza la rutina eliminando el ejercicio
             await updateDoc(doc.ref, {
                 exercise: arrayRemove(exercise),
             });
+
+            // Verifica si la rutina quedó sin ejercicios
+            const updatedRoutine = await getDocs(query(doc.ref));
+            const updatedExercises = updatedRoutine.docs[0]?.data()?.exercise || [];
+
+            if (updatedExercises.length === 0) {
+                // Si no quedan ejercicios, elimina la rutina completa
+                await deleteDoc(doc.ref);
+                alert(`La rutina para el día "${day}" ha sido eliminada porque no tiene ejercicios.`);
+            } else {
+                alert(`Ejercicio "${exercise.name}" eliminado correctamente.`);
+            }
         });
 
-        alert(`Ejercicio "${exercise.name}" eliminado correctamente.`);
-
-        // Actualiza dinámicamente la lista de ejercicios en el popup
-        exercises.splice(index, 1);
-        const exerciseList = document.getElementById("exercises-list");
-        exerciseList.children[index].remove();
+        location.reload(); // Actualiza la página
     } catch (error) {
         console.error("Error al eliminar ejercicio:", error);
         alert("No se pudo eliminar el ejercicio.");
     }
 }
+
 async function deleteRoutine(day) {
     const user = JSON.parse(localStorage.getItem("currentUser"));
     const routinesRef = collection(db, "routines");
