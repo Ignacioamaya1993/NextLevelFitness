@@ -206,10 +206,9 @@ function renderEditFields(container, exercise, index, day, exercises) {
             <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}">
         </div>
         <div>
-            <label>Peso:</label>
-                <div style="display: flex; align-items: center;">
+            <label>Peso (kg):</label>
                 <input type="number" value="${exercise.weight || 0}" id="weight-${index}">
-                <span>Kg</span>        </div>
+                </div>
         <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
     `;
 

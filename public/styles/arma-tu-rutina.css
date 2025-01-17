@@ -140,22 +140,56 @@ main {
     display: none;
 }
 
-#exercise-form {
+/* Estilos para la vista de detalles del ejercicio */
+.exercise-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+    padding: 20px;
+}
+
+.exercise-details h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1d3557;
+}
+
+.exercise-details video {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.exercise-details p {
+    font-size: 1rem;
+    color: #333;
+    max-width: 600px;
+}
+
+/* Estilos para el formulario de agregar ejercicios */
+.exercise-form {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
+    width: 100%;
+    max-width: 400px;
 }
 
-#exercise-form label {
+.exercise-form label {
     font-size: 1rem;
     font-weight: bold;
+    color: #1d3557;
 }
 
-#exercise-form input,
-#exercise-form select {
-    padding: 8px;
+.exercise-form input,
+.exercise-form select {
+    padding: 10px;
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
+    background-color: #f8f9fa;
 }

@@ -138,39 +138,39 @@ function showExerciseDetails(nombre, video, instrucciones) {
         return;
     }
 
-    const contentHTML = ` 
-        <div style="text-align: center;">
-            <h3>${nombre}</h3>
-            <div>
-                <img src="${video}" alt="${nombre}" style="max-width: 100%; height: auto; margin-bottom: 15px;">
-            </div>
-            <p>${instrucciones}</p>
+    const contentHTML = `
+    <div class="exercise-details">
+        <h3>${nombre}</h3>
+        <video controls>
+            <source src="${video}" type="video/mp4">
+            Tu navegador no soporta la reproducción de videos.
+        </video>
+        <p>${instrucciones}</p>
 
-            <!-- Formulario para agregar las series, repeticiones, día y peso -->
-            <form id="exercise-form">
-                <label for="series">Series:</label>
-                <input type="number" id="series" min="1" required>
+        <form id="exercise-form" class="exercise-form">
+            <label for="series">Series:</label>
+            <input type="number" id="series" min="1" required>
 
-                <label for="repeticiones">Repeticiones:</label>
-                <input type="number" id="repeticiones" min="1" required>
+            <label for="repeticiones">Repeticiones:</label>
+            <input type="number" id="repeticiones" min="1" required>
 
-                <label for="peso">Peso (kg):</label>
-                <input type="number" id="peso" min="0" step="0.1" required>
+            <label for="peso">Peso (kg):</label>
+            <input type="number" id="peso" min="0" step="0.1" required>
 
-                <label for="dias">Día de la semana:</label>
-                <select id="dias" required>
-                    <option value="lunes">Lunes</option>
-                    <option value="martes">Martes</option>
-                    <option value="miércoles">Miércoles</option>
-                    <option value="jueves">Jueves</option>
-                    <option value="viernes">Viernes</option>
-                    <option value="sábado">Sábado</option>
-                </select>               
-            </form>
-        </div>
-    `;
+            <label for="dias">Día de la semana:</label>
+            <select id="dias" required>
+                <option value="lunes">Lunes</option>
+                <option value="martes">Martes</option>
+                <option value="miércoles">Miércoles</option>
+                <option value="jueves">Jueves</option>
+                <option value="viernes">Viernes</option>
+                <option value="sábado">Sábado</option>
+            </select>               
+        </form>
+    </div>
+`;
 
-    // Mostrar el popup
+
     Swal.fire({
         title: "Detalles del ejercicio",
         html: contentHTML,
@@ -181,27 +181,25 @@ function showExerciseDetails(nombre, video, instrucciones) {
             const series = document.getElementById('series').value;
             const repeticiones = document.getElementById('repeticiones').value;
             const dia = document.getElementById('dias').value;
-            const peso = document.getElementById('peso').value; // Capturando el valor de peso
+            const peso = document.getElementById('peso').value;
 
-            // Validar que todos los campos estén completos
             if (!series || !repeticiones || !dia || !peso) {
                 Swal.showValidationMessage("Por favor, completa todos los campos.");
                 return;
             }
 
             try {
-                // Guardar en Firestore
                 const db = getFirestore(app);
                 const routinesRef = collection(db, "routines");
 
                 await addDoc(routinesRef, {
-                    userId: user.uid, // ID del usuario autenticado
+                    userId: user.uid,
                     day: dia,
                     exercise: {
                         name: nombre,
                         series: parseInt(series, 10),
                         repetitions: parseInt(repeticiones, 10),
-                        weight: parseFloat(peso), // Guardar el peso
+                        weight: parseFloat(peso),
                         video: video,
                         instructions: instrucciones,
                     },
