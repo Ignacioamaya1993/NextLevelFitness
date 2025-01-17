@@ -99,12 +99,15 @@ function displayUserRoutines(routines) {
 // Función para abrir el popup de edición
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
-    const popupContent = document.getElementById("popup-content");
+    if (!popup) {
+        console.error("El elemento popup no se encuentra en el DOM");
+        return;
+    }
 
-    // Filtrar las rutinas para obtener las correspondientes al día
+    const popupContent = document.getElementById("popup-content");
     const routine = routines.find(routine => routine.day === day);
 
-    if (!routine || !routine.exercises) {
+    if (!routine || !Array.isArray(routine.exercises)) {
         popupContent.innerHTML = `<p>No hay ejercicios para la rutina de ${day}</p>`;
         popup.classList.remove("hidden");
         return;
@@ -118,7 +121,7 @@ function openEditPopup(day, routines) {
             ${exercises.map((exercise, index) => `
                 <li>
                     <div>
-                        <span>${exercise.name}</span> 
+                        <span>${exercise.name}</span>
                         <input type="number" value="${exercise.series}" id="series-${index}" placeholder="Series">
                         <input type="number" value="${exercise.repetitions}" id="reps-${index}" placeholder="Repeticiones">
                         <input type="number" value="${exercise.weight}" id="weight-${index}" placeholder="Peso">
@@ -133,21 +136,19 @@ function openEditPopup(day, routines) {
 
     popup.classList.remove("hidden");
 
-    // Eventos para eliminar un ejercicio
     const deleteButtons = popup.querySelectorAll(".delete-exercise");
     deleteButtons.forEach(button => {
-        button.addEventListener("click", async (e) => {
+        button.addEventListener("click", (e) => {
             const index = e.target.dataset.index;
-            await deleteExerciseFromRoutine(day, index, exercises);
+            exercises.splice(index, 1); // Eliminar ejercicio del array local
+            openEditPopup(day, routines); // Reabrir popup para reflejar los cambios
         });
     });
 
-    // Evento para guardar los cambios
     document.getElementById("save-changes").addEventListener("click", () => {
         saveChanges(day, exercises);
     });
 
-    // Evento para cerrar el popup
     document.getElementById("close-popup").addEventListener("click", () => {
         popup.classList.add("hidden");
     });
