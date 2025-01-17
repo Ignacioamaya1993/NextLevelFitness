@@ -112,78 +112,78 @@ function groupRoutinesByDay(routines) {
     return grouped;
 }
 
-function openEditPopup(day, routines) {
-    const popup = document.getElementById("edit-popup");
-    const popupContent = document.getElementById("popup-content");
+    function openEditPopup(day, routines) {
+        const popup = document.getElementById("edit-popup");
+        const popupContent = document.getElementById("popup-content");
 
-    // Limpia el contenido previo del popup
-    popupContent.innerHTML = "";
+        // Limpia el contenido previo del popup
+        popupContent.innerHTML = "";
 
-    // Encuentra la rutina correspondiente al día seleccionado
-    const routine = routines.find(routine => routine.day === day);
+        // Encuentra la rutina correspondiente al día seleccionado
+        const routine = routines.find(routine => routine.day === day);
 
-    if (!routine || !routine.exercise) {
-        popupContent.innerHTML = `<p>No hay ejercicios para la rutina de ${day}</p>`;
+        if (!routine || !routine.exercise) {
+            popupContent.innerHTML = `<p>No hay ejercicios para la rutina de ${day}</p>`;
+            popup.classList.remove("hidden");
+            return;
+        }
+
+        const exercises = Array.isArray(routine.exercise) ? routine.exercise : [routine.exercise];
+
+        // Crear encabezado
+        const header = document.createElement("h3");
+        header.textContent = `Editar Rutina para ${day}`;
+        popupContent.appendChild(header);
+
+        // Selector de ejercicios
+        const exerciseSelect = document.createElement("select");
+        exerciseSelect.id = "exercise-select";
+        exerciseSelect.innerHTML = exercises.map((exercise, index) => `
+            <option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>
+        `).join('');
+        popupContent.appendChild(exerciseSelect);
+
+        // Contenedor para los campos de edición
+        const editFieldsContainer = document.createElement("div");
+        editFieldsContainer.id = "edit-fields-container";
+        popupContent.appendChild(editFieldsContainer);
+
+        // Botón para guardar cambios
+        const saveButton = document.createElement("button");
+        saveButton.id = "save-changes";
+        saveButton.textContent = "Guardar cambios";
+        popupContent.appendChild(saveButton);
+
+        // Botón para cerrar
+        const closeButton = document.createElement("button");
+        closeButton.id = "close-popup";
+        closeButton.textContent = "Cerrar";
+        popupContent.appendChild(closeButton);
+
+        // Mostrar el popup
         popup.classList.remove("hidden");
-        return;
+
+        // Mostrar campos de edición al seleccionar un ejercicio
+        exerciseSelect.addEventListener("change", () => {
+            const selectedIndex = parseInt(exerciseSelect.value, 10);
+            const selectedExercise = exercises[selectedIndex];
+            renderEditFields(editFieldsContainer, selectedExercise, selectedIndex, day, exercises, routine);
+        });
+
+        // Inicializar con el primer ejercicio
+        renderEditFields(editFieldsContainer, exercises[0], 0, day, exercises, routine);
+
+        // Guardar cambios
+        saveButton.addEventListener("click", () => {
+            saveChanges(day, exercises);
+            popup.classList.add("hidden");
+        });
+
+        // Cerrar popup
+        closeButton.addEventListener("click", () => {
+            popup.classList.add("hidden");
+        });
     }
-
-    const exercises = Array.isArray(routine.exercise) ? routine.exercise : [routine.exercise];
-
-    // Crear encabezado
-    const header = document.createElement("h3");
-    header.textContent = `Editar Rutina para ${day}`;
-    popupContent.appendChild(header);
-
-    // Selector de ejercicios
-    const exerciseSelect = document.createElement("select");
-    exerciseSelect.id = "exercise-select";
-    exerciseSelect.innerHTML = exercises.map((exercise, index) => `
-        <option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>
-    `).join('');
-    popupContent.appendChild(exerciseSelect);
-
-    // Contenedor para los campos de edición
-    const editFieldsContainer = document.createElement("div");
-    editFieldsContainer.id = "edit-fields-container";
-    popupContent.appendChild(editFieldsContainer);
-
-    // Botón para guardar cambios
-    const saveButton = document.createElement("button");
-    saveButton.id = "save-changes";
-    saveButton.textContent = "Guardar cambios";
-    popupContent.appendChild(saveButton);
-
-    // Botón para cerrar
-    const closeButton = document.createElement("button");
-    closeButton.id = "close-popup";
-    closeButton.textContent = "Cerrar";
-    popupContent.appendChild(closeButton);
-
-    // Mostrar el popup
-    popup.classList.remove("hidden");
-
-    // Mostrar campos de edición al seleccionar un ejercicio
-    exerciseSelect.addEventListener("change", () => {
-        const selectedIndex = parseInt(exerciseSelect.value, 10);
-        const selectedExercise = exercises[selectedIndex];
-        renderEditFields(editFieldsContainer, selectedExercise, selectedIndex, day, exercises, routine);
-    });
-
-    // Inicializar con el primer ejercicio
-    renderEditFields(editFieldsContainer, exercises[0], 0, day, exercises, routine);
-
-    // Guardar cambios
-    saveButton.addEventListener("click", () => {
-        saveChanges(day, exercises);
-        popup.classList.add("hidden");
-    });
-
-    // Cerrar popup
-    closeButton.addEventListener("click", () => {
-        popup.classList.add("hidden");
-    });
-}
 
 function renderEditFields(container, exercise, index, day, exercises) {
     container.innerHTML = `
