@@ -81,16 +81,17 @@ function displayUserRoutines(routines) {
         })
     );
 
-    deleteButtons.forEach((button) =>
-        button.addEventListener("click", (e) => {
-            const day = e.target.dataset.day;
-            const confirmDelete = confirm(`¿Estás seguro de eliminar la rutina para el día ${day}?`);
+    deleteButtons.forEach(button => {
+        button.addEventListener("click", async (e) => {
+            const index = e.target.dataset.index;
+            const confirmDelete = confirm(`¿Estás seguro de eliminar el ejercicio "${exercises[index].name}"?`);
             if (confirmDelete) {
-                deleteRoutine(day);
+                await deleteExerciseFromRoutine(day, index, exercises);
+                exercises.splice(index, 1); // Actualiza localmente el arreglo
+                openEditPopup(day, routines); // Reabre el popup actualizado
             }
-        })
-    );
-}
+        });
+    });    
 
 function groupRoutinesByDay(routines) {
     const grouped = {};
@@ -183,7 +184,6 @@ function openEditPopup(day, routines) {
         });
     });
 
-    // Guardar cambios en los ejercicios
     saveButton.addEventListener("click", () => {
         const updatedExercises = [];
         exercisesList.querySelectorAll("li").forEach((listItem, idx) => {
@@ -191,14 +191,15 @@ function openEditPopup(day, routines) {
             const series = parseInt(document.getElementById(`series-${idx}`).value, 10) || 0;
             const repetitions = parseInt(document.getElementById(`reps-${idx}`).value, 10) || 0;
             const weight = parseInt(document.getElementById(`weight-${idx}`).value, 10) || 0;
-
+    
             updatedExercises.push({ name, series, repetitions, weight });
         });
-
+    
         routine.exercise = updatedExercises; // Actualiza la rutina con los nuevos datos
         popup.classList.add("hidden"); // Cierra el popup
-        renderRoutines(routines); // Vuelve a renderizar todas las rutinas
+        displayUserRoutines(routines); // Vuelve a renderizar todas las rutinas
     });
+    
 
     // Cerrar el popup
     closeButton.addEventListener("click", () => {
@@ -292,5 +293,6 @@ async function saveChanges(day, exercises) {
     } catch (error) {
         console.error("Error al guardar los cambios:", error);
         alert("Ocurrió un error al guardar los cambios.");
+        }
     }
 }
