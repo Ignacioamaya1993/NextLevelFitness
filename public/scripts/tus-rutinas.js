@@ -155,7 +155,7 @@ function groupRoutinesByDay(routines) {
         popupContent.appendChild(saveButton);
 
         // Botón para cerrar
-        const closeButton = document.querySelector("#close-popup");
+        const closeButton = document.createElement("button");
         closeButton.id = "close-popup";
         closeButton.textContent = "Cerrar";
         popupContent.appendChild(closeButton);
