@@ -1,5 +1,5 @@
-import { db } from './firebaseConfig.js';  // Importa solo db
-import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { db } from './firebaseConfig.js'; // Importa solo db
+import { collection, getDocs, query, where, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -8,32 +8,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     const noRoutinesMessage = document.getElementById("no-routines-message");
 
     if (user && user.isLoggedIn) {
-        // Usuario logueado: mostrar la sección de rutinas
         restrictedMessage.classList.add("hidden");
         routineViewer.classList.remove("hidden");
 
         try {
             const routines = await getUserRoutines(user.uid);
             if (routines && routines.length > 0) {
-                // Mostrar rutinas creadas
                 noRoutinesMessage.classList.add("hidden");
                 displayUserRoutines(routines);
             } else {
-                // Mostrar mensaje: no hay rutinas creadas
                 noRoutinesMessage.classList.remove("hidden");
             }
         } catch (error) {
             console.error("Error al obtener las rutinas: ", error);
         }
     } else {
-        // Usuario no logueado: mostrar mensaje restrictivo
         restrictedMessage.classList.remove("hidden");
         routineViewer.classList.add("hidden");
     }
 });
 
 async function getUserRoutines(userId) {
-    const routinesRef = collection(db, "routines"); // Asegúrate de que la colección se llama "routines"
+    const routinesRef = collection(db, "routines");
     const q = query(routinesRef, where("userId", "==", userId));
     const querySnapshot = await getDocs(q);
 
@@ -47,38 +43,33 @@ async function getUserRoutines(userId) {
 
 function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
-    routineList.innerHTML = ""; // Limpiar lista de rutinas
+    routineList.innerHTML = "";
 
-    const dayOrder = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const groupedRoutines = groupRoutinesByDay(routines);
 
-    // Ordenar rutinas por el orden de los días
-    const sortedRoutines = routines.sort((a, b) => {
-        return dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
-    });
-
-    sortedRoutines.forEach((routine) => {
+    Object.keys(groupedRoutines).forEach(day => {
         const routineCard = document.createElement("div");
         routineCard.classList.add("routine-card");
 
+        const exercisesList = groupedRoutines[day].map(exercise => {
+            return `<li>${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg</li>`;
+        }).join('');
+
         routineCard.innerHTML = `
-            <h3>${routine.day}</h3>
+            <h3>Rutina para ${day}</h3>
             <ul>
-                ${routine.exercises
-                    .map(
-                        (exercise) =>
-                            `<li>${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg</li>`
-                    )
-                    .join("")}
+                ${exercisesList}
             </ul>
-            <button class="edit-button" data-day="${routine.day}">Editar</button>
-            <button class="delete-button" data-day="${routine.day}">Eliminar</button>
+            <button class="edit-button" data-day="${day}">Editar</button>
+            <button class="delete-button">Eliminar</button>
         `;
 
         routineList.appendChild(routineCard);
     });
 
-    // Event listeners para los botones de editar
     const editButtons = routineList.querySelectorAll(".edit-button");
+    const deleteButtons = routineList.querySelectorAll(".delete-button");
+
     editButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
             const day = e.target.dataset.day;
@@ -86,34 +77,42 @@ function displayUserRoutines(routines) {
         })
     );
 
-       // Event listeners para los botones de eliminar
-       const deleteButtons = routineList.querySelectorAll(".delete-button");
-       deleteButtons.forEach((button) =>
-           button.addEventListener("click", (e) => {
-               const day = e.target.dataset.day;
-               alert(`Eliminar rutina para el día: ${day}`);
-           })
-       );
-   }
+    deleteButtons.forEach((button) =>
+        button.addEventListener("click", () => {
+            alert("Eliminar rutina (falta implementar)");
+        })
+    );
+}
 
-// Función para abrir el popup de edición
+function groupRoutinesByDay(routines) {
+    const grouped = {};
+
+    routines.forEach(routine => {
+        const day = routine.day || "Día no especificado";
+
+        if (!grouped[day]) {
+            grouped[day] = [];
+        }
+
+        grouped[day].push(routine.exercise);
+    });
+
+    return grouped;
+}
+
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
-    if (!popup) {
-        console.error("El elemento popup no se encuentra en el DOM");
-        return;
-    }
-
     const popupContent = document.getElementById("popup-content");
+
     const routine = routines.find(routine => routine.day === day);
 
-    if (!routine || !Array.isArray(routine.exercises)) {
+    if (!routine || !routine.exercise) {
         popupContent.innerHTML = `<p>No hay ejercicios para la rutina de ${day}</p>`;
         popup.classList.remove("hidden");
         return;
     }
 
-    const exercises = routine.exercises;
+    const exercises = Array.isArray(routine.exercise) ? routine.exercise : [routine.exercise];
 
     popupContent.innerHTML = `
         <h3>Editar Rutina para ${day}</h3>
@@ -138,10 +137,9 @@ function openEditPopup(day, routines) {
 
     const deleteButtons = popup.querySelectorAll(".delete-exercise");
     deleteButtons.forEach(button => {
-        button.addEventListener("click", (e) => {
+        button.addEventListener("click", async (e) => {
             const index = e.target.dataset.index;
-            exercises.splice(index, 1); // Eliminar ejercicio del array local
-            openEditPopup(day, routines); // Reabrir popup para reflejar los cambios
+            await deleteExerciseFromRoutine(day, index, exercises);
         });
     });
 
@@ -154,17 +152,22 @@ function openEditPopup(day, routines) {
     });
 }
 
-// Eventos para eliminar un ejercicio
-const deleteButtons = popup.querySelectorAll(".delete-exercise");
-deleteButtons.forEach(button => {
-    button.addEventListener("click", async (e) => {
-        const index = e.target.dataset.index;
-        exercises.splice(index, 1); // Eliminar ejercicio del array local
-        openEditPopup(day, routines); // Reabrir popup para reflejar los cambios
-    });
-});alert(`Ejercicio "${exercise.name}" eliminado`);
+async function deleteExerciseFromRoutine(day, index, exercises) {
+    const exercise = exercises[index];
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    const routinesRef = collection(db, "routines");
+    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
 
-// Guardar cambios realizados en los ejercicios
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (doc) => {
+        await updateDoc(doc.ref, {
+            exercise: arrayRemove(exercise)
+        });
+    });
+
+    alert(`Ejercicio "${exercise.name}" eliminado`);
+}
+
 async function saveChanges(day, exercises) {
     const user = JSON.parse(localStorage.getItem("currentUser"));
     const routinesRef = collection(db, "routines");
@@ -180,7 +183,7 @@ async function saveChanges(day, exercises) {
         }));
 
         await updateDoc(doc.ref, {
-            exercises: updatedExercises
+            exercise: updatedExercises
         });
     });
 
