@@ -85,27 +85,14 @@ function displayUserRoutines(routines) {
     );
 }
 
-
-    // Asegúrate de añadir los event listeners después de añadir los botones
-    const editButtons = routineList.querySelectorAll(".edit-button");
-    const deleteButtons = routineList.querySelectorAll(".delete-button");
-
-    editButtons.forEach((button) =>
-        button.addEventListener("click", (e) => {
-            const day = e.target.dataset.day;
-            console.log("Editando rutina para el día:", day); // Añadir un console.log para verificar
-            openEditPopup(day, routines);
-        })
-    );
-
+const deleteButtons = routineList.querySelectorAll(".delete-button");
+if (deleteButtons.length > 0) {
     deleteButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
             alert("Eliminar rutina (falta implementar)");
         })
     );
 }
-
-
 function groupRoutinesByDay(routines) {
     const grouped = {};
 
@@ -185,7 +172,6 @@ function openEditPopup(day, routines) {
         popup.classList.add("hidden");
     });
 }
-
 
 // Eliminar ejercicio de la rutina
 async function deleteExerciseFromRoutine(day, index, exercises) {
