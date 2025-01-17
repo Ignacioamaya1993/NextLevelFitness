@@ -116,6 +116,7 @@ function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
     const popupContent = document.getElementById("popup-content");
 
+    // Encuentra la rutina correspondiente al día seleccionado
     const routine = routines.find(routine => routine.day === day);
 
     if (!routine || !routine.exercise) {
@@ -124,8 +125,10 @@ function openEditPopup(day, routines) {
         return;
     }
 
+    // Asegurarse de que los ejercicios estén en un arreglo
     const exercises = Array.isArray(routine.exercise) ? routine.exercise : [routine.exercise];
 
+    // Renderiza todos los ejercicios en el popup
     popupContent.innerHTML = `
         <h3>Editar Rutina para ${day}</h3>
         <ul id="exercises-list">
@@ -147,6 +150,7 @@ function openEditPopup(day, routines) {
 
     popup.classList.remove("hidden");
 
+    // Configurar eventos para eliminar ejercicios
     const deleteButtons = popup.querySelectorAll(".delete-exercise");
     deleteButtons.forEach(button => {
         button.addEventListener("click", async (e) => {
@@ -155,15 +159,17 @@ function openEditPopup(day, routines) {
         });
     });
 
-    document.getElementById("save-changes").addEventListener("click", async () => {
-        await saveChanges(day, exercises);
-        popup.classList.add("hidden");
+    // Guardar cambios en los ejercicios
+    document.getElementById("save-changes").addEventListener("click", () => {
+        saveChanges(day, exercises);
     });
 
+    // Cerrar el popup
     document.getElementById("close-popup").addEventListener("click", () => {
         popup.classList.add("hidden");
     });
 }
+
 
 async function deleteExerciseFromRoutine(day, index, exercises) {
     const exercise = exercises[index];
