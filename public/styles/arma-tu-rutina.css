@@ -6,23 +6,23 @@ main {
 .access-restricted {
     text-align: center;
     padding: 50px;
-    background-color: #f1f3f5; /* Gris claro y suave */
-    border: 1px solid #e0e0e0; /* Gris muy tenue */
+    background-color: #f1f3f5;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera para profundidad */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .access-restricted h2 {
     font-size: 1.8rem;
     font-weight: bold;
     margin-bottom: 20px;
-    color: #1d3557; /* Azul oscuro moderno */
+    color: #1d3557;
 }
 
 .access-restricted .cta-button {
     margin: 5px;
-    background-color: #457b9d; /* Azul intermedio */
-    color: #f1faee; /* Blanco suave */
+    background-color: #457b9d;
+    color: #f1faee;
     text-decoration: none;
     padding: 12px 25px;
     border-radius: 5px;
@@ -31,8 +31,8 @@ main {
 }
 
 .access-restricted .cta-button:hover {
-    background-color: #1d3557; /* Azul más oscuro para hover */
-    transform: scale(1.05); /* Agrandamiento suave */
+    background-color: #1d3557;
+    transform: scale(1.05);
 }
 
 .routine-builder {
@@ -44,23 +44,10 @@ main {
 .filters {
     display: flex;
     justify-content: space-between;
-    gap: 15px; /* Espaciado mayor para una apariencia más limpia */
+    gap: 15px;
 }
 
-#category-filter {
-    padding: 12px;
-    font-size: 1rem;
-    width: 100%;
-    max-width: 300px;
-    border: 1px solid #e0e0e0; /* Borde tenue */
-    border-radius: 5px;
-    background-color: #f8f9fa; /* Gris muy claro */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-    text-transform: capitalize; /* Hacer que los nombres se vean mejor */
-    min-width: 200px; /* Asegurar un tamaño mínimo */
-}
-
-#search-bar {
+#category-filter, #search-bar {
     padding: 12px;
     font-size: 1rem;
     width: 100%;
@@ -73,23 +60,23 @@ main {
 
 .exercise-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Aumenta el tamaño mínimo de las tarjetas */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
 
 .exercise-grid div {
     padding: 15px;
-    background-color: #ffffff; /* Blanco puro */
-    border: 1px solid #e0e0e0; /* Gris tenue */
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
     text-align: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera para profundidad */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .exercise-grid div:hover {
-    transform: translateY(-5px); /* Desplazamiento hacia arriba */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .exercise-grid div img {
@@ -99,8 +86,8 @@ main {
 }
 
 .exercise-grid div img:empty {
-    content: url('../assets/images/placeholder.png'); /* Ruta a tu imagen de respaldo */
-    opacity: 0.7; /* Indica que es un placeholder */
+    content: url('../assets/images/placeholder.png');
+    opacity: 0.7;
 }
 
 .exercise-grid div h3 {
@@ -115,8 +102,8 @@ main {
 .exercise-grid div button {
     margin-top: 10px;
     padding: 10px 20px;
-    background-color: #457b9d; /* Azul consistente con el diseño */
-    color: #f1faee; /* Blanco suave */
+    background-color: #457b9d;
+    color: #f1faee;
     border: none;
     border-radius: 5px;
     font-size: 1rem;
@@ -125,14 +112,14 @@ main {
 }
 
 .exercise-grid div button:hover {
-    background-color: #1d3557; /* Azul más oscuro */
-    transform: scale(1.05); /* Pequeño zoom al hover */
+    background-color: #1d3557;
+    transform: scale(1.05);
 }
 
 .loading-message, .empty-message {
     text-align: center;
     font-size: 1.2rem;
-    color: #6c757d; /* Gris medio */
+    color: #6c757d;
     margin-top: 20px;
 }
 
@@ -140,43 +127,51 @@ main {
     display: none;
 }
 
-/* Estilos para la vista de detalles del ejercicio */
+/* --- Estilos para el popup de detalles del ejercicio --- */
 .exercise-details {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas: izquierda (video/instrucciones) y derecha (formulario) */
+    gap: 20px;
+    align-items: start;
+    text-align: left;
     padding: 20px;
 }
 
 .exercise-details h3 {
-    font-size: 1.5rem;
+    grid-column: span 2;
+    text-align: center;
+    font-size: 1.8rem;
     font-weight: bold;
     color: #1d3557;
+    margin-bottom: 15px;
 }
 
-.exercise-details video {
+.exercise-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.video-container iframe {
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.exercise-details p {
+.instructions {
     font-size: 1rem;
     color: #333;
-    max-width: 600px;
+    max-width: 500px;
 }
 
-/* Estilos para el formulario de agregar ejercicios */
+/* --- Estilos para el formulario dentro del popup --- */
 .exercise-form {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 20px;
     width: 100%;
-    max-width: 400px;
+    max-width: 300px;
 }
 
 .exercise-form label {
