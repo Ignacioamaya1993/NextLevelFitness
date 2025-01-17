@@ -155,8 +155,9 @@ function openEditPopup(day, routines) {
         });
     });
 
-    document.getElementById("save-changes").addEventListener("click", () => {
-        saveChanges(day, exercises);
+    document.getElementById("save-changes").addEventListener("click", async () => {
+        await saveChanges(day, exercises);
+        popup.classList.add("hidden");
     });
 
     document.getElementById("close-popup").addEventListener("click", () => {
@@ -179,13 +180,16 @@ async function deleteExerciseFromRoutine(day, index, exercises) {
         });
 
         alert(`Ejercicio "${exercise.name}" eliminado correctamente.`);
-        location.reload();
+
+        // Actualiza dinámicamente la lista de ejercicios en el popup
+        exercises.splice(index, 1);
+        const exerciseList = document.getElementById("exercises-list");
+        exerciseList.children[index].remove();
     } catch (error) {
         console.error("Error al eliminar ejercicio:", error);
         alert("No se pudo eliminar el ejercicio.");
     }
 }
-
 async function deleteRoutine(day) {
     const user = JSON.parse(localStorage.getItem("currentUser"));
     const routinesRef = collection(db, "routines");
@@ -198,7 +202,16 @@ async function deleteRoutine(day) {
         });
 
         alert(`Rutina para el día "${day}" eliminada correctamente.`);
-        location.reload();
+
+        // Actualiza dinámicamente la interfaz para eliminar la rutina del DOM
+        const routineCard = document.querySelector(`.routine-card [data-day="${day}"]`).parentElement;
+        routineCard.remove();
+
+        // Opcional: muestra el mensaje "No hay rutinas" si ya no quedan rutinas
+        const routineList = document.getElementById("routine-list");
+        if (!routineList.children.length) {
+            document.getElementById("no-routines-message").classList.remove("hidden");
+        }
     } catch (error) {
         console.error("Error al eliminar rutina:", error);
         alert("No se pudo eliminar la rutina.");
