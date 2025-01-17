@@ -138,13 +138,22 @@ function showExerciseDetails(nombre, video, instrucciones) {
         return;
     }
 
+    // Convertir la URL de YouTube Shorts a formato de embed
+    let embedVideoUrl = "";
+    if (video.includes("youtube.com/shorts/")) {
+        embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
+    } else if (video.includes("youtube.com/watch?v=")) {
+        embedVideoUrl = video.replace("watch?v=", "embed/");
+    } else {
+        embedVideoUrl = video; // En caso de que ya sea un embed correcto
+    }
+
     const contentHTML = `
     <div class="exercise-details">
         <h3>${nombre}</h3>
-        <video controls>
-            <source src="${video}" type="video/mp4">
-            Tu navegador no soporta la reproducción de videos.
-        </video>
+        <div class="video-container">
+            <iframe width="560" height="315" src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
+        </div>
         <p>${instrucciones}</p>
 
         <form id="exercise-form" class="exercise-form">
@@ -168,8 +177,7 @@ function showExerciseDetails(nombre, video, instrucciones) {
             </select>               
         </form>
     </div>
-`;
-
+    `;
 
     Swal.fire({
         title: "Detalles del ejercicio",
