@@ -61,7 +61,7 @@ function displayUserRoutines(routines) {
                 ${exercisesList}
             </ul>
             <button class="edit-button" data-day="${day}">Editar</button>
-            <button class="delete-button">Eliminar</button>
+            <button class="delete-button" data-day="${day}">Eliminar</button>
         `;
 
         routineList.appendChild(routineCard);
@@ -78,11 +78,15 @@ function displayUserRoutines(routines) {
     );
 
     deleteButtons.forEach((button) =>
-        button.addEventListener("click", () => {
-            alert("Eliminar rutina (falta implementar)");
+        button.addEventListener("click", (e) => {
+            const day = e.target.dataset.day; // Capturar el día desde data-day
+            const confirmDelete = confirm(`¿Estás seguro de eliminar la rutina para el día ${day}?`);
+            if (confirmDelete) {
+                deleteRoutine(day);
+            }
         })
     );
-}
+} 
 
 function groupRoutinesByDay(routines) {
     const grouped = {};
@@ -158,14 +162,39 @@ async function deleteExerciseFromRoutine(day, index, exercises) {
     const routinesRef = collection(db, "routines");
     const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
 
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(async (doc) => {
-        await updateDoc(doc.ref, {
-            exercise: arrayRemove(exercise)
+    try {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (doc) => {
+            await updateDoc(doc.ref, {
+                exercise: arrayRemove(exercise),
+            });
         });
-    });
 
-    alert(`Ejercicio "${exercise.name}" eliminado`);
+        alert(`Ejercicio "${exercise.name}" eliminado correctamente.`);
+        location.reload(); // Recargar para reflejar los cambios
+    } catch (error) {
+        console.error("Error al eliminar ejercicio:", error);
+        alert("No se pudo eliminar el ejercicio.");
+    }
+}
+
+async function deleteRoutine(day) {
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    const routinesRef = collection(db, "routines");
+    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
+
+    try {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref); // Eliminar documento completo
+        });
+
+        alert(`Rutina para el día "${day}" eliminada correctamente.`);
+        location.reload(); // Recargar para reflejar los cambios
+    } catch (error) {
+        console.error("Error al eliminar rutina:", error);
+        alert("No se pudo eliminar la rutina.");
+    }
 }
 
 async function saveChanges(day, exercises) {
@@ -173,19 +202,24 @@ async function saveChanges(day, exercises) {
     const routinesRef = collection(db, "routines");
     const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
 
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(async (doc) => {
-        const updatedExercises = exercises.map((exercise, index) => ({
-            ...exercise,
-            series: document.getElementById(`series-${index}`).value,
-            repetitions: document.getElementById(`reps-${index}`).value,
-            weight: document.getElementById(`weight-${index}`).value
-        }));
+    try {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (doc) => {
+            const updatedExercises = exercises.map((exercise, index) => ({
+                ...exercise,
+                series: parseInt(document.getElementById(`series-${index}`).value),
+                repetitions: parseInt(document.getElementById(`reps-${index}`).value),
+                weight: parseInt(document.getElementById(`weight-${index}`).value),
+            }));
 
-        await updateDoc(doc.ref, {
-            exercise: updatedExercises
+            await updateDoc(doc.ref, {
+                exercise: updatedExercises,
+            });
         });
-    });
 
-    alert("Cambios guardados");
+        alert("Cambios guardados correctamente.");
+    } catch (error) {
+        console.error("Error al guardar los cambios:", error);
+        alert("Ocurrió un error al guardar los cambios.");
+    }
 }
