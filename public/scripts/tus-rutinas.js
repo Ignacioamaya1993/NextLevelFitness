@@ -145,7 +145,8 @@ function openEditPopup(day, routines) {
 
         listItem.innerHTML = `
             <div>
-                <span>${exercise.name || "Ejercicio sin nombre"}</span>
+                <span>Ejercicio:</span>
+                <input type="text" value="${exercise.name || ''}" id="name-${index}" placeholder="Nombre del ejercicio">
                 <input type="number" value="${exercise.series || 0}" id="series-${index}" placeholder="Series">
                 <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}" placeholder="Repeticiones">
                 <input type="number" value="${exercise.weight || 0}" id="weight-${index}" placeholder="Peso">
@@ -175,15 +176,28 @@ function openEditPopup(day, routines) {
     // Configurar eventos para eliminar ejercicios
     const deleteButtons = popup.querySelectorAll(".delete-exercise");
     deleteButtons.forEach(button => {
-        button.addEventListener("click", async (e) => {
+        button.addEventListener("click", (e) => {
             const index = e.target.dataset.index;
-            await deleteExerciseFromRoutine(day, index, exercises);
+            exercises.splice(index, 1); // Elimina el ejercicio del arreglo
+            openEditPopup(day, routines); // Reabre el popup actualizado
         });
     });
 
     // Guardar cambios en los ejercicios
     saveButton.addEventListener("click", () => {
-        saveChanges(day, exercises);
+        const updatedExercises = [];
+        exercisesList.querySelectorAll("li").forEach((listItem, idx) => {
+            const name = document.getElementById(`name-${idx}`).value;
+            const series = parseInt(document.getElementById(`series-${idx}`).value, 10) || 0;
+            const repetitions = parseInt(document.getElementById(`reps-${idx}`).value, 10) || 0;
+            const weight = parseInt(document.getElementById(`weight-${idx}`).value, 10) || 0;
+
+            updatedExercises.push({ name, series, repetitions, weight });
+        });
+
+        routine.exercise = updatedExercises; // Actualiza la rutina con los nuevos datos
+        popup.classList.add("hidden"); // Cierra el popup
+        renderRoutines(routines); // Vuelve a renderizar todas las rutinas
     });
 
     // Cerrar el popup
