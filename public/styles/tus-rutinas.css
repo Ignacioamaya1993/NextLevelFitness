@@ -76,7 +76,7 @@ main {
 
 #routine-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, minmax(250px, 1fr)); /* 3 columnas, con un ancho mínimo de 250px */
     gap: 20px;
     background-color: #ffffff;
     padding: 20px;
