@@ -116,6 +116,9 @@ function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
     const popupContent = document.getElementById("popup-content");
 
+    // Limpia el contenido previo del popup
+    popupContent.innerHTML = "";
+
     // Encuentra la rutina correspondiente al día seleccionado
     const routine = routines.find(routine => routine.day === day);
 
@@ -125,29 +128,48 @@ function openEditPopup(day, routines) {
         return;
     }
 
-    // Asegurarse de que los ejercicios estén en un arreglo
+    // Asegurar que los ejercicios sean un arreglo
     const exercises = Array.isArray(routine.exercise) ? routine.exercise : [routine.exercise];
 
-    // Renderiza todos los ejercicios en el popup
-    popupContent.innerHTML = `
-        <h3>Editar Rutina para ${day}</h3>
-        <ul id="exercises-list">
-            ${exercises.map((exercise, index) => `
-                <li>
-                    <div>
-                        <span>${exercise.name || "Ejercicio sin nombre"}</span>
-                        <input type="number" value="${exercise.series || 0}" id="series-${index}" placeholder="Series">
-                        <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}" placeholder="Repeticiones">
-                        <input type="number" value="${exercise.weight || 0}" id="weight-${index}" placeholder="Peso">
-                        <button class="delete-exercise" data-index="${index}">Eliminar</button>
-                    </div>
-                </li>
-            `).join('')}
-        </ul>
-        <button id="save-changes">Guardar cambios</button>
-        <button id="close-popup">Cerrar</button>
-    `;
+    // Crear encabezado
+    const header = document.createElement("h3");
+    header.textContent = `Editar Rutina para ${day}`;
+    popupContent.appendChild(header);
 
+    // Crear lista de ejercicios
+    const exercisesList = document.createElement("ul");
+    exercisesList.id = "exercises-list";
+
+    exercises.forEach((exercise, index) => {
+        const listItem = document.createElement("li");
+
+        listItem.innerHTML = `
+            <div>
+                <span>${exercise.name || "Ejercicio sin nombre"}</span>
+                <input type="number" value="${exercise.series || 0}" id="series-${index}" placeholder="Series">
+                <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}" placeholder="Repeticiones">
+                <input type="number" value="${exercise.weight || 0}" id="weight-${index}" placeholder="Peso">
+                <button class="delete-exercise" data-index="${index}">Eliminar</button>
+            </div>
+        `;
+        exercisesList.appendChild(listItem);
+    });
+
+    popupContent.appendChild(exercisesList);
+
+    // Botón para guardar cambios
+    const saveButton = document.createElement("button");
+    saveButton.id = "save-changes";
+    saveButton.textContent = "Guardar cambios";
+    popupContent.appendChild(saveButton);
+
+    // Botón para cerrar
+    const closeButton = document.createElement("button");
+    closeButton.id = "close-popup";
+    closeButton.textContent = "Cerrar";
+    popupContent.appendChild(closeButton);
+
+    // Mostrar el popup
     popup.classList.remove("hidden");
 
     // Configurar eventos para eliminar ejercicios
@@ -160,16 +182,15 @@ function openEditPopup(day, routines) {
     });
 
     // Guardar cambios en los ejercicios
-    document.getElementById("save-changes").addEventListener("click", () => {
+    saveButton.addEventListener("click", () => {
         saveChanges(day, exercises);
     });
 
     // Cerrar el popup
-    document.getElementById("close-popup").addEventListener("click", () => {
+    closeButton.addEventListener("click", () => {
         popup.classList.add("hidden");
     });
 }
-
 
 async function deleteExerciseFromRoutine(day, index, exercises) {
     const exercise = exercises[index];
