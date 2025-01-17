@@ -16,11 +16,19 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId; // Solo propietarios
     }
 
-    // Reglas para la colección "routines"
+// Reglas para la colección "routines"
     match /routines/{routineId} {
+      // Permitir lectura si el usuario está autenticado y es el propietario de la rutina
       allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+
+      // Permitir creación si el usuario está autenticado y es el propietario
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
 
+      // Permitir actualización si el usuario está autenticado y es el propietario
+      allow update: if request.auth != null && request.auth.uid == resource.data.userId;
+
+      // Permitir eliminación si el usuario está autenticado y es el propietario
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
   }
 }
