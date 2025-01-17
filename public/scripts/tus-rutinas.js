@@ -1,5 +1,5 @@
 import { db } from './firebaseConfig.js'; // Importa solo db
-import { collection, getDocs, query, where, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, getDocs, query, where, updateDoc, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -35,7 +35,7 @@ async function getUserRoutines(userId) {
 
     const routines = [];
     querySnapshot.forEach((doc) => {
-        routines.push(doc.data());
+        routines.push({ ...doc.data(), id: doc.id });
     });
 
     return routines;
@@ -52,7 +52,11 @@ function displayUserRoutines(routines) {
         routineCard.classList.add("routine-card");
 
         const exercisesList = groupedRoutines[day].map(exercise => {
-            return `<li>${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg</li>`;
+            const name = exercise.name || "Ejercicio sin nombre";
+            const series = exercise.series || 0;
+            const reps = exercise.repetitions || 0;
+            const weight = exercise.weight || 0;
+            return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg</li>`;
         }).join('');
 
         routineCard.innerHTML = `
@@ -79,14 +83,14 @@ function displayUserRoutines(routines) {
 
     deleteButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
-            const day = e.target.dataset.day; // Capturar el día desde data-day
+            const day = e.target.dataset.day;
             const confirmDelete = confirm(`¿Estás seguro de eliminar la rutina para el día ${day}?`);
             if (confirmDelete) {
                 deleteRoutine(day);
             }
         })
     );
-} 
+}
 
 function groupRoutinesByDay(routines) {
     const grouped = {};
@@ -98,7 +102,11 @@ function groupRoutinesByDay(routines) {
             grouped[day] = [];
         }
 
-        grouped[day].push(routine.exercise);
+        if (Array.isArray(routine.exercise)) {
+            grouped[day] = grouped[day].concat(routine.exercise);
+        } else if (routine.exercise) {
+            grouped[day].push(routine.exercise);
+        }
     });
 
     return grouped;
@@ -124,10 +132,10 @@ function openEditPopup(day, routines) {
             ${exercises.map((exercise, index) => `
                 <li>
                     <div>
-                        <span>${exercise.name}</span>
-                        <input type="number" value="${exercise.series}" id="series-${index}" placeholder="Series">
-                        <input type="number" value="${exercise.repetitions}" id="reps-${index}" placeholder="Repeticiones">
-                        <input type="number" value="${exercise.weight}" id="weight-${index}" placeholder="Peso">
+                        <span>${exercise.name || "Ejercicio sin nombre"}</span>
+                        <input type="number" value="${exercise.series || 0}" id="series-${index}" placeholder="Series">
+                        <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}" placeholder="Repeticiones">
+                        <input type="number" value="${exercise.weight || 0}" id="weight-${index}" placeholder="Peso">
                         <button class="delete-exercise" data-index="${index}">Eliminar</button>
                     </div>
                 </li>
@@ -171,7 +179,7 @@ async function deleteExerciseFromRoutine(day, index, exercises) {
         });
 
         alert(`Ejercicio "${exercise.name}" eliminado correctamente.`);
-        location.reload(); // Recargar para reflejar los cambios
+        location.reload();
     } catch (error) {
         console.error("Error al eliminar ejercicio:", error);
         alert("No se pudo eliminar el ejercicio.");
@@ -186,11 +194,11 @@ async function deleteRoutine(day) {
     try {
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach(async (doc) => {
-            await deleteDoc(doc.ref); // Eliminar documento completo
+            await deleteDoc(doc.ref);
         });
 
         alert(`Rutina para el día "${day}" eliminada correctamente.`);
-        location.reload(); // Recargar para reflejar los cambios
+        location.reload();
     } catch (error) {
         console.error("Error al eliminar rutina:", error);
         alert("No se pudo eliminar la rutina.");
