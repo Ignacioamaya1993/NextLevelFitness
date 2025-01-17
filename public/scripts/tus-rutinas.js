@@ -81,17 +81,16 @@ function displayUserRoutines(routines) {
         })
     );
 
-    deleteButtons.forEach(button => {
-        button.addEventListener("click", async (e) => {
-            const index = e.target.dataset.index;
-            const confirmDelete = confirm(`¿Estás seguro de eliminar el ejercicio "${exercises[index].name}"?`);
+    deleteButtons.forEach((button) =>
+        button.addEventListener("click", (e) => {
+            const day = e.target.dataset.day;
+            const confirmDelete = confirm(`¿Estás seguro de eliminar la rutina para el día ${day}?`);
             if (confirmDelete) {
-                await deleteExerciseFromRoutine(day, index, exercises);
-                exercises.splice(index, 1); // Actualiza localmente el arreglo
-                openEditPopup(day, routines); // Reabre el popup actualizado
+                deleteRoutine(day);
             }
-        });
-    });    
+        })
+    );
+}
 
 function groupRoutinesByDay(routines) {
     const grouped = {};
@@ -129,7 +128,6 @@ function openEditPopup(day, routines) {
         return;
     }
 
-    // Asegurar que los ejercicios sean un arreglo
     const exercises = Array.isArray(routine.exercise) ? routine.exercise : [routine.exercise];
 
     // Crear encabezado
@@ -137,27 +135,18 @@ function openEditPopup(day, routines) {
     header.textContent = `Editar Rutina para ${day}`;
     popupContent.appendChild(header);
 
-    // Crear lista de ejercicios
-    const exercisesList = document.createElement("ul");
-    exercisesList.id = "exercises-list";
+    // Selector de ejercicios
+    const exerciseSelect = document.createElement("select");
+    exerciseSelect.id = "exercise-select";
+    exerciseSelect.innerHTML = exercises.map((exercise, index) => `
+        <option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>
+    `).join('');
+    popupContent.appendChild(exerciseSelect);
 
-    exercises.forEach((exercise, index) => {
-        const listItem = document.createElement("li");
-
-        listItem.innerHTML = `
-            <div>
-                <span>Ejercicio:</span>
-                <input type="text" value="${exercise.name || ''}" id="name-${index}" placeholder="Nombre del ejercicio">
-                <input type="number" value="${exercise.series || 0}" id="series-${index}" placeholder="Series">
-                <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}" placeholder="Repeticiones">
-                <input type="number" value="${exercise.weight || 0}" id="weight-${index}" placeholder="Peso">
-                <button class="delete-exercise" data-index="${index}">Eliminar</button>
-            </div>
-        `;
-        exercisesList.appendChild(listItem);
-    });
-
-    popupContent.appendChild(exercisesList);
+    // Contenedor para los campos de edición
+    const editFieldsContainer = document.createElement("div");
+    editFieldsContainer.id = "edit-fields-container";
+    popupContent.appendChild(editFieldsContainer);
 
     // Botón para guardar cambios
     const saveButton = document.createElement("button");
@@ -174,38 +163,59 @@ function openEditPopup(day, routines) {
     // Mostrar el popup
     popup.classList.remove("hidden");
 
-    // Configurar eventos para eliminar ejercicios
-    const deleteButtons = popup.querySelectorAll(".delete-exercise");
-    deleteButtons.forEach(button => {
-        button.addEventListener("click", (e) => {
-            const index = e.target.dataset.index;
-            exercises.splice(index, 1); // Elimina el ejercicio del arreglo
-            openEditPopup(day, routines); // Reabre el popup actualizado
-        });
+    // Mostrar campos de edición al seleccionar un ejercicio
+    exerciseSelect.addEventListener("change", () => {
+        const selectedIndex = parseInt(exerciseSelect.value, 10);
+        const selectedExercise = exercises[selectedIndex];
+        renderEditFields(editFieldsContainer, selectedExercise, selectedIndex, day, exercises, routine);
     });
 
+    // Inicializar con el primer ejercicio
+    renderEditFields(editFieldsContainer, exercises[0], 0, day, exercises, routine);
+
+    // Guardar cambios
     saveButton.addEventListener("click", () => {
-        const updatedExercises = [];
-        exercisesList.querySelectorAll("li").forEach((listItem, idx) => {
-            const name = document.getElementById(`name-${idx}`).value;
-            const series = parseInt(document.getElementById(`series-${idx}`).value, 10) || 0;
-            const repetitions = parseInt(document.getElementById(`reps-${idx}`).value, 10) || 0;
-            const weight = parseInt(document.getElementById(`weight-${idx}`).value, 10) || 0;
-    
-            updatedExercises.push({ name, series, repetitions, weight });
-        });
-    
-        routine.exercise = updatedExercises; // Actualiza la rutina con los nuevos datos
-        popup.classList.add("hidden"); // Cierra el popup
-        displayUserRoutines(routines); // Vuelve a renderizar todas las rutinas
+        saveChanges(day, exercises);
+        popup.classList.add("hidden");
     });
-    
 
-    // Cerrar el popup
+    // Cerrar popup
     closeButton.addEventListener("click", () => {
         popup.classList.add("hidden");
     });
 }
+
+function renderEditFields(container, exercise, index, day, exercises, routine) {
+    container.innerHTML = `
+        <div>
+            <label>Nombre:</label>
+            <input type="text" value="${exercise.name || ''}" id="name-${index}">
+        </div>
+        <div>
+            <label>Series:</label>
+            <input type="number" value="${exercise.series || 0}" id="series-${index}">
+        </div>
+        <div>
+            <label>Repeticiones:</label>
+            <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}">
+        </div>
+        <div>
+            <label>Peso:</label>
+            <input type="number" value="${exercise.weight || 0}" id="weight-${index}">
+        </div>
+        <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
+    `;
+
+    // Configurar evento para eliminar ejercicio
+    const deleteButton = container.querySelector(".delete-exercise");
+    deleteButton.addEventListener("click", () => {
+        const confirmDelete = confirm(`¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`);
+        if (confirmDelete) {
+            deleteExerciseFromRoutine(day, index, exercises);
+        }
+    });
+}
+
 
 async function deleteExerciseFromRoutine(day, index, exercises) {
     const exercise = exercises[index];
@@ -293,6 +303,5 @@ async function saveChanges(day, exercises) {
     } catch (error) {
         console.error("Error al guardar los cambios:", error);
         alert("Ocurrió un error al guardar los cambios.");
-        }
     }
 }
