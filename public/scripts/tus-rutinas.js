@@ -44,28 +44,20 @@ async function getUserRoutines(userId) {
 
     return routines;
 }
-
 function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = ""; // Limpiar lista de rutinas
 
     const dayOrder = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
-   // Ordenar rutinas por el orden de los días
-   const sortedRoutines = routines.sort((a, b) => {
-    return dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
-});
+    // Ordenar rutinas por el orden de los días
+    const sortedRoutines = routines.sort((a, b) => {
+        return dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+    });
 
-sortedRoutines.forEach((routine) => {
-    const routineCard = document.createElement("div");
-    routineCard.classList.add("routine-card");
-
-        // Título con el día de la rutina
-        const exercisesList = groupedRoutines[day].map(exercise => {
-            return `<li>
-                        ${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg
-                    </li>`;
-        }).join('');
+    sortedRoutines.forEach((routine) => {
+        const routineCard = document.createElement("div");
+        routineCard.classList.add("routine-card");
 
         routineCard.innerHTML = `
             <h3>${routine.day}</h3>
@@ -82,6 +74,17 @@ sortedRoutines.forEach((routine) => {
 
         routineList.appendChild(routineCard);
     });
+
+    // Event listeners para los botones de editar
+    const editButtons = routineList.querySelectorAll(".edit-button");
+    editButtons.forEach((button) =>
+        button.addEventListener("click", (e) => {
+            const day = e.target.dataset.day;
+            openEditPopup(day, routines);
+        })
+    );
+}
+
 
     // Asegúrate de añadir los event listeners después de añadir los botones
     const editButtons = routineList.querySelectorAll(".edit-button");
