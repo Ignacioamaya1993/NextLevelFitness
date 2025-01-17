@@ -145,37 +145,42 @@ function showExerciseDetails(nombre, video, instrucciones) {
     } else if (video.includes("youtube.com/watch?v=")) {
         embedVideoUrl = video.replace("watch?v=", "embed/");
     } else {
-        embedVideoUrl = video; // En caso de que ya sea un embed correcto
+        embedVideoUrl = video;
     }
 
     const contentHTML = `
-    <div class="exercise-details">
-        <h3>${nombre}</h3>
-        <div class="video-container">
-            <iframe width="560" height="315" src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
+    <div class="exercise-popup">
+        <h3 class="exercise-title">${nombre}</h3>
+        <div class="exercise-content">
+            <div class="exercise-left">
+                <div class="video-container">
+                    <iframe width="100%" height="250" src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <p class="exercise-instructions">${instrucciones}</p>
+            </div>
+            <div class="exercise-right">
+                <form id="exercise-form" class="exercise-form">
+                    <label for="series">Series:</label>
+                    <input type="number" id="series" min="1" required>
+
+                    <label for="repeticiones">Repeticiones:</label>
+                    <input type="number" id="repeticiones" min="1" required>
+
+                    <label for="peso">Peso (kg):</label>
+                    <input type="number" id="peso" min="0" step="0.1" required>
+
+                    <label for="dias">Día de la semana:</label>
+                    <select id="dias" required>
+                        <option value="lunes">Lunes</option>
+                        <option value="martes">Martes</option>
+                        <option value="miércoles">Miércoles</option>
+                        <option value="jueves">Jueves</option>
+                        <option value="viernes">Viernes</option>
+                        <option value="sábado">Sábado</option>
+                    </select>               
+                </form>
+            </div>
         </div>
-        <p>${instrucciones}</p>
-
-        <form id="exercise-form" class="exercise-form">
-            <label for="series">Series:</label>
-            <input type="number" id="series" min="1" required>
-
-            <label for="repeticiones">Repeticiones:</label>
-            <input type="number" id="repeticiones" min="1" required>
-
-            <label for="peso">Peso (kg):</label>
-            <input type="number" id="peso" min="0" step="0.1" required>
-
-            <label for="dias">Día de la semana:</label>
-            <select id="dias" required>
-                <option value="lunes">Lunes</option>
-                <option value="martes">Martes</option>
-                <option value="miércoles">Miércoles</option>
-                <option value="jueves">Jueves</option>
-                <option value="viernes">Viernes</option>
-                <option value="sábado">Sábado</option>
-            </select>               
-        </form>
     </div>
     `;
 
