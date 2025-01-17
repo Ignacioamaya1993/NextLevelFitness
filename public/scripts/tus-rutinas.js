@@ -160,6 +160,16 @@ function groupRoutinesByDay(routines) {
         closeButton.textContent = "Cerrar";
         popupContent.appendChild(closeButton);
 
+        // Evento para escuchar la tecla Escape
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                const popup = document.getElementById('edit-popup');
+                if (!popup.classList.contains('hidden')) { // Solo cierra si el popup está visible
+                    popup.classList.add('hidden');
+        }
+    }
+});
+
         // Mostrar el popup
         popup.classList.remove("hidden");
 
