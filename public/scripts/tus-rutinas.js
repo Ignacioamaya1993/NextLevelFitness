@@ -128,7 +128,6 @@ function openEditPopup(day, routines) {
         return;
     }
 
-    // Asegurarse de que `exercise` sea siempre un arreglo
     const exercises = Array.isArray(routine.exercise) ? routine.exercise : [routine.exercise];
 
     // Crear encabezado
@@ -139,12 +138,9 @@ function openEditPopup(day, routines) {
     // Selector de ejercicios
     const exerciseSelect = document.createElement("select");
     exerciseSelect.id = "exercise-select";
-    exercises.forEach((exercise, index) => {
-        const option = document.createElement("option");
-        option.value = index;
-        option.textContent = exercise.name || `Ejercicio ${index + 1}`;
-        exerciseSelect.appendChild(option);
-    });
+    exerciseSelect.innerHTML = exercises.map((exercise, index) => `
+        <option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>
+    `).join('');
     popupContent.appendChild(exerciseSelect);
 
     // Contenedor para los campos de edición
@@ -162,80 +158,24 @@ function openEditPopup(day, routines) {
     const closeButton = document.createElement("button");
     closeButton.id = "close-popup";
     closeButton.textContent = "Cerrar";
-    closeButton.classList.add("btn", "btn-danger");
     popupContent.appendChild(closeButton);
 
     // Mostrar el popup
     popup.classList.remove("hidden");
 
-    // Función para renderizar los campos de edición
-    const renderEditFields = (container, exercise, index) => {
-        container.innerHTML = ""; // Limpia el contenedor antes de renderizar
-
-        // Crear campos de edición para el ejercicio
-        const seriesInput = document.createElement("input");
-        seriesInput.type = "number";
-        seriesInput.id = `series-input-${index}`;
-        seriesInput.value = exercise.series || '';
-        seriesInput.placeholder = "Series";
-
-        const repsInput = document.createElement("input");
-        repsInput.type = "number";
-        repsInput.id = `reps-input-${index}`;
-        repsInput.value = exercise.repetitions || '';
-        repsInput.placeholder = "Repeticiones";
-
-        const weightInput = document.createElement("input");
-        weightInput.type = "number";
-        weightInput.id = `weight-input-${index}`;
-        weightInput.value = exercise.weight || '';
-        weightInput.placeholder = "Peso";
-
-        // Agregar los inputs al contenedor
-        container.appendChild(document.createTextNode("Series:"));
-        container.appendChild(seriesInput);
-        container.appendChild(document.createElement("br"));
-
-        container.appendChild(document.createTextNode("Repeticiones:"));
-        container.appendChild(repsInput);
-        container.appendChild(document.createElement("br"));
-
-        container.appendChild(document.createTextNode("Peso:"));
-        container.appendChild(weightInput);
-        container.appendChild(document.createElement("br"));
-
-        // Botón para eliminar ejercicio
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Eliminar ejercicio";
-        deleteButton.classList.add("btn", "btn-warning");
-        deleteButton.addEventListener("click", () => {
-            exercises.splice(index, 1);
-            openEditPopup(day, routines); // Recargar el popup para reflejar los cambios
-        });
-        container.appendChild(deleteButton);
-    };
-
     // Mostrar campos de edición al seleccionar un ejercicio
     exerciseSelect.addEventListener("change", () => {
         const selectedIndex = parseInt(exerciseSelect.value, 10);
-        renderEditFields(editFieldsContainer, exercises[selectedIndex], selectedIndex);
+        const selectedExercise = exercises[selectedIndex];
+        renderEditFields(editFieldsContainer, selectedExercise, selectedIndex, day, exercises, routine);
     });
 
     // Inicializar con el primer ejercicio
-    renderEditFields(editFieldsContainer, exercises[0], 0);
+    renderEditFields(editFieldsContainer, exercises[0], 0, day, exercises, routine);
 
     // Guardar cambios
     saveButton.addEventListener("click", () => {
-        // Actualizar los valores en la rutina
-        exercises.forEach((exercise, index) => {
-            exercise.series = parseInt(document.getElementById(`series-input-${index}`).value, 10) || 0;
-            exercise.repetitions = parseInt(document.getElementById(`reps-input-${index}`).value, 10) || 0;
-            exercise.weight = parseInt(document.getElementById(`weight-input-${index}`).value, 10) || 0;
-        });
-
-        // Lógica para guardar los cambios (puedes implementar Firebase u otra lógica aquí)
-        console.log("Cambios guardados:", { day, exercises });
-
+        saveChanges(day, exercises);
         popup.classList.add("hidden");
     });
 
@@ -244,7 +184,6 @@ function openEditPopup(day, routines) {
         popup.classList.add("hidden");
     });
 }
-
 
 function renderEditFields(container, exercise, index, day, exercises) {
     container.innerHTML = `
