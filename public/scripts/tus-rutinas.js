@@ -44,6 +44,7 @@ async function getUserRoutines(userId) {
 
     return routines;
 }
+
 function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = ""; // Limpiar lista de rutinas
@@ -70,6 +71,7 @@ function displayUserRoutines(routines) {
                     .join("")}
             </ul>
             <button class="edit-button" data-day="${routine.day}">Editar</button>
+            <button class="delete-button" data-day="${routine.day}">Eliminar</button>
         `;
 
         routineList.appendChild(routineCard);
@@ -83,53 +85,32 @@ function displayUserRoutines(routines) {
             openEditPopup(day, routines);
         })
     );
-}
 
-const deleteButtons = routineList.querySelectorAll(".delete-button");
-if (deleteButtons.length > 0) {
-    deleteButtons.forEach((button) =>
-        button.addEventListener("click", (e) => {
-            alert("Eliminar rutina (falta implementar)");
-        })
-    );
-}
-function groupRoutinesByDay(routines) {
-    const grouped = {};
-
-    routines.forEach(routine => {
-        const day = routine.day || "Día no especificado"; // Si no tiene día, asignar un valor por defecto
-
-        if (!grouped[day]) {
-            grouped[day] = [];
-        }
-
-        // Añadir el ejercicio al grupo correspondiente
-        grouped[day].push(routine.exercise);
-    });
-
-    return grouped;
-}
+       // Event listeners para los botones de eliminar
+       const deleteButtons = routineList.querySelectorAll(".delete-button");
+       deleteButtons.forEach((button) =>
+           button.addEventListener("click", (e) => {
+               const day = e.target.dataset.day;
+               alert(`Eliminar rutina para el día: ${day}`);
+           })
+       );
+   }
 
 // Función para abrir el popup de edición
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
     const popupContent = document.getElementById("popup-content");
 
-    console.log("Abriendo popup para el día:", day); // Añadir log aquí
-
     // Filtrar las rutinas para obtener las correspondientes al día
     const routine = routines.find(routine => routine.day === day);
-    console.log("Rutina encontrada:", routine); // Verifica que la rutina exista
 
-    if (!routine || !routine.exercise) {
+    if (!routine || !routine.exercises) {
         popupContent.innerHTML = `<p>No hay ejercicios para la rutina de ${day}</p>`;
         popup.classList.remove("hidden");
-        return;  // Salir de la función si no hay ejercicios
+        return;
     }
 
-    // Si 'exercise' es un solo objeto, lo convertimos en un arreglo
-    const exercises = Array.isArray(routine.exercise) ? routine.exercise : [routine.exercise];
-    console.log("Ejercicios para editar:", exercises); // Verifica que los ejercicios estén presentes
+    const exercises = routine.exercises;
 
     popupContent.innerHTML = `
         <h3>Editar Rutina para ${day}</h3>
@@ -151,7 +132,6 @@ function openEditPopup(day, routines) {
     `;
 
     popup.classList.remove("hidden");
-    console.log("Popup debería estar visible ahora");
 
     // Eventos para eliminar un ejercicio
     const deleteButtons = popup.querySelectorAll(".delete-exercise");
@@ -173,23 +153,15 @@ function openEditPopup(day, routines) {
     });
 }
 
-// Eliminar ejercicio de la rutina
-async function deleteExerciseFromRoutine(day, index, exercises) {
-    const exercise = exercises[index];
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    const routinesRef = collection(db, "routines");
-    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
-
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(async (doc) => {
-        const routineDoc = doc.id;
-        await updateDoc(doc.ref, {
-            exercise: arrayRemove(exercise)
-        });
+// Eventos para eliminar un ejercicio
+const deleteButtons = popup.querySelectorAll(".delete-exercise");
+deleteButtons.forEach(button => {
+    button.addEventListener("click", async (e) => {
+        const index = e.target.dataset.index;
+        exercises.splice(index, 1); // Eliminar ejercicio del array local
+        openEditPopup(day, routines); // Reabrir popup para reflejar los cambios
     });
-
-    alert(`Ejercicio "${exercise.name}" eliminado`);
-}
+});alert(`Ejercicio "${exercise.name}" eliminado`);
 
 // Guardar cambios realizados en los ejercicios
 async function saveChanges(day, exercises) {
@@ -199,7 +171,6 @@ async function saveChanges(day, exercises) {
 
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach(async (doc) => {
-        const routineDoc = doc.id;
         const updatedExercises = exercises.map((exercise, index) => ({
             ...exercise,
             series: document.getElementById(`series-${index}`).value,
@@ -208,7 +179,7 @@ async function saveChanges(day, exercises) {
         }));
 
         await updateDoc(doc.ref, {
-            exercise: updatedExercises
+            exercises: updatedExercises
         });
     });
 
