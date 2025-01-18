@@ -188,3 +188,117 @@ main {
     border-radius: 5px;
     background-color: #f8f9fa;
 }
+
+.exercise-instructions {
+    font-size: 1.3em; /* Tamaño de letra ajustado */
+    color: #1d3557;
+    font-weight: bold;
+}
+.exercise-details {
+    font-size: 1em; /* Tamaño estándar */
+}
+
+/* --- Popup de detalles del ejercicio --- */
+.exercise-popup {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 40px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.popup-header {
+    text-align: center;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+.exercise-title {
+    font-size: 1.8rem;
+    color: #1d3557;
+    font-weight: bold;
+}
+
+.popup-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas */
+    gap: 20px;
+}
+
+.popup-left, .popup-right {
+    padding: 10px;
+}
+
+.video-container iframe {
+    width: 500px;
+    height: 250px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.popup-left h4 {
+    font-size: 1.2rem;
+    color: #1d3557;
+    margin-top: 15px;
+}
+
+.popup-left p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.5;
+}
+
+.popup-right {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.popup-right .form-group {
+    margin-bottom: 15px;
+}
+
+.popup-right label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #1d3557;
+}
+
+.popup-right input,
+.popup-right select {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.popup-right input:focus,
+.popup-right select:focus {
+    border-color: #457b9d;
+    outline: none;
+}
+
+.custom-popup {
+    width: 900px !important; /* Ajusta el ancho  */
+    max-width: 5000px !important; /* Límite máximo de ancho */
+    height: 800px !important; /* Ajusta la altura  */
+    max-height: 5000px !important; /* Límite máximo de altura */
+    padding: 20px; /* Añade un poco de espacio interno */
+    overflow: auto; /* Permite scroll si el contenido es mayor al tamaño */
+}
+
+
+/*responsive*/
+@media (max-width: 768px) {
+    .popup-content {
+        grid-template-columns: 1fr; /* Cambia a una sola columna */
+    }
+}
