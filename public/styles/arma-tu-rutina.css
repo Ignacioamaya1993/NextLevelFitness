@@ -295,6 +295,24 @@ main {
     overflow: auto; /* Permite scroll si el contenido es mayor al tamaño */
 }
 
+.form-group textarea {
+    width: 100%;
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    resize: none; /* Desactiva el redimensionado manual si no es necesario */
+    background-color: #f8f9fa;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group textarea:focus {
+    outline: none;
+    font-family: Arial, sans-serif;
+    border-color: #457b9d;
+    box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
+}
 
 /*responsive*/
 @media (max-width: 768px) {
