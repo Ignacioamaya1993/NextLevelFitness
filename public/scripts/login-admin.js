@@ -3,7 +3,8 @@ import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstati
 
 const auth = getAuth(app);
 
-const adminEmail = "soutrelleagustin64@gmail.com"; // Correo del administrador
+const adminEmail = "soutrelleagustin64@gmail.com"; "naa87.1993@gmail.com"// Correo del administrador
+
 
 document.getElementById("admin-login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
