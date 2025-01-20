@@ -1,4 +1,16 @@
-/* Estilos del panel de administración */
+/* Header container */
+.header-container {
+    display: flex;
+    justify-content: flex-start; /* Alinea el contenido a la izquierda */
+    padding: 20px;
+}
+
+/* Logo */
+.logo img {
+    max-width: 150px; /* Limita el tamaño del logo */
+    height: auto; /* Mantiene la proporción del logo */
+}
+
 .admin-panel {
     width: 90%;
     max-width: 1200px;
