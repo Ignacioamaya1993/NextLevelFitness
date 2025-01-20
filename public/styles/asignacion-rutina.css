@@ -6,6 +6,11 @@ body {
     background-color: #f7f7f7;
 }
 
+/* Logo */
+.logo img {
+    height: 50px;
+}
+
 /* Contenedor principal */
 .container {
     max-width: 1200px;
