@@ -1,7 +1,7 @@
 console.log('El archivo JS se ha cargado correctamente'); // Log de prueba
 
 import { db } from './firebaseConfig.js'; // Importamos la configuración de Firebase
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const searchButton = document.getElementById('search-button');
