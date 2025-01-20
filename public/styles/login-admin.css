@@ -88,15 +88,12 @@ main {
     margin-top: 10px;
 }
 
-/* Estilos del footer */
+/* Footer Sticky */
 footer {
     width: 100%;
-    padding: 30px 0;
+    padding: 15px 0; /* Tamaño reducido para el footer */
     background-color: #1d3557;
     color: white;
-    position: absolute;
-    bottom: 0;
-    left: 0;
     text-align: center;
 }
 
@@ -107,17 +104,17 @@ footer {
 }
 
 .footer-info {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .footer-social {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .footer-social a {
     margin: 0 10px;
     color: white;
-    font-size: 20px;
+    font-size: 18px; /* Iconos de tamaño más pequeño */
     text-decoration: none;
 }
 
@@ -126,7 +123,7 @@ footer {
 }
 
 .footer-design {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 /* Estilo para los iconos de redes sociales */
