@@ -1,5 +1,5 @@
 import { db, auth } from './firebaseConfig.js'; // Importamos la configuración de Firebase
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const searchButton = document.getElementById('search-button');
 const searchInput = document.getElementById('search-input');
@@ -24,16 +24,27 @@ async function searchUser() {
     noRoutinesMessage.classList.add('hidden');
 
     try {
-        // Consulta de usuario por nombre o correo
-        const userQuery = query(
-            collection(db, 'users'),
-            where('fullName', '==', queryText) // Busca por nombre completo
-        );
-        
+        // Hacemos la consulta para buscar el usuario por nombre o correo
+        let userQuery;
+        if (queryText.includes('@')) {
+            // Si el input tiene un '@', lo tratamos como correo
+            userQuery = query(
+                collection(db, 'users'),
+                where('email', '==', queryText) // Buscar por correo
+            );
+        } else {
+            // Si no es correo, buscamos por nombre completo
+            userQuery = query(
+                collection(db, 'users'),
+                where('fullName', '==', queryText) // Buscar por nombre completo
+            );
+        }
+
         const querySnapshot = await getDocs(userQuery);
 
         if (querySnapshot.empty) {
             // Si no encontramos el usuario, mostramos el mensaje
+            console.log('No se encontró el usuario');
             noUserMessage.classList.remove('hidden');
             return;
         }
@@ -41,6 +52,7 @@ async function searchUser() {
         // Si encontramos el usuario, mostramos su nombre y rutinas
         const userDoc = querySnapshot.docs[0]; // Asumimos que hay un solo resultado
         const userData = userDoc.data();
+        console.log('Usuario encontrado:', userData);
         userNameDisplay.textContent = userData.fullName;
 
         // Verificamos si el usuario tiene rutinas asignadas
