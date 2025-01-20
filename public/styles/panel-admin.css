@@ -1,0 +1,29 @@
+/* Estilos del panel de administración */
+.admin-panel {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-menu {
+    display: flex;
+    justify-content: space-around;
+    background: #1d3557;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.admin-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+}
+
+.admin-menu a:hover {
+    background: #5a3794;
+    border-radius: 5px;
+}
