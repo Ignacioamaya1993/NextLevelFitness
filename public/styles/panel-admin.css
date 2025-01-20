@@ -84,22 +84,49 @@ h2 {
     transform: scale(1.05);
 }
 
-/* Footer */
+/* Footer Sticky */
 footer {
+    width: 100%;
+    padding: 15px 0; /* Tamaño reducido para el footer */
     background-color: #1d3557;
-    padding: 20px;
     color: white;
     text-align: center;
-    margin-top: 40px;
 }
 
-footer a {
-    color: #5a3794;
+.footer-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.footer-info {
+    margin-bottom: 10px;
+}
+
+.footer-social {
+    margin-bottom: 10px;
+}
+
+.footer-social a {
+    margin: 0 10px;
+    color: white;
+    font-size: 18px; /* Iconos de tamaño más pequeño */
     text-decoration: none;
 }
 
-footer a:hover {
-    text-decoration: underline;
+.footer-social a:hover {
+    color: #5a3794;
+}
+
+.footer-design {
+    font-size: 12px;
+}
+
+/* Estilo para los iconos de redes sociales */
+.social-icon {
+    display: inline-block;
+    color: inherit;
+    transition: color 0.3s ease;
 }
 
 /* Responsividad */
