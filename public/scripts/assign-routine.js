@@ -1,60 +1,62 @@
-document.getElementById("search").addEventListener("input", (event) => {
-    const query = event.target.value.toLowerCase();
-    const users = [
-        { name: "Agustín Soutrelle", email: "agustin@example.com" },
-        { name: "María Pérez", email: "maria@example.com" },
-    ]; // Datos simulados, reemplazar con Firebase
+import { auth, db } from "./firebaseConfig.js"; // Asegúrate de tener la configuración
 
-    const filteredUsers = users.filter(user => 
-        user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query)
-    );
-
-    const userList = document.getElementById("user-list");
-    userList.innerHTML = "";
-
-    filteredUsers.forEach(user => {
-        const li = document.createElement("li");
-        li.textContent = `${user.name} (${user.email})`;
-        li.addEventListener("click", () => selectUser(user));
-        userList.appendChild(li);
-    });
-});
+const userList = document.getElementById("user-list");
+const exerciseList = document.getElementById("exercise-list");
+const assignBtn = document.getElementById("assign-routine-btn");
 
 let selectedUser = null;
+let selectedExercises = [];
 
-function selectUser(user) {
-    selectedUser = user;
+// 🔹 Obtener usuarios desde Firebase
+function loadUsers() {
+    db.collection("users").get().then((snapshot) => {
+        userList.innerHTML = ""; // Limpiar lista antes de mostrar nuevos datos
+        snapshot.forEach((doc) => {
+            const user = doc.data();
+            const li = document.createElement("li");
+            li.textContent = `${user.name} (${user.email})`;
+            li.addEventListener("click", () => selectUser(user, doc.id));
+            userList.appendChild(li);
+        });
+    }).catch(error => console.error("Error al obtener usuarios:", error));
+}
+
+// 🔹 Seleccionar usuario
+function selectUser(user, id) {
+    selectedUser = { ...user, id };
     alert(`Usuario seleccionado: ${user.name}`);
 }
 
-// Cargar ejercicios (simulado)
-document.addEventListener("DOMContentLoaded", () => {
-    const exercises = ["Sentadillas", "Flexiones", "Dominadas", "Plancha"]; // Datos simulados
-    const exerciseList = document.getElementById("exercise-list");
+// 🔹 Obtener ejercicios desde Firebase
+function loadExercises() {
+    db.collection("exercises").get().then((snapshot) => {
+        exerciseList.innerHTML = ""; // Limpiar lista
+        snapshot.forEach((doc) => {
+            const exercise = doc.data();
+            const li = document.createElement("li");
+            li.textContent = exercise.name;
+            li.addEventListener("click", () => toggleExercise(li, doc.id));
+            exerciseList.appendChild(li);
+        });
+    }).catch(error => console.error("Error al obtener ejercicios:", error));
+}
 
-    exercises.forEach(exercise => {
-        const li = document.createElement("li");
-        li.textContent = exercise;
-        li.addEventListener("click", () => toggleExercise(li));
-        exerciseList.appendChild(li);
-    });
-});
+// 🔹 Seleccionar ejercicios
+function toggleExercise(li, id) {
+    const exerciseName = li.textContent;
+    const exerciseData = { id, name: exerciseName };
 
-let selectedExercises = [];
-
-function toggleExercise(li) {
-    const exercise = li.textContent;
-    if (selectedExercises.includes(exercise)) {
-        selectedExercises = selectedExercises.filter(e => e !== exercise);
+    if (selectedExercises.some(e => e.id === id)) {
+        selectedExercises = selectedExercises.filter(e => e.id !== id);
         li.style.backgroundColor = "";
     } else {
-        selectedExercises.push(exercise);
+        selectedExercises.push(exerciseData);
         li.style.backgroundColor = "#d3f9d8";
     }
 }
 
-// Asignar rutina
-document.getElementById("assign-routine-btn").addEventListener("click", () => {
+// 🔹 Asignar rutina en Firebase
+assignBtn.addEventListener("click", () => {
     if (!selectedUser) {
         alert("Selecciona un usuario primero.");
         return;
@@ -65,6 +67,20 @@ document.getElementById("assign-routine-btn").addEventListener("click", () => {
         return;
     }
 
-    alert(`Rutina asignada a ${selectedUser.name}: ${selectedExercises.join(", ")}`);
-    // Aquí se integrará Firebase para guardar los datos
+    const routineData = {
+        userId: selectedUser.id,
+        userName: selectedUser.name,
+        exercises: selectedExercises,
+        createdAt: new Date()
+    };
+
+    db.collection("routines").add(routineData)
+        .then(() => alert(`Rutina asignada a ${selectedUser.name}`))
+        .catch(error => console.error("Error al asignar rutina:", error));
+});
+
+// 🔹 Cargar datos al inicio
+document.addEventListener("DOMContentLoaded", () => {
+    loadUsers();
+    loadExercises();
 });
