@@ -1,0 +1,201 @@
+/* Estilos globales */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Estilos del header */
+header {
+    background-color: #333;
+    padding: 20px;
+    color: white;
+}
+
+header .logo img {
+    width: 150px;
+}
+
+header nav {
+    margin-top: 10px;
+}
+
+header nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 20px;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+header nav ul li a:hover {
+    color: #f5a623;
+}
+
+/* Estilos del formulario de búsqueda */
+.search-container {
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-container input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 50%;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    transition: border 0.3s ease;
+}
+
+.search-container input[type="text"]:focus {
+    border-color: #f5a623;
+    outline: none;
+}
+
+.search-container button {
+    background-color: #f5a623;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.search-container button:hover {
+    background-color: #e5941e;
+}
+
+/* Estilos del mensaje de usuario no encontrado */
+#no-user-message {
+    color: #e94e77;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+/* Estilos de la vista de rutinas */
+#routine-viewer {
+    display: none;
+    margin-top: 30px;
+}
+
+#routine-viewer h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#no-routines-message {
+    display: none;
+    color: #e94e77;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+#routine-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.routine {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.routine:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.routine h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.routine p {
+    font-size: 16px;
+    color: #555;
+}
+
+/* Estilos de la sección footer */
+footer {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+
+footer .social-icons a {
+    margin: 0 10px;
+    color: white;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+footer .social-icons a:hover {
+    color: #f5a623;
+}
+
+footer .footer-info p {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+footer .footer-info a {
+    color: #f5a623;
+    text-decoration: none;
+}
+
+footer .footer-info a:hover {
+    text-decoration: underline;
+}
+
+/* Responsividad */
+@media screen and (max-width: 768px) {
+    header nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .search-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .search-container input[type="text"] {
+        width: 80%;
+        margin-bottom: 10px;
+    }
+
+    .search-container button {
+        width: 80%;
+    }
+
+    #routine-list {
+        grid-template-columns: 1fr;
+    }
+}
