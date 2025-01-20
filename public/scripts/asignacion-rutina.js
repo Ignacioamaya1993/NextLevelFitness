@@ -1,4 +1,6 @@
-import { db, auth } from './firebaseConfig.js'; // Importamos la configuración de Firebase
+console.log('El archivo JS se ha cargado correctamente'); // Log de prueba
+
+import { db } from './firebaseConfig.js'; // Importamos la configuración de Firebase
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const searchButton = document.getElementById('search-button');
