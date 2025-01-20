@@ -12,6 +12,7 @@ const routineList = document.getElementById('routine-list');
 // Función para buscar el usuario en Firestore
 async function searchUser() {
     const queryText = searchInput.value.trim();
+    console.log('Texto de búsqueda:', queryText); // Verificar lo que se ingresa en el input
 
     if (!queryText) {
         alert('Por favor, ingresa un nombre o correo para buscar.');
@@ -27,12 +28,14 @@ async function searchUser() {
         // Hacemos la consulta para buscar el usuario por nombre o correo
         let userQuery;
         if (queryText.includes('@')) {
+            console.log('Buscando por correo:', queryText); // Verificar que se detecta un correo
             // Si el input tiene un '@', lo tratamos como correo
             userQuery = query(
                 collection(db, 'users'),
                 where('email', '==', queryText) // Buscar por correo
             );
         } else {
+            console.log('Buscando por nombre completo:', queryText); // Verificar que se busca por nombre
             // Si no es correo, buscamos por nombre completo
             userQuery = query(
                 collection(db, 'users'),
@@ -41,6 +44,7 @@ async function searchUser() {
         }
 
         const querySnapshot = await getDocs(userQuery);
+        console.log('Resultado de la consulta:', querySnapshot); // Verificar la consulta
 
         if (querySnapshot.empty) {
             // Si no encontramos el usuario, mostramos el mensaje
@@ -52,11 +56,13 @@ async function searchUser() {
         // Si encontramos el usuario, mostramos su nombre y rutinas
         const userDoc = querySnapshot.docs[0]; // Asumimos que hay un solo resultado
         const userData = userDoc.data();
-        console.log('Usuario encontrado:', userData);
+        console.log('Usuario encontrado:', userData); // Verificar los datos del usuario encontrado
         userNameDisplay.textContent = userData.fullName;
 
         // Verificamos si el usuario tiene rutinas asignadas
         const routines = userData.routines || [];
+        console.log('Rutinas del usuario:', routines); // Verificar las rutinas del usuario
+
         if (routines.length === 0) {
             noRoutinesMessage.classList.remove('hidden');
         } else {
@@ -92,10 +98,14 @@ function displayRoutines(routines) {
 }
 
 // Evento al hacer clic en el botón de buscar
-searchButton.addEventListener('click', searchUser);
+searchButton.addEventListener('click', () => {
+    console.log('Botón de búsqueda clickeado');
+    searchUser();
+});
 
 // También permitimos que presionar "Enter" en el input dispare la búsqueda
 searchInput.addEventListener('keypress', (e) => {
+    console.log('Tecla presionada:', e.key); // Verificar qué tecla se presionó
     if (e.key === 'Enter') {
         searchUser();
     }
