@@ -314,9 +314,14 @@ main {
     box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
 }
 
-/*responsive*/
 @media (max-width: 768px) {
-    .popup-content {
-        grid-template-columns: 1fr; /* Cambia a una sola columna */
+    #routine-list {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    #routine-list {
+        grid-template-columns: 1fr;
     }
 }

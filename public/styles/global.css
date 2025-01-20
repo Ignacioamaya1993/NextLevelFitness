@@ -18,33 +18,48 @@ html, body {
 
 /* Encabezado */
 header {
-    background-color: #34495e; /* Azul grisáceo oscuro */
-    color: #ecf0f1; /* Blanco suave */
-    padding: 0;
-    margin: 0;
+    background-color: #34495e; /* Mantener el fondo oscuro */
+    padding: 10px 0; /* Espaciado vertical del encabezado */
 }
 
-header .logo {
+/* Contenedor principal del header */
+.header-container {
     display: flex;
-    align-items: center;
-    padding: 10px 20px;
+    align-items: center; /* Alinea verticalmente los elementos */
+    justify-content: center; /* Centra todos los elementos horizontalmente */
+    padding: 10px 0;
 }
 
-header .logo img {
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center; /* Alinea el logo verticalmente */
+    padding: 10px; /* Elimina el padding adicional */
+    margin-right: 50px; /* Empuja el logo a la izquierda */
+
+}
+
+.logo img {
     max-height: 110px; /* Ajusta el valor según el tamaño que desees */
 }
 
+/* Menú de navegación */
 .nav-menu {
     display: flex;
-    justify-content: center;
-    gap: 30px; /* Espaciado uniforme entre los elementos */
+    justify-content: center; /* Centra los enlaces dentro del menú */
+    align-items: center;
     list-style: none;
-    padding: 10px 0;
+    gap: 20px; /* Espaciado entre los elementos */
     margin: 0;
+    padding: 0;
 }
 
 .nav-menu li {
     display: inline-block;
+}
+
+#mi-cuenta-link, #iniciar-sesion-link {
+    display: inline-block; /* Asegura que el enlace ocupe el espacio adecuado */
 }
 
 .nav-menu li a {
@@ -52,8 +67,8 @@ header .logo img {
     color: #ecf0f1; /* Blanco suave */
     font-weight: bold;
     text-transform: uppercase;
-    font-size: 0.9rem;
-    padding: 10px 15px;
+    font-size: 1rem;
+    padding: 10px 20px; /* Más espacio alrededor del texto */
     transition: color 0.3s, background-color 0.3s;
 }
 
@@ -154,4 +169,21 @@ footer {
 .footer-design {
     font-size: 0.8rem;
     color: #bdc3c7; /* Gris claro para texto secundario */
+}
+
+/* Menú de navegación: ajusta para pantallas pequeñas */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column; /* Cambia a una columna para dispositivos pequeños */
+    }
+    
+    .nav-menu {
+        gap: 10px; /* Reduce el espacio entre elementos */
+    }
+}
+
+@media (max-width: 480px) {
+    #routine-list {
+        grid-template-columns: 1fr;
+    }
 }

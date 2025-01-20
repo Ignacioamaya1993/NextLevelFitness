@@ -56,7 +56,8 @@ function displayUserRoutines(routines) {
             const series = exercise.series || 0;
             const reps = exercise.repetitions || 0;
             const weight = exercise.weight || 0;
-            return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg</li>`;
+            const additionalData = exercise.additionalData || "Sin información adicional";
+            return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
         }).join('');
 
         routineCard.innerHTML = `
@@ -157,7 +158,7 @@ function groupRoutinesByDay(routines) {
         // Botón para cerrar
         const closeButton = document.createElement("button");
         closeButton.id = "close-popup";
-        closeButton.textContent = "Cerrar";
+        closeButton.textContent = "Cancelar";
         popupContent.appendChild(closeButton);
 
         // Evento para escuchar la tecla Escape
@@ -183,11 +184,19 @@ function groupRoutinesByDay(routines) {
         // Inicializar con el primer ejercicio
         renderEditFields(editFieldsContainer, exercises[0], 0, day, exercises, routine);
 
-        // Guardar cambios
         saveButton.addEventListener("click", () => {
+            // Actualiza los valores de los ejercicios con los datos del DOM
+            exercises.forEach((exercise, index) => {
+                exercise.series = parseInt(document.getElementById(`series-${index}`).value, 10);
+                exercise.repetitions = parseInt(document.getElementById(`reps-${index}`).value, 10);
+                exercise.weight = parseFloat(document.getElementById(`weight-${index}`).value);
+                exercise.additionalData = document.getElementById(`additionalData-${index}`).value;
+            });
+
             saveChanges(day, exercises);
             popup.classList.add("hidden");
         });
+
 
         // Cerrar popup
         closeButton.addEventListener("click", () => {
@@ -208,7 +217,11 @@ function renderEditFields(container, exercise, index, day, exercises) {
         <div>
             <label>Peso (kg):</label>
                 <input type="number" value="${exercise.weight || 0}" id="weight-${index}">
-                </div>
+        </div>
+        <div>
+            <label>Información adicional:</label>
+            <input type="text" value="${exercise.additionalData || ''}" id="additionalData-${index}">
+        </div>
         <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
     `;
 
@@ -230,24 +243,24 @@ async function deleteExerciseFromRoutine(day, index, exercises) {
 
     try {
         const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(async (doc) => {
-            // Actualiza la rutina eliminando el ejercicio
+
+        // Actualiza cada documento eliminando el ejercicio y verifica si queda vacío
+        for (const doc of querySnapshot.docs) {
             await updateDoc(doc.ref, {
                 exercise: arrayRemove(exercise),
             });
 
-            // Verifica si la rutina quedó sin ejercicios
-            const updatedRoutine = await getDocs(query(doc.ref));
-            const updatedExercises = updatedRoutine.docs[0]?.data()?.exercise || [];
+            // Reobtén la rutina actualizada para verificar si está vacía
+            const updatedDoc = await getDocs(query(routinesRef, where("userId", "==", user.uid), where("day", "==", day)));
+            const updatedExercises = updatedDoc.docs[0]?.data()?.exercise || [];
 
             if (updatedExercises.length === 0) {
-                // Si no quedan ejercicios, elimina la rutina completa
                 await deleteDoc(doc.ref);
                 alert(`La rutina para el día "${day}" ha sido eliminada porque no tiene ejercicios.`);
             } else {
                 alert(`Ejercicio "${exercise.name}" eliminado correctamente.`);
             }
-        });
+        }
 
         location.reload(); // Actualiza la página
     } catch (error) {
@@ -263,9 +276,10 @@ async function deleteRoutine(day) {
 
     try {
         const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(async (doc) => {
-            await deleteDoc(doc.ref);
-        });
+
+        // Elimina todos los documentos que coincidan
+        const deletePromises = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
+        await Promise.all(deletePromises);
 
         alert(`Rutina para el día "${day}" eliminada correctamente.`);
 
@@ -291,22 +305,18 @@ async function saveChanges(day, exercises) {
 
     try {
         const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(async (doc) => {
-            const updatedExercises = exercises.map((exercise, index) => ({
-                ...exercise,
-                series: parseInt(document.getElementById(`series-${index}`).value),
-                repetitions: parseInt(document.getElementById(`reps-${index}`).value),
-                weight: parseInt(document.getElementById(`weight-${index}`).value),
-            }));
 
-            await updateDoc(doc.ref, {
-                exercise: updatedExercises,
-            });
-        });
+        if (!querySnapshot.empty) {
+            const routineDoc = querySnapshot.docs[0]; // Asume que hay un único documento por día
+            await updateDoc(routineDoc.ref, { exercise: exercises });
+            alert("Cambios guardados exitosamente.");
+        } else {
+            alert("No se encontró la rutina para actualizar.");
+        }
 
-        alert("Cambios guardados correctamente.");
+        location.reload(); // Recarga la página para reflejar los cambios
     } catch (error) {
-        console.error("Error al guardar los cambios:", error);
-        alert("Ocurrió un error al guardar los cambios.");
+        console.error("Error al guardar cambios:", error);
+        alert("No se pudieron guardar los cambios.");
     }
 }

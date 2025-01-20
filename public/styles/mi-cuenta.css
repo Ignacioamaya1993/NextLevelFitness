@@ -7,43 +7,6 @@ main {
     background: linear-gradient(135deg, #f9fafb, #f4f4f4); /* Fondo degradado suave */
 }
 
-header {
-    background-color: #34495e; /* Azul grisáceo oscuro */
-    color: #ecf0f1; /* Blanco suave */
-    padding: 0;
-    margin: 0;
-}
-
-.nav-menu {
-    display: flex;
-    justify-content: center;
-    gap: 30px; /* Espaciado uniforme entre los elementos */
-    list-style: none;
-    padding: 10px 0;
-    margin: 0;
-}
-
-.nav-menu li {
-    display: inline-block;
-}
-
-.nav-menu li a {
-    text-decoration: none;
-    color: #ecf0f1; /* Blanco suave */
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    padding: 10px 15px;
-    transition: color 0.3s, background-color 0.3s;
-}
-
-.nav-menu li a:hover,
-.nav-menu li a.active {
-    color: #34495e; /* Azul gris oscuro */
-    background-color: #ecf0f1; /* Blanco suave para contraste */
-    border-radius: 5px;
-}
-
 /* Sección de detalles de la cuenta */
 .account-details {
     background-color: #ffffff;
@@ -171,4 +134,16 @@ button#logout-btn:disabled {
 
 .hidden {
     display: none;
+}
+
+@media (max-width: 768px) {
+    #routine-list {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    #routine-list {
+        grid-template-columns: 1fr;
+    }
 }

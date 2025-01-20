@@ -226,6 +226,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const repeticiones = document.getElementById('repeticiones').value;
                 const dia = document.getElementById('dias').value;
                 const peso = document.getElementById('peso').value;
+                const adicionales = document.getElementById('adicionales').value;
         
                 if (!series || !repeticiones || !dia || !peso) {
                     Swal.showValidationMessage("Por favor, completa todos los campos.");
@@ -246,6 +247,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             weight: parseFloat(peso),
                             video: video,
                             instructions: instrucciones,
+                            additionalData: adicionales,
                         },
                     });
         

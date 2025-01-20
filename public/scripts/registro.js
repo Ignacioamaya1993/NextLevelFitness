@@ -22,19 +22,25 @@ registroForm.addEventListener("submit", async (event) => {
     const apellido = document.getElementById("apellido").value.trim();
     const fechaNacimiento = document.getElementById("fecha-nacimiento").value.trim();
     const genero = document.getElementById("genero").value;
-    const peso = parseFloat(document.getElementById("peso").value.trim());
+    const celular = document.getElementById("celular").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
     const confirmarPassword = document.getElementById("confirmar-password").value;
 
     // Validaciones básicas
-    if (!nombre || !apellido || !fechaNacimiento || !genero || !peso || !email || !password || !confirmarPassword) {
+    if (!nombre || !apellido || !fechaNacimiento || !genero || !celular || !email || !password || !confirmarPassword) {
         mostrarMensaje("Por favor, completa todos los campos.", "error");
         return;
     }
 
     if (password !== confirmarPassword) {
         mostrarMensaje("Las contraseñas no coinciden.", "error");
+        return;
+    }
+
+    // Validar número de celular (Ejemplo: solo números y de 10 dígitos)
+    if (!/^\d{10}$/.test(celular)) {
+        mostrarMensaje("Por favor, ingresa un número de celular válido (10 dígitos).", "error");
         return;
     }
 
@@ -57,7 +63,7 @@ registroForm.addEventListener("submit", async (event) => {
             apellido,
             fechaNacimiento,
             genero,
-            peso,
+            celular,
             email,
         };
     

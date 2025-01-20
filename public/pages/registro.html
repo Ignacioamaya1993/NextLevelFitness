@@ -12,9 +12,10 @@
 </head>
 <body>
     <header>
-        <div class="logo">
+        <div class="header-container">
+            <div class="logo">
                 <img src="../assets/images/logos/nextlevel1.png" alt="Next Level Fitness Logo">
-        </div>
+            </div>
         
         <nav>
             <ul class="nav-menu">
@@ -23,9 +24,10 @@
                 <li><a href="tus-rutinas.html">Tus Rutinas</a></li>
                 <li><a href="registro.html" class="active">Registrarse</a></li>
                 <li><a href="../pages/login.html" id="iniciar-sesion-link">Iniciar Sesión</a></li>
-                <li><a href="../pages/mi-cuenta.html" id="mi-cuenta-link" style="display: none;">Mi Cuenta</a></li>    
+                <li><a href="../pages/mi-cuenta.html" id="mi-cuenta-link">Mi Cuenta</a></li>
             </ul>
         </nav>
+        
     </header>
 
     <main>
@@ -55,8 +57,8 @@
     
                 <!-- Segunda columna -->
                 <div class="column">
-                    <label for="peso">Peso (kg):</label>
-                    <input type="number" id="peso" name="peso" placeholder="Ingresa tu peso" step="0.1" required>
+                    <label for="celular">Número de Celular:</label>
+                    <input type="text" id="celular" name="celular" placeholder="Ej: 1234567890" required>
     
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" placeholder="Ingresa tu correo electrónico" required>

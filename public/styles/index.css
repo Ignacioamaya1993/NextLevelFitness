@@ -1,29 +1,42 @@
 /* Estilos para la página principal */
 .hero {
+    position: relative;
     text-align: center;
-    padding: 50px 20px;
-    background: linear-gradient(to right, #a8dadc, #457b9d); /* Degradado moderno en tonos azules */
-    color: #f1faee; /* Blanco suave */
+    background-image: url('../assets/images/banner/banner.webp'); /* Ruta de tu imagen */
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px; /* Bordes redondeados */
+    padding: 60px 20px; /* Ajusta el espaciado */
+    color: #ffffff; /* Color del texto */
+    max-width: 1200px; /* Ancho máximo */
+    margin: 0 auto; /* Centrado horizontal */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar */
+}
+
+.hero-content {
+    background-color: rgba(0, 0, 0, 0); /* Fondo semitransparente para destacar el texto */
+    padding: 20px;
+    border-radius: 10px; /* Bordes redondeados del contenido */
+    display: inline-block; /* Ajusta el ancho del contenido al texto */
 }
 
 .hero h1 {
     font-size: 2.5rem;
     font-weight: bold;
     margin-bottom: 15px;
-    color: #1d3557; /* Azul oscuro para un contraste moderno */
 }
 
 .hero p {
     font-size: 1.2rem;
     margin-bottom: 25px;
-    color: #f1faee; /* Blanco suave */
 }
+
 
 .hero .cta-button {
     font-size: 1rem;
-    padding: 15px 30px;
-    background-color: #1d3557; /* Azul oscuro para el botón */
-    color: #f1faee; /* Blanco para el texto */
+    padding: 12px 25px;
+    background-color: #ff5733; /* Color llamativo para el botón */
+    color: #ffffff; /* Texto en blanco */
     text-decoration: none;
     border-radius: 5px;
     font-weight: bold;
@@ -31,6 +44,15 @@
 }
 
 .hero .cta-button:hover {
-    background-color: #457b9d; /* Azul intermedio para hover */
+    background-color: #c70039; /* Color diferente al pasar el ratón */
     transform: scale(1.05); /* Pequeño efecto de agrandamiento */
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    .hero p {
+        font-size: 1rem;
+    }
 }

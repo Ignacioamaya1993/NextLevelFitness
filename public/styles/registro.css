@@ -172,3 +172,15 @@ button:hover {
 .password-container .toggle-password:hover {
     color: #5a3794;
 }
+
+@media (max-width: 768px) {
+    #routine-list {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    #routine-list {
+        grid-template-columns: 1fr;
+    }
+}
