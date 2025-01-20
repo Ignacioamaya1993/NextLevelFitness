@@ -19,8 +19,52 @@ body {
 
 /* Logo */
 .logo img {
-    max-width: 150px;
-    height: auto;
+    height: 50px;
+}
+
+.login-container {
+    background: white;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-container h2 {
+    margin-bottom: 20px;
+    color: #1d3557;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+}
+
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    background: #1d3557;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.login-container button:hover {
+    background: #5a3794;
 }
 
 /* Título del panel */
