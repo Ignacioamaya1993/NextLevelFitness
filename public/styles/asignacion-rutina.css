@@ -4,6 +4,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f7f7f7;
+    color: #333;
 }
 
 /* Logo */
@@ -88,6 +89,7 @@ body {
     gap: 20px;
 }
 
+/* Estilos de las rutinas */
 .routine {
     background-color: white;
     padding: 20px;
@@ -112,7 +114,15 @@ body {
     color: #555;
 }
 
-/* Estilos de la sección footer */
+/* Estilos del mensaje de no rutinas */
+#no-routines-message {
+    display: none;
+    color: #e94e77;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+/* Estilos del footer */
 footer {
     background-color: #333;
     color: white;
