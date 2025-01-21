@@ -336,7 +336,7 @@ async function saveChanges(day, exercises) {
                         series !== exercise.series ||
                         repetitions !== exercise.repetitions ||
                         weight !== exercise.weight ||
-                        additionalData !== (exercise.additionalData || "")
+                        additionalData.trim() !== (exercise.additionalData || "").trim()
                     ) {
                         hasChanges = true; // Detectar si hubo algún cambio
                     }
