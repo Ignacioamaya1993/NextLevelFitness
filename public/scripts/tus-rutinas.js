@@ -219,22 +219,22 @@ function openEditPopup(day, routines) {
 
 function renderEditFields(container, exercise, index, day, exercises) {
     container.innerHTML = `
-        <div>
-            <label>Series:</label>
-            <input type="number" value="${exercise.series || 0}" id="series-${index}" min="0">
-        </div>
-        <div>
-            <label>Repeticiones:</label>
-            <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}" min="0">
-        </div>
-        <div>
-            <label>Peso (kg):</label>
-            <input type="number" value="${exercise.weight || 0}" id="weight-${index}" min="0" step="0.01">
-        </div>
-        <div>
-            <label>Información adicional:</label>
-            <input type="text" value="${exercise.additionalData || ''}" id="additionalData-${index}">
-        </div>
+            <div>
+                <label>Series:</label>
+                <input type="number" value="${exercise.series != null ? exercise.series : 1}" id="series-${index}" min="1">
+            </div>
+            <div>
+                <label>Repeticiones:</label>
+                <input type="number" value="${exercise.repetitions != null ? exercise.repetitions : 1}" id="reps-${index}" min="1">
+            </div>
+            <div>
+                <label>Peso (kg):</label>
+                <input type="number" value="${exercise.weight != null ? exercise.weight : 1}" id="weight-${index}" min="1" step="0.01">
+            </div>
+            <div>
+                <label>Información adicional:</label>
+                <input type="text" value="${exercise.additionalData != null ? exercise.additionalData : ''}" id="additionalData-${index}">
+            </div>
         <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
     `;
 
