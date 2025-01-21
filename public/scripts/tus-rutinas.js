@@ -306,7 +306,10 @@ async function saveChanges(day, exercises) {
 
                     // Validar si los valores son válidos
                     if (series <= 0 || repetitions <= 0 || weight <= 0) {
-                        input.setCustomValidity("El valor debe ser mayor a 0.");
+                        // Aquí es donde estaba el error, "input" no estaba definido
+                        if (series <= 0) seriesInput.setCustomValidity("El valor de series debe ser mayor a 0.");
+                        if (repetitions <= 0) repsInput.setCustomValidity("El valor de repeticiones debe ser mayor a 0.");
+                        if (weight <= 0) weightInput.setCustomValidity("El valor de peso debe ser mayor a 0.");
                         hasErrors = true;
                         return; // Detener el procesamiento de este ejercicio
                     }
