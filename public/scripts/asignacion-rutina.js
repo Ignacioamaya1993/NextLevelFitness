@@ -1,9 +1,21 @@
-console.log('El archivo JS se ha cargado correctamente'); // Log de prueba
-
-import { db } from './firebaseConfig.js'; // Importamos la configuración de Firebase
+import { db } from './firebaseConfig.js';
 import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    const auth = getAuth();
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            console.log('✅ Usuario autenticado:', user.email);
+        } else {
+            alert('No tienes permiso para acceder. Inicia sesión.');
+            window.location.href = 'login-admin.html';
+        }
+    });
+
     const searchButton = document.getElementById('search-button');
     const searchInput = document.getElementById('search-input');
     const noUserMessage = document.getElementById('no-user-message');
@@ -12,105 +24,128 @@ document.addEventListener('DOMContentLoaded', () => {
     const noRoutinesMessage = document.getElementById('no-routines-message');
     const routineList = document.getElementById('routine-list');
 
-    // Función para buscar el usuario en Firestore
     async function searchUser() {
+        if (!currentUser) {
+            alert('Debes estar autenticado para buscar usuarios.');
+            return;
+        }
+    
         const queryText = searchInput.value.trim();
-        console.log('Texto de búsqueda:', queryText); // Verificar lo que se ingresa en el input
-
         if (!queryText) {
             alert('Por favor, ingresa un nombre o correo para buscar.');
             return;
         }
-
-        // Ocultamos los mensajes previos
-        noUserMessage.classList.add('hidden');
+    
+        // Ocultamos mensajes previos y limpiamos la lista
+        noUserMessage.classList.add('hidden'); // Aseguramos que el mensaje de "No se encontró" esté oculto
         routineViewer.classList.add('hidden');
         noRoutinesMessage.classList.add('hidden');
-
+        routineList.innerHTML = '';
+    
         try {
-            // Hacemos la consulta para buscar el usuario por nombre o correo
             let userQuery;
             if (queryText.includes('@')) {
-                console.log('Buscando por correo:', queryText); // Verificar que se detecta un correo
-                // Si el input tiene un '@', lo tratamos como correo
-                userQuery = query(
-                    collection(db, 'users'),
-                    where('email', '==', queryText) // Buscar por correo
-                );
+                userQuery = query(collection(db, 'usuarios'), where('email', '==', queryText));
+                console.log(`📧 Búsqueda por correo: ${queryText}`);
             } else {
-                console.log('Buscando por nombre completo:', queryText); // Verificar que se busca por nombre
-                // Si no es correo, buscamos por nombre completo
+                const [firstName, lastName] = queryText.split(' ');
                 userQuery = query(
-                    collection(db, 'users'),
-                    where('fullName', '==', queryText) // Buscar por nombre completo
+                    collection(db, 'usuarios'),
+                    where('nombre', '==', firstName.toLowerCase()),
+                    where('apellido', '==', lastName.toLowerCase())
                 );
+                console.log(`📑 Búsqueda por nombre: ${firstName} ${lastName}`);
             }
-
+    
             const querySnapshot = await getDocs(userQuery);
-            console.log('Resultado de la consulta:', querySnapshot); // Verificar la consulta
-
+    
             if (querySnapshot.empty) {
-                // Si no encontramos el usuario, mostramos el mensaje
-                console.log('No se encontró el usuario');
                 noUserMessage.classList.remove('hidden');
+                console.log('🔍 No se encontró un usuario.');
                 return;
             }
-
-            // Si encontramos el usuario, mostramos su nombre y rutinas
-            const userDoc = querySnapshot.docs[0]; // Asumimos que hay un solo resultado
+    
+            const userDoc = querySnapshot.docs[0];
             const userData = userDoc.data();
-            console.log('Usuario encontrado:', userData); // Verificar los datos del usuario encontrado
-            userNameDisplay.textContent = userData.fullName;
-
-            // Verificamos si el usuario tiene rutinas asignadas
-            const routines = userData.routines || [];
-            console.log('Rutinas del usuario:', routines); // Verificar las rutinas del usuario
-
+            const userId = userDoc.id;
+    
+            userNameDisplay.textContent = `${userData.nombre} ${userData.apellido}`;
+    
+            // **Buscar rutinas del usuario**
+            const routinesQuery = query(collection(db, 'routines'), where('userId', '==', userId));
+            const routinesSnapshot = await getDocs(routinesQuery);
+            const routines = routinesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    
             if (routines.length === 0) {
                 noRoutinesMessage.classList.remove('hidden');
             } else {
                 displayRoutines(routines);
             }
-
-            // Mostramos el contenedor de rutinas
+    
             routineViewer.classList.remove('hidden');
-
+            console.log('👀 Vista de rutinas activada.');
+    
         } catch (error) {
-            console.error('Error buscando usuario:', error);
+            console.error('Error buscando usuario o rutinas:', error);
         }
     }
 
-    // Función para mostrar las rutinas
     function displayRoutines(routines) {
-        routineList.innerHTML = ''; // Limpiamos la lista de rutinas antes de agregar nuevas
-
-        routines.forEach(routine => {
-            const routineDiv = document.createElement('div');
-            routineDiv.classList.add('routine');
-
-            const routineTitle = document.createElement('h3');
-            routineTitle.textContent = routine.name;
-
-            const routineDetails = document.createElement('p');
-            routineDetails.textContent = `Series: ${routine.series}, Repeticiones: ${routine.repetitions}`;
-
-            routineDiv.appendChild(routineTitle);
-            routineDiv.appendChild(routineDetails);
-            routineList.appendChild(routineDiv);
+        routineList.innerHTML = ''; // Limpiar lista previa
+        console.log('🔧 Mostrando rutinas:', routines); // Ver qué rutinas se están pasando a la función
+    
+        routines.forEach((routineDoc) => {
+            const { day, exercise } = routineDoc;
+            console.log(`📅 Día de la rutina: ${day}`); // Verificar día
+            console.log('🏋️‍♂️ Ejercicio:', exercise); // Verificar ejercicios
+    
+            // Título del día
+            const dayTitle = document.createElement('h2');
+            dayTitle.textContent = `Día: ${day || 'Sin día especificado'}`;
+            routineList.appendChild(dayTitle);
+    
+            if (Array.isArray(exercise)) {
+                // Procesar exercise como array
+                exercise.forEach((routine, i) => displayRoutineDetails(routine, i + 1));
+            } else if (typeof exercise === 'object') {
+                // Procesar exercise como objeto
+                displayRoutineDetails(exercise, 1); // Muestra el ejercicio del objeto
+            } else {
+                // Caso donde no hay ejercicios válidos
+                const noExerciseMessage = document.createElement('p');
+                noExerciseMessage.textContent = 'No hay ejercicios registrados para este día.';
+                routineList.appendChild(noExerciseMessage);
+            }
         });
+    
+        routineViewer.classList.remove('hidden');
+        console.log('👀 Vista de rutinas activada.');
     }
 
-    // Evento al hacer clic en el botón de buscar
-    searchButton.addEventListener('click', () => {
-        console.log('Botón de búsqueda clickeado');
-        searchUser();
-    });
+    // **Función para mostrar los detalles de un ejercicio**
+    function displayRoutineDetails(routine, index) {
+        console.log(`🔧 Detalles del ejercicio ${index}:`, routine);
+        
+        const routineDiv = document.createElement('div');
+        routineDiv.classList.add('routine');
 
-    // También permitimos que presionar "Enter" en el input dispare la búsqueda
+        const routineTitle = document.createElement('h3');
+        routineTitle.textContent = `Ejercicio ${index}: ${routine.name || 'Sin nombre'}`;
+
+        const routineDetails = document.createElement('p');
+        routineDetails.textContent = `Series: ${routine.series || 'N/A'}, 
+            Repeticiones: ${routine.repetitions || 'N/A'}, 
+            Peso: ${routine.weight || 'N/A'} kg
+        `;
+
+        routineDiv.appendChild(routineTitle);
+        routineDiv.appendChild(routineDetails);
+        routineList.appendChild(routineDiv);
+    }
+
+    // **Eventos de búsqueda**
+    searchButton.addEventListener('click', searchUser);
     searchInput.addEventListener('keypress', (e) => {
-        console.log('Tecla presionada:', e.key); // Verificar qué tecla se presionó
-        if (e.key === 'Enter') {
-            searchUser();
-        }
+        if (e.key === 'Enter') searchUser();
     });
 });

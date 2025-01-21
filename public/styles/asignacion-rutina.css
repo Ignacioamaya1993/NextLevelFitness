@@ -7,6 +7,11 @@ body {
     color: #333;
 }
 
+.hidden {
+    display: none;
+}
+
+
 /* Logo */
 .logo img {
     height: 50px;

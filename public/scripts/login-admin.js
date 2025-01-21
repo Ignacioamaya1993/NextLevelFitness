@@ -3,8 +3,8 @@ import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstati
 
 const auth = getAuth(app);
 
-const adminEmail = "ignacioamaya04@gmail.com";// Correo del administrador
-
+// Lista de correos de administradores
+const adminEmails = ["ignacioamaya04@gmail.com", "soutrelleagustin64@gmail.com"];
 
 document.getElementById("admin-login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -16,7 +16,7 @@ document.getElementById("admin-login-form").addEventListener("submit", async (e)
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        if (user.email === adminEmail) {
+        if (adminEmails.includes(user.email)) {
             // Redirige al panel de administración
             window.location.href = "panel-admin.html";
         } else {

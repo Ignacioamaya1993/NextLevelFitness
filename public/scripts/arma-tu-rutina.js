@@ -1,5 +1,5 @@
 import app from './firebaseConfig.js';
-import { getFirestore, collection, doc, getDocs, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, getDoc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     // Asegúrate de que este código solo se ejecute una vez
@@ -140,36 +140,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Modifica la función para incluir la lógica de guardar en Firestore
-    function showExerciseDetails(nombre, video, instrucciones) {
+    async function showExerciseDetails(nombre, video, instrucciones) {
         const user = JSON.parse(localStorage.getItem("currentUser"));
-
         if (!user || !user.isLoggedIn) {
             Swal.fire("Error", "Debes estar logueado para guardar rutinas.", "error");
             return;
         }
-
-        // Convertir la URL de YouTube a formato de embed
         let embedVideoUrl = "";
-
         if (video.includes("youtube.com/shorts/")) {
-            // Convierte Shorts a formato embed
             embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
         } else if (video.includes("youtube.com/watch?v=")) {
-            // Convierte videos regulares a formato embed
-            const videoId = video.split("v=")[1]?.split("&")[0]; // Extrae solo el ID del video
+            const videoId = video.split("v=")[1]?.split("&")[0];
             embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
-        } else {
-            console.error("Formato de URL no reconocido:", video);
         }
-
         const contentHTML = `
         <div class="exercise-popup">
             <div class="popup-header">
                 <h3 class="exercise-title">${nombre}</h3>
             </div>
             <div class="popup-content">
-                <!-- Columna izquierda -->
                 <div class="popup-left">
                     <div class="video-container">
                         <iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
@@ -177,7 +166,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <h4>Instrucciones</h4>
                     <p>${instrucciones}</p>
                 </div>
-                <!-- Columna derecha -->
                 <div class="popup-right">
                     <form id="exercise-form">
                         <div class="form-group">
@@ -219,7 +207,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             confirmButtonText: "Guardar",
             cancelButtonText: "Cancelar",
             customClass: {
-                popup: 'custom-popup' // Añadimos una clase personalizada
+                popup: 'custom-popup'
             },
             preConfirm: async () => {
                 const series = document.getElementById('series').value;
@@ -227,20 +215,24 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const dia = document.getElementById('dias').value;
                 const peso = document.getElementById('peso').value;
                 const adicionales = document.getElementById('adicionales').value;
-        
+            
                 if (!series || !repeticiones || !dia || !peso) {
                     Swal.showValidationMessage("Por favor, completa todos los campos.");
                     return;
                 }
-        
+            
                 try {
                     const db = getFirestore(app);
                     const routinesRef = collection(db, "routines");
-        
-                    await addDoc(routinesRef, {
-                        userId: user.uid,
-                        day: dia,
-                        exercise: {
+            
+                    // Verificar si ya existe una rutina para ese día y usuario
+                    const routinesSnapshot = await getDocs(routinesRef);
+                    const existingRoutineDoc = routinesSnapshot.docs.find(doc => doc.data().userId === user.uid && doc.data().day === dia);
+            
+                    if (existingRoutineDoc) {
+                        // Si ya existe, agregar el nuevo ejercicio al array de ejercicios
+                        const routineData = existingRoutineDoc.data();
+                        const updatedExercises = [...routineData.exercises, {
                             name: nombre,
                             series: parseInt(series, 10),
                             repetitions: parseInt(repeticiones, 10),
@@ -248,15 +240,39 @@ document.addEventListener("DOMContentLoaded", async () => {
                             video: video,
                             instructions: instrucciones,
                             additionalData: adicionales,
-                        },
-                    });
-        
-                    Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina.", "success");
+                        }];
+                        
+                        // Actualizar el documento existente con el nuevo ejercicio
+                        await updateDoc(doc(db, "routines", existingRoutineDoc.id), {
+                            exercises: updatedExercises,
+                        });
+            
+                        Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
+                    } else {
+                        // Si no existe, crear un nuevo documento
+                        await addDoc(routinesRef, {
+                            userId: user.uid,
+                            day: dia,
+                            exercises: [{
+                                name: nombre,
+                                series: parseInt(series, 10),
+                                repetitions: parseInt(repeticiones, 10),
+                                weight: parseFloat(peso),
+                                video: video,
+                                instructions: instrucciones,
+                                additionalData: adicionales,
+                            }],
+                        });
+            
+                        Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
+                    }
                 } catch (error) {
                     console.error("Error al guardar la rutina:", error);
                     Swal.fire("Error", "Hubo un problema al guardar la rutina. Inténtalo de nuevo.", "error");
                 }
             },
+            
         });
     }
+
 });
