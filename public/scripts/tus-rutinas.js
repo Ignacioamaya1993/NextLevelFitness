@@ -255,9 +255,20 @@ function preventNegativeValues(index) {
 
     [seriesInput, repsInput, weightInput].forEach(input => {
         if (input) {
+            // Eliminar el carácter '-' mientras el usuario escribe
             input.addEventListener('input', () => {
                 if (input.value.includes('-')) {
                     input.value = input.value.replace('-', '');
+                }
+            });
+
+            // Validar el valor al salir del campo (blur)
+            input.addEventListener('blur', () => {
+                if (input.value === "" || parseInt(input.value, 10) <= 0) {
+                    input.setCustomValidity("El valor debe ser mayor a 0.");
+                    input.reportValidity(); // Muestra el mensaje emergente
+                } else {
+                    input.setCustomValidity(""); // Limpia el mensaje si el valor es válido
                 }
             });
         }
@@ -281,7 +292,7 @@ async function saveChanges(day, exercises) {
             let hasErrors = false;
 
             exercises.forEach((exercise, index) => {
-                preventNegativeValues(index); // Evitar valores negativos al escribir
+                preventNegativeValues(index); // Prevenir valores negativos
 
                 const seriesInput = document.getElementById(`series-${index}`);
                 const repsInput = document.getElementById(`reps-${index}`);
@@ -293,9 +304,9 @@ async function saveChanges(day, exercises) {
                     const repetitions = parseInt(repsInput.value, 10) || 0;
                     const weight = parseFloat(weightInput.value) || 0;
 
-                    // Verificar que los campos no estén en 0
-                    if (series === 0 || repetitions === 0 || weight === 0) {
-                        alert(`Todos los campos deben ser mayores a 0 en el ejercicio ${index + 1}.`);
+                    // Validar si los valores son válidos
+                    if (series <= 0 || repetitions <= 0 || weight <= 0) {
+                        input.setCustomValidity("El valor debe ser mayor a 0.");
                         hasErrors = true;
                         return; // Detener el procesamiento de este ejercicio
                     }
@@ -311,6 +322,7 @@ async function saveChanges(day, exercises) {
             });
 
             if (hasErrors) {
+                alert("Por favor corrige los campos con valores inválidos.");
                 return; // Si hay errores, no continuar con la actualización
             }
 
