@@ -248,6 +248,22 @@ function renderEditFields(container, exercise, index, day, exercises) {
     });
 }
 
+function preventNegativeValues(index) {
+    const seriesInput = document.getElementById(`series-${index}`);
+    const repsInput = document.getElementById(`reps-${index}`);
+    const weightInput = document.getElementById(`weight-${index}`);
+
+    [seriesInput, repsInput, weightInput].forEach(input => {
+        if (input) {
+            input.addEventListener('input', () => {
+                if (input.value.includes('-')) {
+                    input.value = input.value.replace('-', '');
+                }
+            });
+        }
+    });
+}
+
 async function saveChanges(day, exercises) {
     const user = JSON.parse(localStorage.getItem("currentUser"));
     const routinesRef = collection(db, "routines");
@@ -262,37 +278,41 @@ async function saveChanges(day, exercises) {
             console.log("Ejercicios a guardar:", exercises);
 
             const validExercises = [];
+            let hasErrors = false;
 
             exercises.forEach((exercise, index) => {
-                console.log(`Verificando inputs para ejercicio ${index}`);
+                preventNegativeValues(index); // Evitar valores negativos al escribir
 
                 const seriesInput = document.getElementById(`series-${index}`);
                 const repsInput = document.getElementById(`reps-${index}`);
                 const weightInput = document.getElementById(`weight-${index}`);
                 const additionalDataInput = document.getElementById(`additionalData-${index}`);
 
-                console.log(`series-${index}:`, seriesInput ? seriesInput.value : "No encontrado");
-                console.log(`reps-${index}:`, repsInput ? repsInput.value : "No encontrado");
-                console.log(`weight-${index}:`, weightInput ? weightInput.value : "No encontrado");
-                console.log(`additionalData-${index}:`, additionalDataInput ? additionalDataInput.value : "No encontrado");
-
                 if (seriesInput && repsInput && weightInput && additionalDataInput) {
-                    // Asegurarse de que los valores no sean negativos
-                    const series = Math.max(0, parseInt(seriesInput.value, 10) || 0);
-                    const repetitions = Math.max(0, parseInt(repsInput.value, 10) || 0);
-                    const weight = Math.max(0, parseFloat(weightInput.value) || 0);
+                    const series = parseInt(seriesInput.value, 10) || 0;
+                    const repetitions = parseInt(repsInput.value, 10) || 0;
+                    const weight = parseFloat(weightInput.value) || 0;
 
-                    // Actualizar los valores en el ejercicio
+                    // Verificar que los campos no estén en 0
+                    if (series === 0 || repetitions === 0 || weight === 0) {
+                        alert(`Todos los campos deben ser mayores a 0 en el ejercicio ${index + 1}.`);
+                        hasErrors = true;
+                        return; // Detener el procesamiento de este ejercicio
+                    }
+
                     exercise.series = series;
                     exercise.repetitions = repetitions;
                     exercise.weight = weight;
                     exercise.additionalData = additionalDataInput.value || "";
-
                     validExercises.push(exercise);
                 } else {
                     console.warn(`Faltan inputs para el ejercicio ${index}, se omitirá.`);
                 }
             });
+
+            if (hasErrors) {
+                return; // Si hay errores, no continuar con la actualización
+            }
 
             console.log("Ejercicios válidos a actualizar:", validExercises);
 
@@ -310,7 +330,6 @@ async function saveChanges(day, exercises) {
         console.error("Error al guardar cambios:", error);
     }
 }
-
 
 // Para depuración, imprime todos los elementos con ID `series-`
 document.addEventListener("DOMContentLoaded", () => {
