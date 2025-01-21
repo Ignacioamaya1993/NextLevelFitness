@@ -9,12 +9,11 @@
     display: none !important;
 }
 
-
 html, body {
     height: 100%;
     font-family: 'Arial', sans-serif;
-    background-color: #f9fafb;
-    color: #2c3e50;
+    background-color: #f3f4f6;
+    color: #374151;
 }
 
 /* Estilos para la sección principal */
@@ -30,15 +29,15 @@ main {
 .access-restricted {
     text-align: center;
     padding: 50px;
-    background-color: #f1f3f5;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .access-restricted:hover {
-    transform: scale(1.02);
+    transform: scale(1.03);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -46,23 +45,23 @@ main {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 20px;
-    color: #1d3557;
+    color: #1f2937;
 }
 
 .access-restricted .cta-button {
     margin: 10px;
-    background-color: #457b9d;
-    color: #f1faee;
+    background-color: #3b82f6;
+    color: #ffffff;
     text-decoration: none;
     padding: 12px 25px;
-    border-radius: 5px;
+    border-radius: 8px;
     font-weight: bold;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.3s ease, transform 0.2s ease;
     display: inline-block;
 }
 
 .access-restricted .cta-button:hover {
-    background-color: #1d3557;
+    background-color: #2563eb;
     transform: scale(1.1);
 }
 
@@ -76,13 +75,13 @@ main {
 
 #routine-list {
     display: grid;
-    grid-template-columns: repeat(3, minmax(250px, 1fr)); /* 3 columnas, con un ancho mínimo de 250px */
+    grid-template-columns: repeat(3, minmax(250px, 1fr));
     gap: 20px;
     background-color: #ffffff;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 #routine-list:hover {
@@ -93,23 +92,22 @@ main {
 /* Tarjetas de rutina */
 .routine-card {
     background-color: #ffffff;
-    border: 1px solid #ddd;
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    margin-bottom: 20px;
-    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .routine-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .routine-card h3 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: bold;
-    color: #1d3557;
+    color: #1f2937;
     margin-bottom: 10px;
 }
 
@@ -121,30 +119,29 @@ main {
 
 .routine-card li {
     font-size: 1rem;
-    margin-bottom: 5px;
-    color: #2c3e50;
+    margin-bottom: 8px;
+    color: #374151;
 }
-
 
 .routine-card p {
     font-size: 1rem;
-    color: #7f8c8d;
+    color: #6b7280;
     margin-bottom: 20px;
 }
 
 .routine-card .cta-button {
-    background-color: #27ae60;
+    background-color: #10b981;
     color: #ffffff;
     padding: 10px 20px;
-    font-size: 0.9rem;
-    border-radius: 5px;
+    font-size: 1rem;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: bold;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
 }
 
 .routine-card .cta-button:hover {
-    background-color: #1e8449;
+    background-color: #059669;
 }
 
 /* Popup de edición */
@@ -156,12 +153,13 @@ main {
     transform: translate(-50%, -50%);
     background-color: #ffffff;
     padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     width: 90%;
     max-width: 400px;
     animation: popup-show 0.3s ease-in-out;
+    border: 2px solid #3b82f6;
 }
 
 /* Fondo semi-transparente al abrir el popup */
@@ -179,64 +177,69 @@ main {
 /* Selector y campos de edición */
 #edit-popup select,
 #edit-popup input[type="text"],
-#edit-popup input[type="number"] {
+#edit-popup input[type="number"],
+#popup-content textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-bottom: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
     font-size: 1rem;
     background-color: #f9fafb;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 #edit-popup select:focus,
-#edit-popup input:focus {
-    border-color: #457b9d;
-    box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
+#edit-popup input:focus,
+#popup-content textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
     outline: none;
 }
 
 /* Botones del popup */
 #edit-popup button {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 12px 20px;
     margin: 10px 5px 0;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 #edit-popup .save-button {
-    background-color: #457b9d;
+    background-color: #3b82f6;
     color: #ffffff;
+    border: 2px solid #2563eb;
 }
 
 #edit-popup .save-button:hover {
-    background-color: #1d3557;
+    background-color: #2563eb;
     transform: translateY(-2px);
 }
 
 #edit-popup .delete-button {
-    background-color: #e63946;
+    background-color: #ef4444;
     color: #ffffff;
+    border: 2px solid #dc2626;
 }
 
 #edit-popup .delete-button:hover {
-    background-color: #c0392b;
+    background-color: #dc2626;
     transform: translateY(-2px);
 }
 
 #edit-popup .close-button {
-    background-color: #a8a8a8;
+    background-color: #9ca3af;
     color: #ffffff;
+    border: 2px solid #6b7280;
 }
 
 #edit-popup .close-button:hover {
-    background-color: #7a7a7a;
+    background-color: #6b7280;
     transform: translateY(-2px);
 }
 
@@ -254,13 +257,13 @@ main {
 
 #popup-content h3 {
     font-size: 1.8rem;
-    color: #1d3557;
+    color: #1f2937;
     margin-bottom: 10px;
 }
 
 #popup-content p {
     font-size: 1rem;
-    color: #555;
+    color: #4b5563;
     margin-bottom: 20px;
 }
 
@@ -276,19 +279,21 @@ main {
 }
 
 #close-popup:hover {
-    background-color: #c0392b;
+    background-color: #b3392b; /* Color ajustado para mejor contraste */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Añadido efecto de sombra */
+    transform: scale(1.05); /* Efecto de escala */
 }
 
 /* Botones en las tarjetas */
 .routine-card .edit-button,
 .routine-card .delete-button {
-    padding: 8px 12px;
-    margin-top: 10px;
+    padding: 10px 15px; /* Tamaño ajustado para mayor comodidad */
+    margin-top: 12px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px; /* Bordes más redondeados */
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
 
 .routine-card .edit-button {
@@ -296,9 +301,16 @@ main {
     color: #ffffff;
 }
 
-.routine-card .delete-button:hover {
-    background-color: #c0392b;
+.routine-card .edit-button:hover {
+    background-color: #356485; /* Color más oscuro al pasar el mouse */
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.routine-card .delete-button:hover {
+    background-color: #b3392b; /* Ajuste para mejor cohesión */
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Lista de rutinas */
@@ -306,72 +318,75 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: 16px; /* Espaciado más generoso */
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s, transform 0.2s;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Sombra más suave */
+    transition: box-shadow 0.3s, transform 0.3s;
 }
 
 .routine-item:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px); /* Movimiento más pronunciado */
 }
 
 .routine-item .edit-button {
-    margin-left: 10px;
+    margin-left: 12px; /* Espaciado ajustado */
 }
 
 /* Botones distribuidos horizontalmente */
 #popup-content .button-container {
     display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
+    justify-content: space-evenly; /* Mejor distribución */
+    margin-top: 20px;
 }
 
 /* Botón "Cancelar" centrado */
 #popup-content .centered-button {
     display: block;
-    margin: 15px auto 0; /* Centrado horizontal */
-    padding: 10px 20px;
+    margin: 20px auto 0;
+    padding: 12px 25px;
     background-color: #e74c3c;
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: 12px; /* Bordes más redondeados */
+    font-size: 1.1rem; /* Tamaño de texto ligeramente mayor */
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s;
     text-align: center;
 }
 
 #popup-content .centered-button:hover {
-    background-color: #c0392b;
+    background-color: #b3392b;
+    transform: scale(1.05); /* Añadido efecto de escala */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra adicional */
 }
 
 /* Campo de texto "Información adicional" */
 #popup-content textarea {
     width: 100%;
-    height: 100px; /* Altura ajustada */
-    padding: 10px;
+    height: 120px; /* Altura ligeramente aumentada */
+    padding: 12px;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 10px; /* Bordes más redondeados */
     font-size: 1rem;
     background-color: #f9fafb;
-    resize: vertical; /* Permite redimensionar solo verticalmente */
+    resize: vertical;
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 #popup-content textarea:focus {
-    border-color: #457b9d;
-    box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
+    border-color: #356485; /* Color ajustado al foco */
+    box-shadow: 0 0 8px rgba(53, 100, 133, 0.5);
     outline: none;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     #routine-list {
-        grid-template-columns: repeat(2, minmax(200px, 1fr));
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
     }
 }
 
