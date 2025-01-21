@@ -332,12 +332,12 @@ async function saveChanges(day, exercises) {
                     }
 
                     // Comparar los valores iniciales con los actuales
-                    if (
-                        series !== exercise.series ||
-                        repetitions !== exercise.repetitions ||
-                        weight !== exercise.weight ||
-                        additionalData.trim() !== (exercise.additionalData || "").trim()
-                    ) {
+                    const isSeriesChanged = series !== exercise.series;
+                    const isRepsChanged = repetitions !== exercise.repetitions;
+                    const isWeightChanged = weight !== exercise.weight;
+                    const isAdditionalDataChanged = additionalData.trim() !== (exercise.additionalData || "").trim();
+
+                    if (isSeriesChanged || isRepsChanged || isWeightChanged || isAdditionalDataChanged) {
                         hasChanges = true; // Detectar si hubo algún cambio
                     }
 
