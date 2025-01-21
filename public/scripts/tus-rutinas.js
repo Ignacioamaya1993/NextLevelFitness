@@ -208,15 +208,26 @@ function openEditPopup(day, routines) {
 
     saveButton.addEventListener("click", () => {
         exercises.forEach((exercise, index) => {
-            exercise.series = parseInt(document.getElementById(`series-${index}`).value, 10);
-            exercise.repetitions = parseInt(document.getElementById(`reps-${index}`).value, 10);
-            exercise.weight = parseFloat(document.getElementById(`weight-${index}`).value);
-            exercise.additionalData = document.getElementById(`additionalData-${index}`).value;
+            const seriesInput = document.getElementById(`series-${index}`);
+            const repsInput = document.getElementById(`reps-${index}`);
+            const weightInput = document.getElementById(`weight-${index}`);
+            const additionalDataInput = document.getElementById(`additionalData-${index}`);
+    
+            // Verifica que los inputs existan antes de intentar acceder a sus valores
+            if (seriesInput && repsInput && weightInput && additionalDataInput) {
+                exercise.series = parseInt(seriesInput.value, 10) || 0;
+                exercise.repetitions = parseInt(repsInput.value, 10) || 0;
+                exercise.weight = parseFloat(weightInput.value) || 0;
+                exercise.additionalData = additionalDataInput.value;
+            } else {
+                console.error(`Faltan campos de entrada para el ejercicio ${index}`);
+            }
         });
-
+    
         saveChanges(day, exercises);
         popup.classList.add("hidden");
     });
+    
 
     // Cerrar popup
     closeButton.addEventListener("click", () => {
