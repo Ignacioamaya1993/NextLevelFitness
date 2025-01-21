@@ -226,8 +226,7 @@ function openEditPopup(day, routines) {
     
         saveChanges(day, exercises);
         popup.classList.add("hidden");
-    });
-    
+    });    
 
     // Cerrar popup
     closeButton.addEventListener("click", () => {
@@ -314,7 +313,10 @@ async function saveChanges(day, exercises) {
             const routineDoc = querySnapshot.docs[0];
             console.log("Documento encontrado:", routineDoc);
 
-            const validExercises = [];
+            // Recuperar los ejercicios actuales de la rutina
+            const currentExercises = routineDoc.data().exercises || [];
+            const updatedExercises = [...currentExercises]; // Copiar los ejercicios existentes
+
             let hasErrors = false;
 
             exercises.forEach((exercise, index) => {
@@ -340,11 +342,19 @@ async function saveChanges(day, exercises) {
                         return;
                     }
 
-                    exercise.series = series;
-                    exercise.repetitions = repetitions;
-                    exercise.weight = weight;
-                    exercise.additionalData = additionalDataInput.value || "";
-                    validExercises.push(exercise);
+                    // Actualizar el ejercicio correspondiente en la copia
+                    const exerciseIndex = currentExercises.findIndex(e => e.id === exercise.id);
+                    if (exerciseIndex !== -1) {
+                        updatedExercises[exerciseIndex] = {
+                            ...currentExercises[exerciseIndex], // Mantener otros datos no editados
+                            series,
+                            repetitions,
+                            weight,
+                            additionalData: additionalDataInput.value || "",
+                        };
+                    } else {
+                        console.warn(`Ejercicio con id ${exercise.id} no encontrado en la rutina.`);
+                    }
                 } else {
                     console.warn(`Faltan inputs para el ejercicio ${index}, se omitirá.`);
                 }
@@ -352,20 +362,14 @@ async function saveChanges(day, exercises) {
 
             if (hasErrors) return;
 
-            if (validExercises.length > 0) {
-                await updateDoc(routineDoc.ref, { exercises: validExercises });
-                Swal.fire({
-                    title: "Éxito",
-                    text: "Cambios guardados exitosamente.",
-                    icon: "success",
-                }).then(() => location.reload());
-            } else {
-                Swal.fire({
-                    title: "Advertencia",
-                    text: "No hay ejercicios válidos para guardar.",
-                    icon: "warning",
-                });
-            }
+            // Guardar los ejercicios actualizados
+            await updateDoc(routineDoc.ref, { exercises: updatedExercises });
+
+            Swal.fire({
+                title: "Éxito",
+                text: "Cambios guardados exitosamente.",
+                icon: "success",
+            }).then(() => location.reload());
         } else {
             Swal.fire({
                 title: "Error",
