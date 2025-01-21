@@ -46,7 +46,7 @@ function displayUserRoutines(routines) {
     routineList.innerHTML = "";
 
     const groupedRoutines = groupRoutinesByDay(routines);
-    console.log('Rutinas agrupadas por día:', groupedRoutines);  // Verifica la estructura
+    console.log('Rutinas agrupadas por día:', groupedRoutines);
     
     Object.keys(groupedRoutines).forEach(day => {
         const routineCard = document.createElement("div");
@@ -69,7 +69,7 @@ function displayUserRoutines(routines) {
             <button class="edit-button" data-day="${day}">Editar</button>
             <button class="delete-button" data-day="${day}">Eliminar</button>
         `;
-        console.log('HTML de la rutina:', routineCard.innerHTML);  // Log para ver el HTML generado
+        console.log('HTML de la rutina:', routineCard.innerHTML);
 
 
         routineList.appendChild(routineCard);
@@ -88,10 +88,18 @@ function displayUserRoutines(routines) {
     deleteButtons.forEach((button) =>
         button.addEventListener("click", (e) => {
             const day = e.target.dataset.day;
-            const confirmDelete = confirm(`¿Estás seguro de eliminar la rutina para el día ${day}?`);
-            if (confirmDelete) {
-                deleteRoutine(day);
-            }
+            Swal.fire({
+                title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
+                text: "Esta acción no se puede deshacer.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteRoutine(day);
+                }
+            });
         })
     );
 }
@@ -122,8 +130,7 @@ function openEditPopup(day, routines) {
         if (event.key === "Escape" && !popup.classList.contains("hidden")) {
             popup.classList.add("hidden");
         }
-    });
-    
+    });    
 
     // Limpia el contenido previo del popup
     popupContent.innerHTML = "";
@@ -241,10 +248,17 @@ function renderEditFields(container, exercise, index, day, exercises) {
     // Configurar evento para eliminar ejercicio
     const deleteButton = container.querySelector(".delete-exercise");
     deleteButton.addEventListener("click", () => {
-        const confirmDelete = confirm(`¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`);
-        if (confirmDelete) {
-            deleteExerciseFromRoutine(day, index, exercises);
-        }
+        Swal.fire({
+            title: `¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteExerciseFromRoutine(day, index, exercises);
+            }
+        });
     });
 }
 
@@ -253,22 +267,24 @@ function preventNegativeValues(index) {
     const repsInput = document.getElementById(`reps-${index}`);
     const weightInput = document.getElementById(`weight-${index}`);
 
-    [seriesInput, repsInput, weightInput].forEach(input => {
+    [seriesInput, repsInput, weightInput].forEach((input) => {
         if (input) {
             // Eliminar el carácter '-' mientras el usuario escribe
-            input.addEventListener('input', () => {
-                if (input.value.includes('-')) {
-                    input.value = input.value.replace('-', '');
+            input.addEventListener("input", () => {
+                if (input.value.includes("-")) {
+                    input.value = input.value.replace("-", "");
                 }
             });
 
             // Validar el valor al salir del campo (blur)
-            input.addEventListener('blur', () => {
-                if (input.value === "" || parseInt(input.value, 10) <= 0) {
-                    input.setCustomValidity("El valor debe ser mayor a 0.");
-                    input.reportValidity(); // Muestra el mensaje emergente
-                } else {
-                    input.setCustomValidity(""); // Limpia el mensaje si el valor es válido
+            input.addEventListener("blur", () => {
+                if (input.value === "" || parseFloat(input.value) <= 0) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "El valor debe ser mayor a 0.",
+                        icon: "error",
+                    });
+                    input.value = 1; // Reestablece el valor a 1 si es inválido
                 }
             });
         }
@@ -286,7 +302,6 @@ async function saveChanges(day, exercises) {
         if (!querySnapshot.empty) {
             const routineDoc = querySnapshot.docs[0];
             console.log("Documento encontrado:", routineDoc);
-            console.log("Ejercicios a guardar:", exercises);
 
             const validExercises = [];
             let hasErrors = false;
@@ -304,14 +319,14 @@ async function saveChanges(day, exercises) {
                     const repetitions = parseInt(repsInput.value, 10) || 0;
                     const weight = parseFloat(weightInput.value) || 0;
 
-                    // Validar si los valores son válidos
                     if (series <= 0 || repetitions <= 0 || weight <= 0) {
-                        // Aquí es donde estaba el error, "input" no estaba definido
-                        if (series <= 0) seriesInput.setCustomValidity("El valor de series debe ser mayor a 0.");
-                        if (repetitions <= 0) repsInput.setCustomValidity("El valor de repeticiones debe ser mayor a 0.");
-                        if (weight <= 0) weightInput.setCustomValidity("El valor de peso debe ser mayor a 0.");
+                        Swal.fire({
+                            title: "Error",
+                            text: "Por favor corrige los campos con valores inválidos.",
+                            icon: "error",
+                        });
                         hasErrors = true;
-                        return; // Detener el procesamiento de este ejercicio
+                        return;
                     }
 
                     exercise.series = series;
@@ -324,31 +339,43 @@ async function saveChanges(day, exercises) {
                 }
             });
 
-            if (hasErrors) {
-                alert("Por favor corrige los campos con valores inválidos.");
-                return; // Si hay errores, no continuar con la actualización
-            }
-
-            console.log("Ejercicios válidos a actualizar:", validExercises);
+            if (hasErrors) return;
 
             if (validExercises.length > 0) {
                 await updateDoc(routineDoc.ref, { exercises: validExercises });
-                alert("Cambios guardados exitosamente.");
-                location.reload();
+                Swal.fire({
+                    title: "Éxito",
+                    text: "Cambios guardados exitosamente.",
+                    icon: "success",
+                }).then(() => location.reload());
             } else {
-                alert("No hay ejercicios válidos para guardar.");
+                Swal.fire({
+                    title: "Advertencia",
+                    text: "No hay ejercicios válidos para guardar.",
+                    icon: "warning",
+                });
             }
         } else {
-            console.error("No se encontró la rutina para el día:", day);
+            Swal.fire({
+                title: "Error",
+                text: "No se encontró la rutina para el día especificado.",
+                icon: "error",
+            });
         }
     } catch (error) {
+        Swal.fire({
+            title: "Error",
+            text: "Ocurrió un error al guardar los cambios.",
+            icon: "error",
+        });
         console.error("Error al guardar cambios:", error);
     }
 }
 
 // Para depuración, imprime todos los elementos con ID `series-`
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("IDs de series generados en el DOM:", 
+    console.log(
+        "IDs de series generados en el DOM:",
         [...document.querySelectorAll('[id^="series-"]')].map(el => el.id)
     );
 });
@@ -367,19 +394,44 @@ async function deleteExerciseFromRoutine(day, index, exercises) {
 
             if (exercises.length === 0) {
                 // Si no hay ejercicios restantes, eliminar la rutina completa
-                await deleteDoc(routineDoc.ref);
-                alert(`La rutina para el día ${day} ha sido eliminada.`);
+                Swal.fire({
+                    title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, eliminar",
+                    cancelButtonText: "Cancelar",
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        await deleteDoc(routineDoc.ref);
+                        Swal.fire({
+                            title: "Éxito",
+                            text: `La rutina para el día ${day} ha sido eliminada.`,
+                            icon: "success",
+                        }).then(() => location.reload());
+                    }
+                });
             } else {
                 // Si quedan ejercicios, actualizar la rutina con la lista modificada
                 await updateDoc(routineDoc.ref, { exercises: exercises });
-                alert("Ejercicio eliminado correctamente.");
+                Swal.fire({
+                    title: "Éxito",
+                    text: "Ejercicio eliminado correctamente.",
+                    icon: "success",
+                }).then(() => location.reload());
             }
-
-            location.reload();
         } else {
-            console.error("No se encontró la rutina para el día:", day);
+            Swal.fire({
+                title: "Error",
+                text: "No se encontró la rutina para el día especificado.",
+                icon: "error",
+            });
         }
     } catch (error) {
+        Swal.fire({
+            title: "Error",
+            text: "Ocurrió un error al eliminar el ejercicio o la rutina.",
+            icon: "error",
+        });
         console.error("Error al eliminar el ejercicio o la rutina:", error);
     }
 }
@@ -396,16 +448,35 @@ async function deleteRoutine(day) {
             const routineDoc = querySnapshot.docs[0];
 
             // Confirmar eliminación
-            const confirmDelete = confirm(`¿Estás seguro de eliminar la rutina completa para el día ${day}?`);
-            if (confirmDelete) {
-                await deleteDoc(routineDoc.ref);
-                alert(`La rutina para el día ${day} ha sido eliminada.`);
-                location.reload();
-            }
+            Swal.fire({
+                title: `¿Estás seguro de eliminar la rutina completa para el día ${day}?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar",
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await deleteDoc(routineDoc.ref);
+                    Swal.fire({
+                        title: "Éxito",
+                        text: `La rutina para el día ${day} ha sido eliminada.`,
+                        icon: "success",
+                    }).then(() => location.reload());
+                }
+            });
         } else {
-            console.error("No se encontró la rutina para el día:", day);
+            Swal.fire({
+                title: "Error",
+                text: "No se encontró la rutina para el día especificado.",
+                icon: "error",
+            });
         }
     } catch (error) {
+        Swal.fire({
+            title: "Error",
+            text: "Ocurrió un error al eliminar la rutina.",
+            icon: "error",
+        });
         console.error("Error al eliminar la rutina:", error);
     }
 }
