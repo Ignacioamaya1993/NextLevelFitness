@@ -331,23 +331,12 @@ async function saveChanges(day, exercises) {
                         return; // Detener el procesamiento de este ejercicio
                     }
 
-                    // Comparar los valores iniciales con los actuales solo si al menos uno de los campos cambia
-                    console.log('Comparando datos:', { 
-                        series, 
-                        exerciseSeries: exercise.series, 
-                        repetitions, 
-                        exerciseReps: exercise.repetitions, 
-                        weight, 
-                        exerciseWeight: exercise.weight, 
-                        additionalData, 
-                        exerciseAdditionalData: exercise.additionalData 
-                    });
-
+                    // Comparar los valores iniciales con los actuales para ver si alguno cambió
                     if (
                         series !== exercise.series ||
                         repetitions !== exercise.repetitions ||
                         weight !== exercise.weight ||
-                        additionalData !== String(exercise.additionalData || "")
+                        additionalData !== (exercise.additionalData || "")
                     ) {
                         hasChanges = true; // Detectar si hubo algún cambio
                     }
