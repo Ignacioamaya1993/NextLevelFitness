@@ -221,15 +221,15 @@ function renderEditFields(container, exercise, index, day, exercises) {
     container.innerHTML = `
         <div>
             <label>Series:</label>
-            <input type="number" value="${exercise.series || 0}" id="series-${index}">
+            <input type="number" value="${exercise.series || 0}" id="series-${index}" min="0">
         </div>
         <div>
             <label>Repeticiones:</label>
-            <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}">
+            <input type="number" value="${exercise.repetitions || 0}" id="reps-${index}" min="0">
         </div>
         <div>
             <label>Peso (kg):</label>
-            <input type="number" value="${exercise.weight || 0}" id="weight-${index}">
+            <input type="number" value="${exercise.weight || 0}" id="weight-${index}" min="0" step="0.01">
         </div>
         <div>
             <label>Información adicional:</label>
@@ -277,10 +277,17 @@ async function saveChanges(day, exercises) {
                 console.log(`additionalData-${index}:`, additionalDataInput ? additionalDataInput.value : "No encontrado");
 
                 if (seriesInput && repsInput && weightInput && additionalDataInput) {
-                    exercise.series = parseInt(seriesInput.value, 10) || 0;
-                    exercise.repetitions = parseInt(repsInput.value, 10) || 0;
-                    exercise.weight = parseFloat(weightInput.value) || 0;
+                    // Asegurarse de que los valores no sean negativos
+                    const series = Math.max(0, parseInt(seriesInput.value, 10) || 0);
+                    const repetitions = Math.max(0, parseInt(repsInput.value, 10) || 0);
+                    const weight = Math.max(0, parseFloat(weightInput.value) || 0);
+
+                    // Actualizar los valores en el ejercicio
+                    exercise.series = series;
+                    exercise.repetitions = repetitions;
+                    exercise.weight = weight;
                     exercise.additionalData = additionalDataInput.value || "";
+
                     validExercises.push(exercise);
                 } else {
                     console.warn(`Faltan inputs para el ejercicio ${index}, se omitirá.`);
@@ -303,6 +310,7 @@ async function saveChanges(day, exercises) {
         console.error("Error al guardar cambios:", error);
     }
 }
+
 
 // Para depuración, imprime todos los elementos con ID `series-`
 document.addEventListener("DOMContentLoaded", () => {
