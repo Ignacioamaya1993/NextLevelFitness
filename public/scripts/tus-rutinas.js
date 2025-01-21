@@ -302,9 +302,11 @@ async function saveChanges(day, exercises) {
         if (!querySnapshot.empty) {
             const routineDoc = querySnapshot.docs[0];
             console.log("Documento encontrado:", routineDoc);
+            console.log("Ejercicios a guardar:", exercises);
 
             const validExercises = [];
             let hasErrors = false;
+            let hasChanges = false;
 
             exercises.forEach((exercise, index) => {
                 preventNegativeValues(index); // Prevenir valores negativos
@@ -318,28 +320,58 @@ async function saveChanges(day, exercises) {
                     const series = parseInt(seriesInput.value, 10) || 0;
                     const repetitions = parseInt(repsInput.value, 10) || 0;
                     const weight = parseFloat(weightInput.value) || 0;
+                    const additionalData = additionalDataInput.value || "";
 
+                    // Validar si los valores son válidos
                     if (series <= 0 || repetitions <= 0 || weight <= 0) {
-                        Swal.fire({
-                            title: "Error",
-                            text: "Por favor corrige los campos con valores inválidos.",
-                            icon: "error",
-                        });
+                        if (series <= 0) seriesInput.setCustomValidity("El valor de series debe ser mayor a 0.");
+                        if (repetitions <= 0) repsInput.setCustomValidity("El valor de repeticiones debe ser mayor a 0.");
+                        if (weight <= 0) weightInput.setCustomValidity("El valor de peso debe ser mayor a 0.");
                         hasErrors = true;
-                        return;
+                        return; // Detener el procesamiento de este ejercicio
                     }
 
+                    // Comparar los valores iniciales con los actuales
+                    if (
+                        series !== exercise.series ||
+                        repetitions !== exercise.repetitions ||
+                        weight !== exercise.weight ||
+                        additionalData !== (exercise.additionalData || "")
+                    ) {
+                        hasChanges = true; // Detectar si hubo algún cambio
+                    }
+
+                    // Actualizar el objeto ejercicio con los nuevos valores
                     exercise.series = series;
                     exercise.repetitions = repetitions;
                     exercise.weight = weight;
-                    exercise.additionalData = additionalDataInput.value || "";
+                    exercise.additionalData = additionalData;
                     validExercises.push(exercise);
                 } else {
                     console.warn(`Faltan inputs para el ejercicio ${index}, se omitirá.`);
                 }
             });
 
-            if (hasErrors) return;
+            if (hasErrors) {
+                Swal.fire({
+                    title: "Error",
+                    text: "Por favor corrige los campos con valores inválidos.",
+                    icon: "error",
+                });
+                return; // Si hay errores, no continuar con la actualización
+            }
+
+            if (!hasChanges) {
+                // Mostrar mensaje si no hubo cambios
+                Swal.fire({
+                    title: "Sin cambios",
+                    text: "No se detectaron modificaciones en los campos.",
+                    icon: "info",
+                });
+                return;
+            }
+
+            console.log("Ejercicios válidos a actualizar:", validExercises);
 
             if (validExercises.length > 0) {
                 await updateDoc(routineDoc.ref, { exercises: validExercises });
@@ -350,9 +382,9 @@ async function saveChanges(day, exercises) {
                 }).then(() => location.reload());
             } else {
                 Swal.fire({
-                    title: "Advertencia",
+                    title: "Sin cambios",
                     text: "No hay ejercicios válidos para guardar.",
-                    icon: "warning",
+                    icon: "info",
                 });
             }
         } else {
