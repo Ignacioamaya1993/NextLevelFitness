@@ -9,7 +9,6 @@
     display: none !important;
 }
 
-
 html, body {
     height: 100%;
     font-family: 'Arial', sans-serif;
@@ -90,41 +89,42 @@ main {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Tarjetas de rutina */
+/* Estilo para las tarjetas de rutina */
 .routine-card {
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    margin-bottom: 20px;
-    transition: transform 0.3s, box-shadow 0.3s;
+    margin: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+    overflow: hidden;
+    position: relative;
 }
 
 .routine-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    background-color: #f8fbff;
 }
 
 .routine-card h3 {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #1d3557;
+    color: #08c3f1;
+    font-size: 1.4em;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .routine-card ul {
     list-style: none;
-    margin: 0;
     padding: 0;
 }
 
 .routine-card li {
-    font-size: 1rem;
+    font-size: 0.9em;
     margin-bottom: 5px;
-    color: #2c3e50;
+    color: #555;
 }
-
 
 .routine-card p {
     font-size: 1rem;
@@ -140,6 +140,7 @@ main {
     border-radius: 5px;
     text-decoration: none;
     font-weight: bold;
+    display: inline-block;
     transition: background-color 0.3s;
 }
 
@@ -147,9 +148,22 @@ main {
     background-color: #1e8449;
 }
 
+/* Botones de editar y eliminar */
+.edit-button, .delete-button {
+    background-color: #08c3f1;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    margin: 5px 5px 0 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
 /* Popup de edición mejorado */
 #edit-popup {
-    display: block;
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
