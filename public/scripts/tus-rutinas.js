@@ -332,11 +332,22 @@ async function saveChanges(day, exercises) {
                     }
 
                     // Comparar los valores iniciales con los actuales solo si al menos uno de los campos cambia
+                    console.log('Comparando datos:', { 
+                        series, 
+                        exerciseSeries: exercise.series, 
+                        repetitions, 
+                        exerciseReps: exercise.repetitions, 
+                        weight, 
+                        exerciseWeight: exercise.weight, 
+                        additionalData, 
+                        exerciseAdditionalData: exercise.additionalData 
+                    });
+
                     if (
                         series !== exercise.series ||
                         repetitions !== exercise.repetitions ||
                         weight !== exercise.weight ||
-                        additionalData !== (exercise.additionalData || "")
+                        additionalData !== String(exercise.additionalData || "")
                     ) {
                         hasChanges = true; // Detectar si hubo algún cambio
                     }
