@@ -302,11 +302,9 @@ async function saveChanges(day, exercises) {
         if (!querySnapshot.empty) {
             const routineDoc = querySnapshot.docs[0];
             console.log("Documento encontrado:", routineDoc);
-            console.log("Ejercicios a guardar:", exercises);
 
             const validExercises = [];
             let hasErrors = false;
-            let hasChanges = false;
 
             exercises.forEach((exercise, index) => {
                 preventNegativeValues(index); // Prevenir valores negativos
@@ -320,58 +318,28 @@ async function saveChanges(day, exercises) {
                     const series = parseInt(seriesInput.value, 10) || 0;
                     const repetitions = parseInt(repsInput.value, 10) || 0;
                     const weight = parseFloat(weightInput.value) || 0;
-                    const additionalData = additionalDataInput.value || "";
 
-                    // Validar si los valores son válidos
                     if (series <= 0 || repetitions <= 0 || weight <= 0) {
-                        if (series <= 0) seriesInput.setCustomValidity("El valor de series debe ser mayor a 0.");
-                        if (repetitions <= 0) repsInput.setCustomValidity("El valor de repeticiones debe ser mayor a 0.");
-                        if (weight <= 0) weightInput.setCustomValidity("El valor de peso debe ser mayor a 0.");
+                        Swal.fire({
+                            title: "Error",
+                            text: "Por favor corrige los campos con valores inválidos.",
+                            icon: "error",
+                        });
                         hasErrors = true;
-                        return; // Detener el procesamiento de este ejercicio
+                        return;
                     }
 
-                    // Comparar los valores iniciales con los actuales
-                    const isSeriesChanged = series !== exercise.series;
-                    const isRepsChanged = repetitions !== exercise.repetitions;
-                    const isWeightChanged = weight !== exercise.weight;
-                    const isAdditionalDataChanged = additionalData.trim() !== (exercise.additionalData || "").trim();
-
-                    if (isSeriesChanged || isRepsChanged || isWeightChanged || isAdditionalDataChanged) {
-                        hasChanges = true; // Detectar si hubo algún cambio
-                    }
-
-                    // Actualizar el objeto ejercicio con los nuevos valores
                     exercise.series = series;
                     exercise.repetitions = repetitions;
                     exercise.weight = weight;
-                    exercise.additionalData = additionalData;
+                    exercise.additionalData = additionalDataInput.value || "";
                     validExercises.push(exercise);
                 } else {
                     console.warn(`Faltan inputs para el ejercicio ${index}, se omitirá.`);
                 }
             });
 
-            if (hasErrors) {
-                Swal.fire({
-                    title: "Error",
-                    text: "Por favor corrige los campos con valores inválidos.",
-                    icon: "error",
-                });
-                return; // Si hay errores, no continuar con la actualización
-            }
-
-            if (!hasChanges) {
-                // Mostrar mensaje si no hubo cambios
-                Swal.fire({
-                    title: "Sin cambios",
-                    text: "No se detectaron modificaciones en los campos.",
-                    icon: "info",
-                });
-                return;
-            }
-
-            console.log("Ejercicios válidos a actualizar:", validExercises);
+            if (hasErrors) return;
 
             if (validExercises.length > 0) {
                 await updateDoc(routineDoc.ref, { exercises: validExercises });
@@ -382,9 +350,9 @@ async function saveChanges(day, exercises) {
                 }).then(() => location.reload());
             } else {
                 Swal.fire({
-                    title: "Sin cambios",
+                    title: "Advertencia",
                     text: "No hay ejercicios válidos para guardar.",
-                    icon: "info",
+                    icon: "warning",
                 });
             }
         } else {
