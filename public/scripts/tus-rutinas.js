@@ -331,7 +331,7 @@ async function saveChanges(day, exercises) {
                         return; // Detener el procesamiento de este ejercicio
                     }
 
-                    // Comparar los valores iniciales con los actuales para ver si alguno cambió
+                    // Comparar los valores iniciales con los actuales
                     if (
                         series !== exercise.series ||
                         repetitions !== exercise.repetitions ||
