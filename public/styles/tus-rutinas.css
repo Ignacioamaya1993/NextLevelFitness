@@ -147,7 +147,7 @@ main {
     background-color: #1e8449;
 }
 
-/* Popup de edición */
+/* Popup de edición mejorado */
 #edit-popup {
     display: block;
     position: fixed;
@@ -155,13 +155,14 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #ffffff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     width: 90%;
-    max-width: 400px;
+    max-width: 500px;
     animation: popup-show 0.3s ease-in-out;
+    border: 1px solid #e0e0e0;
 }
 
 /* Fondo semi-transparente al abrir el popup */
@@ -172,14 +173,31 @@ main {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     z-index: 999;
 }
 
-/* Selector y campos de edición */
+/* Título y contenido del popup */
+#popup-content h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1d3557;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#popup-content p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Selector y campos de entrada */
 #edit-popup select,
 #edit-popup input[type="text"],
-#edit-popup input[type="number"] {
+#edit-popup input[type="number"],
+#popup-content textarea {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -191,17 +209,24 @@ main {
 }
 
 #edit-popup select:focus,
-#edit-popup input:focus {
+#edit-popup input:focus,
+#popup-content textarea:focus {
     border-color: #457b9d;
     box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
     outline: none;
 }
 
-/* Botones del popup */
-#edit-popup button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 10px 5px 0;
+/* Contenedor de botones distribuidos horizontalmente */
+#popup-content .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#popup-content .button-container button {
+    flex: 1;
+    margin: 0 5px;
+    padding: 12px 20px;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
@@ -210,13 +235,14 @@ main {
     transition: background-color 0.3s, transform 0.2s;
 }
 
+/* Botones estilizados */
 #edit-popup .save-button {
-    background-color: #457b9d;
+    background-color: #38a169;
     color: #ffffff;
 }
 
 #edit-popup .save-button:hover {
-    background-color: #1d3557;
+    background-color: #2f855a;
     transform: translateY(-2px);
 }
 
@@ -240,6 +266,12 @@ main {
     transform: translateY(-2px);
 }
 
+/* Campo de texto "Información adicional" */
+#popup-content textarea {
+    height: 120px;
+    resize: vertical;
+}
+
 /* Animación del popup */
 @keyframes popup-show {
     from {
@@ -252,131 +284,17 @@ main {
     }
 }
 
-#popup-content h3 {
-    font-size: 1.8rem;
-    color: #1d3557;
-    margin-bottom: 10px;
-}
-
-#popup-content p {
-    font-size: 1rem;
-    color: #555;
-    margin-bottom: 20px;
-}
-
-#close-popup {
-    background-color: #e74c3c;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-#close-popup:hover {
-    background-color: #c0392b;
-}
-
-/* Botones en las tarjetas */
-.routine-card .edit-button,
-.routine-card .delete-button {
-    padding: 8px 12px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.routine-card .edit-button {
-    background-color: #457b9d;
-    color: #ffffff;
-}
-
-.routine-card .delete-button:hover {
-    background-color: #c0392b;
-    transform: translateY(-2px);
-}
-
-/* Lista de rutinas */
-.routine-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s, transform 0.2s;
-}
-
-.routine-item:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    transform: translateY(-3px);
-}
-
-.routine-item .edit-button {
-    margin-left: 10px;
-}
-
-/* Botones distribuidos horizontalmente */
-#popup-content .button-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-}
-
-/* Botón "Cancelar" centrado */
-#popup-content .centered-button {
-    display: block;
-    margin: 15px auto 0; /* Centrado horizontal */
-    padding: 10px 20px;
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    text-align: center;
-}
-
-#popup-content .centered-button:hover {
-    background-color: #c0392b;
-}
-
-/* Campo de texto "Información adicional" */
-#popup-content textarea {
-    width: 100%;
-    height: 100px; /* Altura ajustada */
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    background-color: #f9fafb;
-    resize: vertical; /* Permite redimensionar solo verticalmente */
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-#popup-content textarea:focus {
-    border-color: #457b9d;
-    box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
-    outline: none;
-}
-
+/* Responsividad */
 @media (max-width: 768px) {
-    #routine-list {
-        grid-template-columns: repeat(2, minmax(200px, 1fr));
+    #edit-popup {
+        padding: 15px 20px;
     }
-}
+    
+    #popup-content .button-container {
+        flex-direction: column;
+    }
 
-@media (max-width: 480px) {
-    #routine-list {
-        grid-template-columns: 1fr;
+    #popup-content .button-container button {
+        margin: 5px 0;
     }
 }
