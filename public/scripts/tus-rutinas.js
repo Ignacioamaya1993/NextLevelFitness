@@ -189,31 +189,59 @@ function openEditPopup(day, routines) {
 
     saveButton.addEventListener("click", () => {
         let valid = true;
+    
         exercises.forEach((exercise, index) => {
             const seriesInput = document.getElementById(`series-${index}`);
             const repsInput = document.getElementById(`reps-${index}`);
             const weightInput = document.getElementById(`weight-${index}`);
-            const additionalDataInput = document.getElementById(`additionalData-${index}`);
-
-            // Verificar si algún campo tiene valor 0 y mostrar advertencia
-            if (seriesInput && repsInput && weightInput && additionalDataInput) {
-                if (parseInt(seriesInput.value, 10) <= 0 || parseInt(repsInput.value, 10) <= 0 || parseFloat(weightInput.value) <= 0) {
-                    valid = false;
-                    Swal.fire("Error", "Los campos de Series, Repeticiones o Peso no puede ser 0 o negativo.", "error");
-                } else {
-                    exercise.series = parseInt(seriesInput.value, 10);
-                    exercise.repetitions = parseInt(repsInput.value, 10);
-                    exercise.weight = parseFloat(weightInput.value);
-                    exercise.additionalData = additionalDataInput.value;
-                }
+            const errorSeries = document.getElementById(`error-series-${index}`);
+            const errorReps = document.getElementById(`error-reps-${index}`);
+            const errorWeight = document.getElementById(`error-weight-${index}`);
+    
+            // Verificar campos vacíos o con valor no válido
+            if (!seriesInput.value || parseInt(seriesInput.value, 10) <= 0) {
+                valid = false;
+                errorSeries.textContent = "El campo Series no puede estar vacío o ser 0/negativo.";
+                seriesInput.classList.add("input-error");
+            } else {
+                errorSeries.textContent = "";
+                seriesInput.classList.remove("input-error");
+            }
+    
+            if (!repsInput.value || parseInt(repsInput.value, 10) <= 0) {
+                valid = false;
+                errorReps.textContent = "El campo Repeticiones no puede estar vacío o ser 0/negativo.";
+                repsInput.classList.add("input-error");
+            } else {
+                errorReps.textContent = "";
+                repsInput.classList.remove("input-error");
+            }
+    
+            if (!weightInput.value || parseFloat(weightInput.value) <= 0) {
+                valid = false;
+                errorWeight.textContent = "El campo Peso no puede estar vacío o ser 0/negativo.";
+                weightInput.classList.add("input-error");
+            } else {
+                errorWeight.textContent = "";
+                weightInput.classList.remove("input-error");
+            }
+    
+            // Actualizar los valores del ejercicio si son válidos
+            if (valid) {
+                exercise.series = parseInt(seriesInput.value, 10);
+                exercise.repetitions = parseInt(repsInput.value, 10);
+                exercise.weight = parseFloat(weightInput.value);
             }
         });
-
+    
         if (valid) {
             saveChanges(day, exercises);
             popup.classList.add("hidden");
+        } else {
+            Swal.fire("Error", "Por favor, completa correctamente todos los campos obligatorios.", "error");
         }
     });
+    
 
     closeButton.addEventListener("click", () => {
         popup.classList.add("hidden");
