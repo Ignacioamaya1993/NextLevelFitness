@@ -138,14 +138,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 confirmButtonText: "Confirmar",
                 cancelButtonText: "Cancelar",
                 preConfirm: async (password) => {
-                    if (!password) throw new Error("La reautenticación fue cancelada.");
+                    if (!password) throw new Error("La actualización fue cancelada.");
 
                     const credential = EmailAuthProvider.credential(user.email, password);
                     await reauthenticateWithCredential(user, credential);
                 },
             }).then((result) => result.value);
 
-            if (!password) throw new Error("La reautenticación fue cancelada.");
+            if (!password) throw new Error("La actualización fue cancelada.");
 
             if (newEmail) {
                 try {

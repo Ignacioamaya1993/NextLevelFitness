@@ -61,8 +61,8 @@ function displayUserRoutines(routines) {
             return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
         }).join('');
 
-                routineCard.innerHTML = `
-            <h3>Rutina para ${day}</h3>
+        routineCard.innerHTML = `
+            <h3>Rutina para el día ${day}</h3>
             <ul>
                 ${exercisesList}
             </ul>
@@ -70,7 +70,6 @@ function displayUserRoutines(routines) {
             <button class="delete-button" data-day="${day}">Eliminar</button>
         `;
         console.log('HTML de la rutina:', routineCard.innerHTML);
-
 
         routineList.appendChild(routineCard);
     });
@@ -97,6 +96,7 @@ function displayUserRoutines(routines) {
                 cancelButtonText: "Cancelar"
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Llamar a la función para eliminar la rutina solo después de confirmar
                     deleteRoutine(day);
                 }
             });
@@ -120,25 +120,19 @@ function groupRoutinesByDay(routines) {
     return grouped;
 }
 
-
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
     const popupContent = document.getElementById("popup-content");
 
     document.addEventListener("keydown", (event) => {
-        const popup = document.getElementById("edit-popup");
         if (event.key === "Escape" && !popup.classList.contains("hidden")) {
             popup.classList.add("hidden");
         }
-    });    
+    });
 
-    // Limpia el contenido previo del popup
     popupContent.innerHTML = "";
 
-    // Encuentra la rutina correspondiente al día seleccionado
     const routine = routines.find(routine => routine.day === day);
-
-    console.log('Rutina seleccionada:', routine);  // Verifica qué contiene la rutina
 
     if (!routine) {
         popupContent.innerHTML = `<p>No se encontró la rutina para el día ${day}</p>`;
@@ -146,28 +140,21 @@ function openEditPopup(day, routines) {
         return;
     }
 
-    // Verifica si exercises existe y es un array
     if (!routine.exercises || !Array.isArray(routine.exercises)) {
-        console.error("No se encontraron ejercicios en la rutina:", routine);
         popupContent.innerHTML = `<p>No hay ejercicios disponibles para la rutina de ${day}</p>`;
         popup.classList.remove("hidden");
         return;
     }
 
-    const exercises = routine.exercises;  // Accede a los ejercicios si es un array
+    const exercises = routine.exercises;
 
-    console.log('Ejercicios de la rutina:', exercises);  // Verifica los ejercicios
-
-    // Crear encabezado
     const header = document.createElement("h3");
-    header.textContent = `Editar Rutina para ${day}`;
+    header.textContent = `Editar Rutina para el día ${day}`;
     popupContent.appendChild(header);
 
-    // Crear selector de ejercicios con todos los ejercicios de la rutina
     const exerciseSelect = document.createElement("select");
     exerciseSelect.id = "exercise-select";
 
-    // Verifica si hay ejercicios y genera las opciones
     if (exercises.length > 0) {
         exerciseSelect.innerHTML = exercises.map((exercise, index) => `
             <option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>
@@ -176,90 +163,134 @@ function openEditPopup(day, routines) {
 
     popupContent.appendChild(exerciseSelect);
 
-    // Contenedor para los campos de edición
     const editFieldsContainer = document.createElement("div");
     editFieldsContainer.id = "edit-fields-container";
     popupContent.appendChild(editFieldsContainer);
 
-    // Botón para guardar cambios
     const saveButton = document.createElement("button");
     saveButton.id = "save-changes";
     saveButton.textContent = "Guardar cambios";
     popupContent.appendChild(saveButton);
 
-    // Botón para cerrar
     const closeButton = document.createElement("button");
     closeButton.id = "close-popup";
     closeButton.textContent = "Cancelar";
     popupContent.appendChild(closeButton);
 
-    // Mostrar el popup
     popup.classList.remove("hidden");
 
-    // Mostrar campos de edición al seleccionar un ejercicio
     exerciseSelect.addEventListener("change", () => {
         const selectedIndex = parseInt(exerciseSelect.value, 10);
         const selectedExercise = exercises[selectedIndex];
         renderEditFields(editFieldsContainer, selectedExercise, selectedIndex, day, exercises);
     });
 
-    // Inicializar con el primer ejercicio
     renderEditFields(editFieldsContainer, exercises[0], 0, day, exercises);
 
     saveButton.addEventListener("click", () => {
+        let valid = true;
         exercises.forEach((exercise, index) => {
             const seriesInput = document.getElementById(`series-${index}`);
             const repsInput = document.getElementById(`reps-${index}`);
             const weightInput = document.getElementById(`weight-${index}`);
             const additionalDataInput = document.getElementById(`additionalData-${index}`);
-    
-            // Verifica que los inputs existan antes de intentar acceder a sus valores
+
+            // Verificar si algún campo tiene valor 0 y mostrar advertencia
             if (seriesInput && repsInput && weightInput && additionalDataInput) {
-                exercise.series = parseInt(seriesInput.value, 10) || 0;
-                exercise.repetitions = parseInt(repsInput.value, 10) || 0;
-                exercise.weight = parseFloat(weightInput.value) || 0;
-                exercise.additionalData = additionalDataInput.value;
-            } else {
-                console.error(`Faltan campos de entrada para el ejercicio ${index}`);
+                if (parseInt(seriesInput.value, 10) <= 0 || parseInt(repsInput.value, 10) <= 0 || parseFloat(weightInput.value) <= 0) {
+                    valid = false;
+                    Swal.fire("Error", "Los campos de Series, Repeticiones o Peso no puede ser 0 o negativo.", "error");
+                } else {
+                    exercise.series = parseInt(seriesInput.value, 10);
+                    exercise.repetitions = parseInt(repsInput.value, 10);
+                    exercise.weight = parseFloat(weightInput.value);
+                    exercise.additionalData = additionalDataInput.value;
+                }
             }
         });
-    
-        saveChanges(day, exercises);
-        popup.classList.add("hidden");
-    });    
 
-    // Cerrar popup
+        if (valid) {
+            saveChanges(day, exercises);
+            popup.classList.add("hidden");
+        }
+    });
+
     closeButton.addEventListener("click", () => {
         popup.classList.add("hidden");
     });
 }
 
+// Evita que los campos de número tengan valores negativos
+function preventNegativeValues(event) {
+    const input = event.target;
+    // Si el valor contiene un signo negativo, eliminarlo
+    if (input.value.startsWith("-")) {
+        input.value = input.value.replace("-", "");
+    }
+}
+
+// Configurar los campos para evitar valores negativos
+function setupNegativeValuePrevention() {
+    const numberInputs = document.querySelectorAll('input[type="number"]');
+    numberInputs.forEach(input => {
+        input.addEventListener("input", preventNegativeValues);
+    });
+}
+
+setupNegativeValuePrevention(); // Llamar a la función para evitar valores negativos
+
 function renderEditFields(container, exercise, index, day, exercises) {
     container.innerHTML = `
-            <div>
-                <label>Series:</label>
-                <input type="number" value="${exercise.series != null ? exercise.series : 1}" id="series-${index}" min="1">
-            </div>
-            <div>
-                <label>Repeticiones:</label>
-                <input type="number" value="${exercise.repetitions != null ? exercise.repetitions : 1}" id="reps-${index}" min="1">
-            </div>
-            <div>
-                <label>Peso (kg):</label>
-                <input type="number" value="${exercise.weight != null ? exercise.weight : 1}" id="weight-${index}" min="1" step="0.01">
-            </div>
-            <div>
-                <label>Información adicional:</label>
-                <input type="text" value="${exercise.additionalData != null ? exercise.additionalData : ''}" id="additionalData-${index}">
-            </div>
+        <div>
+            <label>Series:</label>
+            <input type="number" value="${exercise.series != null ? exercise.series : 1}" id="series-${index}" min="1">
+            <span class="error-message" id="error-series-${index}"></span>
+        </div>
+        <div>
+            <label>Repeticiones:</label>
+            <input type="number" value="${exercise.repetitions != null ? exercise.repetitions : 1}" id="reps-${index}" min="1">
+            <span class="error-message" id="error-reps-${index}"></span>
+        </div>
+        <div>
+            <label>Peso (kg):</label>
+            <input type="number" value="${exercise.weight != null ? exercise.weight : 1}" id="weight-${index}" min="1" step="0.01">
+            <span class="error-message" id="error-weight-${index}"></span>
+        </div>
+        <div>
+            <label>Información adicional:</label>
+            <textarea id="additionalData-${index}" rows="4">${exercise.additionalData || ''} </textarea>
+        </div>
         <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
     `;
+
+    // Configurar eventos de validación en tiempo real
+    const seriesInput = document.getElementById(`series-${index}`);
+    const repsInput = document.getElementById(`reps-${index}`);
+    const weightInput = document.getElementById(`weight-${index}`);
+    const errorSeries = document.getElementById(`error-series-${index}`);
+    const errorReps = document.getElementById(`error-reps-${index}`);
+    const errorWeight = document.getElementById(`error-weight-${index}`);
+
+    const validateInput = (input, errorSpan, fieldName) => {
+        if (parseFloat(input.value) <= 0) {
+            errorSpan.textContent = `El campo ${fieldName} no puede ser 0 o negativo.`;
+            input.classList.add("input-error");
+        } else {
+            errorSpan.textContent = "";
+            input.classList.remove("input-error");
+        }
+    };
+
+    seriesInput.addEventListener("input", () => validateInput(seriesInput, errorSeries, "Series"));
+    repsInput.addEventListener("input", () => validateInput(repsInput, errorReps, "Repeticiones"));
+    weightInput.addEventListener("input", () => validateInput(weightInput, errorWeight, "Peso (kg)"));
 
     // Configurar evento para eliminar ejercicio
     const deleteButton = container.querySelector(".delete-exercise");
     deleteButton.addEventListener("click", () => {
         Swal.fire({
             title: `¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`,
+            text: 'No podrás deshacer esta acción.',
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar",
@@ -272,182 +303,91 @@ function renderEditFields(container, exercise, index, day, exercises) {
     });
 }
 
-function preventNegativeValues(index) {
-    const seriesInput = document.getElementById(`series-${index}`);
-    const repsInput = document.getElementById(`reps-${index}`);
-    const weightInput = document.getElementById(`weight-${index}`);
+// Modificar el evento de guardar cambios para validar antes de cerrar el popup
+saveButton.addEventListener("click", () => {
+    let valid = true;
 
-    [seriesInput, repsInput, weightInput].forEach((input) => {
-        if (input) {
-            // Eliminar el carácter '-' mientras el usuario escribe
-            input.addEventListener("input", () => {
-                if (input.value.includes("-")) {
-                    input.value = input.value.replace("-", "");
-                }
-            });
+    exercises.forEach((exercise, index) => {
+        const seriesInput = document.getElementById(`series-${index}`);
+        const repsInput = document.getElementById(`reps-${index}`);
+        const weightInput = document.getElementById(`weight-${index}`);
 
-            // Validar el valor al salir del campo (blur)
-            input.addEventListener("blur", () => {
-                if (input.value === "" || parseFloat(input.value) <= 0) {
-                    Swal.fire({
-                        title: "Error",
-                        text: "El valor debe ser mayor a 0.",
-                        icon: "error",
-                    });
-                    input.value = 1; // Reestablece el valor a 1 si es inválido
-                }
-            });
+        if (parseFloat(seriesInput.value) <= 0 || parseFloat(repsInput.value) <= 0 || parseFloat(weightInput.value) <= 0) {
+            valid = false;
         }
     });
-}
 
-async function saveChanges(day, exercises) {
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    const routinesRef = collection(db, "routines");
-    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
-
-    try {
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            const routineDoc = querySnapshot.docs[0];
-            console.log("Documento encontrado:", routineDoc);
-
-            // Recuperar los ejercicios actuales de la rutina
-            const currentExercises = routineDoc.data().exercises || [];
-            const updatedExercises = [...currentExercises]; // Copiar los ejercicios existentes
-
-            let hasErrors = false;
-
-            exercises.forEach((exercise, index) => {
-                preventNegativeValues(index); // Prevenir valores negativos
-
-                const seriesInput = document.getElementById(`series-${index}`);
-                const repsInput = document.getElementById(`reps-${index}`);
-                const weightInput = document.getElementById(`weight-${index}`);
-                const additionalDataInput = document.getElementById(`additionalData-${index}`);
-
-                if (seriesInput && repsInput && weightInput && additionalDataInput) {
-                    const series = parseInt(seriesInput.value, 10) || 0;
-                    const repetitions = parseInt(repsInput.value, 10) || 0;
-                    const weight = parseFloat(weightInput.value) || 0;
-
-                    if (series <= 0 || repetitions <= 0 || weight <= 0) {
-                        Swal.fire({
-                            title: "Error",
-                            text: "Por favor corrige los campos con valores inválidos.",
-                            icon: "error",
-                        });
-                        hasErrors = true;
-                        return;
-                    }
-
-                    // Actualizar el ejercicio correspondiente en la copia
-                    const exerciseIndex = currentExercises.findIndex(e => e.id === exercise.id);
-                    if (exerciseIndex !== -1) {
-                        updatedExercises[exerciseIndex] = {
-                            ...currentExercises[exerciseIndex], // Mantener otros datos no editados
-                            series,
-                            repetitions,
-                            weight,
-                            additionalData: additionalDataInput.value || "",
-                        };
-                    } else {
-                        console.warn(`Ejercicio con id ${exercise.id} no encontrado en la rutina.`);
-                    }
-                } else {
-                    console.warn(`Faltan inputs para el ejercicio ${index}, se omitirá.`);
-                }
-            });
-
-            if (hasErrors) return;
-
-            // Guardar los ejercicios actualizados
-            await updateDoc(routineDoc.ref, { exercises: updatedExercises });
-
-            Swal.fire({
-                title: "Éxito",
-                text: "Cambios guardados exitosamente.",
-                icon: "success",
-            }).then(() => location.reload());
-        } else {
-            Swal.fire({
-                title: "Error",
-                text: "No se encontró la rutina para el día especificado.",
-                icon: "error",
-            });
-        }
-    } catch (error) {
-        Swal.fire({
-            title: "Error",
-            text: "Ocurrió un error al guardar los cambios.",
-            icon: "error",
-        });
-        console.error("Error al guardar cambios:", error);
+    if (valid) {
+        saveChanges(day, exercises);
+        popup.classList.add("hidden");
+    } else {
+        Swal.fire("Error", "Corrige los valores en 0 o negativos antes de guardar.", "error");
     }
-}
-
-// Para depuración, imprime todos los elementos con ID `series-`
-document.addEventListener("DOMContentLoaded", () => {
-    console.log(
-        "IDs de series generados en el DOM:",
-        [...document.querySelectorAll('[id^="series-"]')].map(el => el.id)
-    );
 });
 
-async function deleteExerciseFromRoutine(day, index, exercises) {
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    const routinesRef = collection(db, "routines");
-    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
+    // Configurar evento para eliminar ejercicio
+    const deleteButton = container.querySelector(".delete-exercise");
+    deleteButton.addEventListener("click", () => {
+        Swal.fire({
+            title: `¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`,
+            text: 'No podrás deshacer esta acción.',
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Llamar a la función de eliminación solo después de confirmar
+                deleteExerciseFromRoutine(day, index, exercises);
+            }
+        });
+    });
 
+const inputElement = document.getElementById("my-input");
+inputElement.addEventListener("input", preventNegativeValues);
+
+async function saveChanges(day, exercises) {
     try {
+        const routinesRef = collection(db, "routines");
+        const q = query(routinesRef, where("day", "==", day));
         const querySnapshot = await getDocs(q);
 
-        if (!querySnapshot.empty) {
-            const routineDoc = querySnapshot.docs[0];
-            exercises.splice(index, 1);
-
-            if (exercises.length === 0) {
-                // Si no hay ejercicios restantes, eliminar la rutina completa
-                Swal.fire({
-                    title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Sí, eliminar",
-                    cancelButtonText: "Cancelar",
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        await deleteDoc(routineDoc.ref);
-                        Swal.fire({
-                            title: "Éxito",
-                            text: `La rutina para el día ${day} ha sido eliminada.`,
-                            icon: "success",
-                        }).then(() => location.reload());
-                    }
-                });
-            } else {
-                // Si quedan ejercicios, actualizar la rutina con la lista modificada
-                await updateDoc(routineDoc.ref, { exercises: exercises });
-                Swal.fire({
-                    title: "Éxito",
-                    text: "Ejercicio eliminado correctamente.",
-                    icon: "success",
-                }).then(() => location.reload());
-            }
-        } else {
-            Swal.fire({
-                title: "Error",
-                text: "No se encontró la rutina para el día especificado.",
-                icon: "error",
+        // Se espera que solo haya un documento por día
+        if (querySnapshot.size === 1) {
+            const docId = querySnapshot.docs[0].id;
+            await updateDoc(querySnapshot.docs[0].ref, { exercises });
+            Swal.fire("Éxito", "La rutina se actualizó correctamente.", "success").then(() => {
+                location.reload(); // Recarga la página después de guardar
             });
+        } else {
+            console.error(`Se encontraron ${querySnapshot.size} documentos para el día ${day}`);
+            Swal.fire("Error", "No se pudo actualizar la rutina.", "error");
         }
     } catch (error) {
-        Swal.fire({
-            title: "Error",
-            text: "Ocurrió un error al eliminar el ejercicio o la rutina.",
-            icon: "error",
+        console.error("Error al guardar los cambios en la rutina:", error);
+        Swal.fire("Error", "No se pudo guardar la rutina. Revisa la consola para más detalles.", "error");
+    }
+}
+async function deleteExerciseFromRoutine(day, index, exercises) {
+    try {
+        // Elimina el ejercicio de la lista de ejercicios
+        exercises.splice(index, 1);
+
+        // Actualiza la rutina en Firestore
+        await saveChanges(day, exercises);
+
+        // Notificar al usuario sobre el éxito de la operación
+        await Swal.fire({
+            title: "Éxito",
+            text: "El ejercicio ha sido eliminado.",
+            icon: "success",
         });
-        console.error("Error al eliminar el ejercicio o la rutina:", error);
+
+        // Recargar la página después de la confirmación
+        location.reload();
+    } catch (error) {
+        console.error("Error al eliminar el ejercicio:", error);
+        Swal.fire("Error", "No se pudo eliminar el ejercicio. Revisa la consola para más detalles.", "error");
     }
 }
 
@@ -462,23 +402,15 @@ async function deleteRoutine(day) {
         if (!querySnapshot.empty) {
             const routineDoc = querySnapshot.docs[0];
 
-            // Confirmar eliminación
+            // Eliminar la rutina directamente sin pedir confirmación nuevamente
+            await deleteDoc(routineDoc.ref);
+
+            // Notificar al usuario sobre el éxito de la operación
             Swal.fire({
-                title: `¿Estás seguro de eliminar la rutina completa para el día ${day}?`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Sí, eliminar",
-                cancelButtonText: "Cancelar",
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    await deleteDoc(routineDoc.ref);
-                    Swal.fire({
-                        title: "Éxito",
-                        text: `La rutina para el día ${day} ha sido eliminada.`,
-                        icon: "success",
-                    }).then(() => location.reload());
-                }
-            });
+                title: "Éxito",
+                text: `La rutina para el día ${day} ha sido eliminada.`,
+                icon: "success",
+            }).then(() => location.reload()); // Recarga la página después de eliminar la rutina
         } else {
             Swal.fire({
                 title: "Error",

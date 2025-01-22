@@ -13,16 +13,14 @@ html, body {
     height: 100%;
     font-family: 'Arial', sans-serif;
     background-color: #f3f4f6;
+    min-height: 100vh;
     color: #374151;
 }
 
 /* Estilos para la sección principal */
 main {
     padding: 20px;
-}
-
-.hidden {
-    display: none;
+    flex: 1;
 }
 
 /* Sección de acceso restringido */
@@ -50,7 +48,7 @@ main {
 
 .access-restricted .cta-button {
     margin: 10px;
-    background-color: #3b82f6;
+    background-color: #457b9d;
     color: #ffffff;
     text-decoration: none;
     padding: 12px 25px;
@@ -61,8 +59,17 @@ main {
 }
 
 .access-restricted .cta-button:hover {
-    background-color: #2563eb;
+    background-color: #1d3557;
     transform: scale(1.1);
+}
+
+.input-error {
+    border: 1px solid red;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
 }
 
 /* Contenedor de rutinas */
@@ -156,8 +163,8 @@ main {
     border-radius: 16px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     z-index: 1000;
-    width: 90%;
-    max-width: 400px;
+    width: 95%;
+    max-width: 500px;
     animation: popup-show 0.3s ease-in-out;
     border: 2px solid #3b82f6;
 }
@@ -187,6 +194,11 @@ main {
     font-size: 1rem;
     background-color: #f9fafb;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra más visible */
+    border: 1px solid #ddd; /* Bordes suaves */
+    border-radius: 8px; /* Bordes redondeados */
+    padding: 10px; /* Ajusta el espaciado interno */
+    transition: box-shadow 0.3s, border-color 0.3s; /* Efectos suaves al interactuar */
 }
 
 #edit-popup select:focus,
@@ -195,6 +207,9 @@ main {
     border-color: #3b82f6;
     box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
     outline: none;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Sombra más intensa al interactuar */
+    border-color: #007BFF; /* Cambia el color del borde al interactuar */
+    outline: none; /* Elimina el borde azul predeterminado del navegador */
 }
 
 /* Botones del popup */
@@ -307,9 +322,14 @@ main {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.routine-card .delete-button {
+    background-color: #e74c3c;
+    color: #ffffff;
+}
+
 .routine-card .delete-button:hover {
     background-color: #b3392b; /* Ajuste para mejor cohesión */
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -375,12 +395,21 @@ main {
     background-color: #f9fafb;
     resize: vertical;
     transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: "Arial", sans-serif;
+    font-size: 1rem;
+    color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra más visible */
+    border: 1px solid #ddd; /* Bordes suaves */
+    border-radius: 8px; /* Bordes redondeados */
+    padding: 10px; /* Ajusta el espaciado interno */
+    transition: box-shadow 0.3s, border-color 0.3s; /* Efectos suaves al interactuar */
 }
 
-#popup-content textarea:focus {
-    border-color: #356485; /* Color ajustado al foco */
-    box-shadow: 0 0 8px rgba(53, 100, 133, 0.5);
-    outline: none;
+/* Edit Fields */
+#edit-fields-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 /* Responsive */

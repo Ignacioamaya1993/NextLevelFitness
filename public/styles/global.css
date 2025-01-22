@@ -9,6 +9,7 @@ html, body {
     height: 100%; /* Asegura que ocupen el 100% de la altura de la ventana */
     margin: 0;
     display: flex;
+    min-height: 100vh;
     flex-direction: column; /* Configura un layout de columna flexible */
     font-family: 'Arial', sans-serif;
     line-height: 1.6;

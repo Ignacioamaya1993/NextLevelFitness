@@ -146,6 +146,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             Swal.fire("Error", "Debes estar logueado para guardar rutinas.", "error");
             return;
         }
+    
         let embedVideoUrl = "";
         if (video.includes("youtube.com/shorts/")) {
             embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
@@ -153,53 +154,54 @@ document.addEventListener("DOMContentLoaded", async () => {
             const videoId = video.split("v=")[1]?.split("&")[0];
             embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
         }
+    
         const contentHTML = `
-        <div class="exercise-popup">
-            <div class="popup-header">
-                <h3 class="exercise-title">${nombre}</h3>
-            </div>
-            <div class="popup-content">
-                <div class="popup-left">
-                    <div class="video-container">
-                        <iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
+            <div class="exercise-popup">
+                <div class="popup-header">
+                    <h3 class="exercise-title">${nombre}</h3>
+                </div>
+                <div class="popup-content">
+                    <div class="popup-left">
+                        <div class="video-container">
+                            <iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                        <h4>Instrucciones</h4>
+                        <p>${instrucciones}</p>
                     </div>
-                    <h4>Instrucciones</h4>
-                    <p>${instrucciones}</p>
+                    <div class="popup-right">
+                        <form id="exercise-form">
+                            <div class="form-group">
+                                <label for="series">Series:</label>
+                                <input type="number" id="series" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="repeticiones">Repeticiones:</label>
+                                <input type="number" id="repeticiones" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="peso">Peso (kg):</label>
+                                <input type="number" id="peso" min="0" step="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dias">Día de la semana:</label>
+                                <select id="dias" required>
+                                    <option value="lunes">Lunes</option>
+                                    <option value="martes">Martes</option>
+                                    <option value="miércoles">Miércoles</option>
+                                    <option value="jueves">Jueves</option>
+                                    <option value="viernes">Viernes</option>
+                                    <option value="sábado">Sábado</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="adicionales">Datos Adicionales:</label>
+                                <textarea id="adicionales" rows="3" placeholder="Escribe aquí alguna aclaración..."></textarea>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="popup-right">
-                    <form id="exercise-form">
-                        <div class="form-group">
-                            <label for="series">Series:</label>
-                            <input type="number" id="series" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="repeticiones">Repeticiones:</label>
-                            <input type="number" id="repeticiones" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="peso">Peso (kg):</label>
-                            <input type="number" id="peso" min="0" step="0.1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="dias">Día de la semana:</label>
-                            <select id="dias" required>
-                                <option value="lunes">Lunes</option>
-                                <option value="martes">Martes</option>
-                                <option value="miércoles">Miércoles</option>
-                                <option value="jueves">Jueves</option>
-                                <option value="viernes">Viernes</option>
-                                <option value="sábado">Sábado</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="adicionales">Datos Adicionales:</label>
-                            <textarea id="adicionales" rows="3" placeholder="Escribe aquí alguna aclaración..."></textarea>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>`;
-
+            </div>`;
+    
         Swal.fire({
             title: "Detalles del ejercicio",
             html: contentHTML,
@@ -215,24 +217,27 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const dia = document.getElementById('dias').value;
                 const peso = document.getElementById('peso').value;
                 const adicionales = document.getElementById('adicionales').value;
-            
+    
                 if (!series || !repeticiones || !dia || !peso) {
                     Swal.showValidationMessage("Por favor, completa todos los campos.");
                     return;
                 }
-            
+    
                 try {
                     const db = getFirestore(app);
                     const routinesRef = collection(db, "routines");
-            
+    
                     // Verificar si ya existe una rutina para ese día y usuario
                     const routinesSnapshot = await getDocs(routinesRef);
                     const existingRoutineDoc = routinesSnapshot.docs.find(doc => doc.data().userId === user.uid && doc.data().day === dia);
-            
+    
+                    // Generar un ID único para el ejercicio
+                    const exerciseId = crypto.randomUUID();
+    
                     if (existingRoutineDoc) {
-                        // Si ya existe, agregar el nuevo ejercicio al array de ejercicios
                         const routineData = existingRoutineDoc.data();
                         const updatedExercises = [...routineData.exercises, {
+                            id: exerciseId, // ID único del ejercicio
                             name: nombre,
                             series: parseInt(series, 10),
                             repetitions: parseInt(repeticiones, 10),
@@ -241,19 +246,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                             instructions: instrucciones,
                             additionalData: adicionales,
                         }];
-                        
-                        // Actualizar el documento existente con el nuevo ejercicio
+    
+                        // Actualizar el documento existente
                         await updateDoc(doc(db, "routines", existingRoutineDoc.id), {
                             exercises: updatedExercises,
                         });
-            
+    
                         Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
                     } else {
-                        // Si no existe, crear un nuevo documento
                         await addDoc(routinesRef, {
                             userId: user.uid,
                             day: dia,
                             exercises: [{
+                                id: exerciseId, // ID único del ejercicio
                                 name: nombre,
                                 series: parseInt(series, 10),
                                 repetitions: parseInt(repeticiones, 10),
@@ -263,16 +268,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 additionalData: adicionales,
                             }],
                         });
-            
+    
                         Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
                     }
                 } catch (error) {
-                    console.error("Error al guardar la rutina:", error);
-                    Swal.fire("Error", "Hubo un problema al guardar la rutina. Inténtalo de nuevo.", "error");
+                    console.error("Error al guardar el ejercicio:", error);
+                    Swal.fire("Error", "No se pudo guardar el ejercicio.", "error");
                 }
-            },
-            
+            }
         });
     }
-
 });
