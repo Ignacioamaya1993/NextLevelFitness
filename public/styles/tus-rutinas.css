@@ -329,21 +329,26 @@ main {
     margin-bottom: 20px;
 }
 
+/* Botón "Cancelar" centrado debajo */
 #close-popup {
-    background-color: #e74c3c;
-    color: #ffffff;
+    display: block;
+    margin: 20px auto 0; /* Centrado con margen superior */
+    background-color: #9ca3af;
+    color: white;
+    padding: 12px 25px;
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
+    border-radius: 12px;
+    font-size: 1.1rem;
     font-weight: bold;
-    transition: background-color 0.3s;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 #close-popup:hover {
-    background-color: #b3392b; /* Color ajustado para mejor contraste */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Añadido efecto de sombra */
-    transform: scale(1.05); /* Efecto de escala */
+    background-color: #6b7280;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Botones en las tarjetas */
@@ -407,6 +412,45 @@ main {
     display: flex;
     justify-content: space-evenly; /* Mejor distribución */
     margin-top: 20px;
+    gap: 10px;
+}
+
+/* Botón "Eliminar" a la izquierda */
+#delete-exercise {
+    background-color: #ef4444;
+    color: #ffffff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+#delete-exercise:hover {
+    background-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Botón "Guardar" a la derecha */
+#save-changes {
+    background-color: #3b82f6;
+    color: #ffffff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+#save-changes:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Botón "Cancelar" centrado */
