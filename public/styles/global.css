@@ -172,19 +172,19 @@ footer {
     color: #bdc3c7; /* Gris claro para texto secundario */
 }
 
-/* Menú de navegación: ajusta para pantallas pequeñas */
-@media (max-width: 776px) {
+/* Media Query para pantallas pequeñas */
+@media (max-width: 768px) {
     .header-container {
-        flex-direction: column; /* Cambia a una columna para dispositivos pequeños */
+        flex-direction: column; /* Apila el logo y el menú */
+        align-items: center;
     }
-    
-    .nav-menu {
-        gap: 10px; /* Reduce el espacio entre elementos */
-    }
-}
 
-@media (max-width: 480px) {
-    #routine-list {
-        grid-template-columns: 1fr;
+    .logo {
+        margin-bottom: 10px; /* Espacio entre logo y menú */
+    }
+
+    .nav-menu {
+        flex-direction: column; /* Cambia el menú a una columna */
+        gap: 5px; /* Espaciado reducido */
     }
 }
