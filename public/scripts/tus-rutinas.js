@@ -46,8 +46,7 @@ function displayUserRoutines(routines) {
     routineList.innerHTML = "";
 
     const groupedRoutines = groupRoutinesByDay(routines);
-    console.log('Rutinas agrupadas por día:', groupedRoutines);
-    
+
     Object.keys(groupedRoutines).forEach(day => {
         const routineCard = document.createElement("div");
         routineCard.classList.add("routine-card");
@@ -69,7 +68,6 @@ function displayUserRoutines(routines) {
             <button class="edit-button" data-day="${day}">Editar</button>
             <button class="delete-button" data-day="${day}">Eliminar</button>
         `;
-        console.log('HTML de la rutina:', routineCard.innerHTML);
 
         routineList.appendChild(routineCard);
     });
@@ -96,7 +94,6 @@ function displayUserRoutines(routines) {
                 cancelButtonText: "Cancelar"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Llamar a la función para eliminar la rutina solo después de confirmar
                     deleteRoutine(day);
                 }
             });
@@ -112,7 +109,6 @@ function groupRoutinesByDay(routines) {
             grouped[day] = [];
         }
 
-        // Asegúrate de que exercise sea siempre un array
         const exercises = Array.isArray(routine.exercises) ? routine.exercises : [routine.exercises];
         grouped[day] = grouped[day].concat(exercises);
     });
@@ -123,15 +119,6 @@ function groupRoutinesByDay(routines) {
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
     const popupContent = document.getElementById("popup-content");
-
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && !popup.classList.contains("hidden")) {
-            popup.classList.add("hidden");
-        }
-    });
-
-    popupContent.innerHTML = "";
-
     const routine = routines.find(routine => routine.day === day);
 
     if (!routine) {
@@ -140,290 +127,93 @@ function openEditPopup(day, routines) {
         return;
     }
 
-    if (!routine.exercises || !Array.isArray(routine.exercises)) {
-        popupContent.innerHTML = `<p>No hay ejercicios disponibles para la rutina de ${day}</p>`;
-        popup.classList.remove("hidden");
-        return;
-    }
+    const exercises = routine.exercises || [];
+    popupContent.innerHTML = `
+        <h3>Editar Rutina para el día ${day}</h3>
+        <div id="edit-fields-container"></div>
+        <button id="save-changes">Guardar cambios</button>
+        <button id="close-popup">Cancelar</button>
+    `;
 
-    const exercises = routine.exercises;
-
-    const header = document.createElement("h3");
-    header.textContent = `Editar Rutina para el día ${day}`;
-    popupContent.appendChild(header);
-
-    const exerciseSelect = document.createElement("select");
-    exerciseSelect.id = "exercise-select";
-
-    if (exercises.length > 0) {
-        exerciseSelect.innerHTML = exercises.map((exercise, index) => `
-            <option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>
-        `).join('');
-    }
-
-    popupContent.appendChild(exerciseSelect);
-
-    const editFieldsContainer = document.createElement("div");
-    editFieldsContainer.id = "edit-fields-container";
-    popupContent.appendChild(editFieldsContainer);
-
-    const saveButton = document.createElement("button");
-    saveButton.id = "save-changes";
-    saveButton.textContent = "Guardar cambios";
-    popupContent.appendChild(saveButton);
-
-    const closeButton = document.createElement("button");
-    closeButton.id = "close-popup";
-    closeButton.textContent = "Cancelar";
-    popupContent.appendChild(closeButton);
-
-    popup.classList.remove("hidden");
-
-    exerciseSelect.addEventListener("change", () => {
-        const selectedIndex = parseInt(exerciseSelect.value, 10);
-        const selectedExercise = exercises[selectedIndex];
-        renderEditFields(editFieldsContainer, selectedExercise, selectedIndex, day, exercises);
+    const editFieldsContainer = document.getElementById("edit-fields-container");
+    exercises.forEach((exercise, index) => {
+        renderEditFields(editFieldsContainer, exercise, index, day, exercises);
     });
 
-    renderEditFields(editFieldsContainer, exercises[0], 0, day, exercises);
-
-    saveButton.addEventListener("click", () => {
-        let valid = true;
-        exercises.forEach((exercise, index) => {
-            const seriesInput = document.getElementById(`series-${index}`);
-            const repsInput = document.getElementById(`reps-${index}`);
-            const weightInput = document.getElementById(`weight-${index}`);
-            const additionalDataInput = document.getElementById(`additionalData-${index}`);
-
-            // Verificar si algún campo tiene valor 0 y mostrar advertencia
-            if (seriesInput && repsInput && weightInput && additionalDataInput) {
-                if (parseInt(seriesInput.value, 10) <= 0 || parseInt(repsInput.value, 10) <= 0 || parseFloat(weightInput.value) <= 0) {
-                    valid = false;
-                    Swal.fire("Error", "Los campos de Series, Repeticiones o Peso no puede ser 0 o negativo.", "error");
-                } else {
-                    exercise.series = parseInt(seriesInput.value, 10);
-                    exercise.repetitions = parseInt(repsInput.value, 10);
-                    exercise.weight = parseFloat(weightInput.value);
-                    exercise.additionalData = additionalDataInput.value;
-                }
-            }
-        });
-
-        if (valid) {
-            saveChanges(day, exercises);
-            popup.classList.add("hidden");
-        }
-    });
-
-    closeButton.addEventListener("click", () => {
+    document.getElementById("save-changes").addEventListener("click", () => {
+        saveChanges(day, exercises);
         popup.classList.add("hidden");
     });
-}
 
-// Evita que los campos de número tengan valores negativos
-function preventNegativeValues(event) {
-    const input = event.target;
-    // Si el valor contiene un signo negativo, eliminarlo
-    if (input.value.startsWith("-")) {
-        input.value = input.value.replace("-", "");
-    }
-}
-
-// Configurar los campos para evitar valores negativos
-function setupNegativeValuePrevention() {
-    const numberInputs = document.querySelectorAll('input[type="number"]');
-    numberInputs.forEach(input => {
-        input.addEventListener("input", preventNegativeValues);
+    document.getElementById("close-popup").addEventListener("click", () => {
+        popup.classList.add("hidden");
     });
-}
 
-setupNegativeValuePrevention(); // Llamar a la función para evitar valores negativos
+    popup.classList.remove("hidden");
+}
 
 function renderEditFields(container, exercise, index, day, exercises) {
-    container.innerHTML = `
+    const fieldSet = document.createElement("fieldset");
+    fieldSet.innerHTML = `
+        <legend>Ejercicio ${index + 1}</legend>
         <div>
             <label>Series:</label>
-            <input type="number" value="${exercise.series != null ? exercise.series : 1}" id="series-${index}" min="1">
-            <span class="error-message" id="error-series-${index}"></span>
+            <input type="number" value="${exercise.series || 1}" id="series-${index}" min="1">
         </div>
         <div>
             <label>Repeticiones:</label>
-            <input type="number" value="${exercise.repetitions != null ? exercise.repetitions : 1}" id="reps-${index}" min="1">
-            <span class="error-message" id="error-reps-${index}"></span>
+            <input type="number" value="${exercise.repetitions || 1}" id="reps-${index}" min="1">
         </div>
         <div>
             <label>Peso (kg):</label>
-            <input type="number" value="${exercise.weight != null ? exercise.weight : 1}" id="weight-${index}" min="1" step="0.01">
-            <span class="error-message" id="error-weight-${index}"></span>
+            <input type="number" value="${exercise.weight || 1}" id="weight-${index}" min="1">
         </div>
         <div>
             <label>Información adicional:</label>
-            <textarea id="additionalData-${index}" rows="4">${exercise.additionalData || ''} </textarea>
+            <textarea id="additionalData-${index}">${exercise.additionalData || ''}</textarea>
         </div>
         <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
     `;
 
-    // Configurar eventos de validación en tiempo real
-    const seriesInput = document.getElementById(`series-${index}`);
-    const repsInput = document.getElementById(`reps-${index}`);
-    const weightInput = document.getElementById(`weight-${index}`);
-    const errorSeries = document.getElementById(`error-series-${index}`);
-    const errorReps = document.getElementById(`error-reps-${index}`);
-    const errorWeight = document.getElementById(`error-weight-${index}`);
+    container.appendChild(fieldSet);
 
-    const validateInput = (input, errorSpan, fieldName) => {
-        if (parseFloat(input.value) <= 0) {
-            errorSpan.textContent = `El campo ${fieldName} no puede ser 0 o negativo.`;
-            input.classList.add("input-error");
-        } else {
-            errorSpan.textContent = "";
-            input.classList.remove("input-error");
-        }
-    };
-
-    seriesInput.addEventListener("input", () => validateInput(seriesInput, errorSeries, "Series"));
-    repsInput.addEventListener("input", () => validateInput(repsInput, errorReps, "Repeticiones"));
-    weightInput.addEventListener("input", () => validateInput(weightInput, errorWeight, "Peso (kg)"));
-
-    // Configurar evento para eliminar ejercicio
-    const deleteButton = container.querySelector(".delete-exercise");
-    deleteButton.addEventListener("click", () => {
+    fieldSet.querySelector(".delete-exercise").addEventListener("click", () => {
         Swal.fire({
-            title: `¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`,
-            text: 'No podrás deshacer esta acción.',
+            title: `¿Estás seguro de eliminar el ejercicio?`,
+            text: "Esta acción no se puede deshacer.",
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar",
+            cancelButtonText: "Cancelar"
         }).then((result) => {
             if (result.isConfirmed) {
-                deleteExerciseFromRoutine(day, index, exercises);
+                exercises.splice(index, 1);
+                fieldSet.remove();
             }
         });
     });
-}
-
-// Modificar el evento de guardar cambios para validar antes de cerrar el popup
-saveButton.addEventListener("click", () => {
-    let valid = true;
-
-    exercises.forEach((exercise, index) => {
-        const seriesInput = document.getElementById(`series-${index}`);
-        const repsInput = document.getElementById(`reps-${index}`);
-        const weightInput = document.getElementById(`weight-${index}`);
-
-        if (parseFloat(seriesInput.value) <= 0 || parseFloat(repsInput.value) <= 0 || parseFloat(weightInput.value) <= 0) {
-            valid = false;
-        }
-    });
-
-    if (valid) {
-        saveChanges(day, exercises);
-        popup.classList.add("hidden");
-    } else {
-        Swal.fire("Error", "Corrige los valores en 0 o negativos antes de guardar.", "error");
-    }
-});
-
-    // Configurar evento para eliminar ejercicio
-    const deleteButton = container.querySelector(".delete-exercise");
-    deleteButton.addEventListener("click", () => {
-        Swal.fire({
-            title: `¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`,
-            text: 'No podrás deshacer esta acción.',
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Llamar a la función de eliminación solo después de confirmar
-                deleteExerciseFromRoutine(day, index, exercises);
-            }
-        });
-    });
-
-const inputElement = document.getElementById("my-input");
-inputElement.addEventListener("input", preventNegativeValues);
-
-async function saveChanges(day, exercises) {
-    try {
-        const routinesRef = collection(db, "routines");
-        const q = query(routinesRef, where("day", "==", day));
-        const querySnapshot = await getDocs(q);
-
-        // Se espera que solo haya un documento por día
-        if (querySnapshot.size === 1) {
-            const docId = querySnapshot.docs[0].id;
-            await updateDoc(querySnapshot.docs[0].ref, { exercises });
-            Swal.fire("Éxito", "La rutina se actualizó correctamente.", "success").then(() => {
-                location.reload(); // Recarga la página después de guardar
-            });
-        } else {
-            console.error(`Se encontraron ${querySnapshot.size} documentos para el día ${day}`);
-            Swal.fire("Error", "No se pudo actualizar la rutina.", "error");
-        }
-    } catch (error) {
-        console.error("Error al guardar los cambios en la rutina:", error);
-        Swal.fire("Error", "No se pudo guardar la rutina. Revisa la consola para más detalles.", "error");
-    }
-}
-async function deleteExerciseFromRoutine(day, index, exercises) {
-    try {
-        // Elimina el ejercicio de la lista de ejercicios
-        exercises.splice(index, 1);
-
-        // Actualiza la rutina en Firestore
-        await saveChanges(day, exercises);
-
-        // Notificar al usuario sobre el éxito de la operación
-        await Swal.fire({
-            title: "Éxito",
-            text: "El ejercicio ha sido eliminado.",
-            icon: "success",
-        });
-
-        // Recargar la página después de la confirmación
-        location.reload();
-    } catch (error) {
-        console.error("Error al eliminar el ejercicio:", error);
-        Swal.fire("Error", "No se pudo eliminar el ejercicio. Revisa la consola para más detalles.", "error");
-    }
 }
 
 async function deleteRoutine(day) {
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    const routinesRef = collection(db, "routines");
-    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", day));
+    const routineRef = query(collection(db, "routines"), where("day", "==", day));
+    const querySnapshot = await getDocs(routineRef);
 
-    try {
-        const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+    });
 
-        if (!querySnapshot.empty) {
-            const routineDoc = querySnapshot.docs[0];
+    Swal.fire("Éxito", `La rutina para el día ${day} ha sido eliminada.`, "success");
+    location.reload();
+}
 
-            // Eliminar la rutina directamente sin pedir confirmación nuevamente
-            await deleteDoc(routineDoc.ref);
+async function saveChanges(day, exercises) {
+    const routineRef = query(collection(db, "routines"), where("day", "==", day));
+    const querySnapshot = await getDocs(routineRef);
 
-            // Notificar al usuario sobre el éxito de la operación
-            Swal.fire({
-                title: "Éxito",
-                text: `La rutina para el día ${day} ha sido eliminada.`,
-                icon: "success",
-            }).then(() => location.reload()); // Recarga la página después de eliminar la rutina
-        } else {
-            Swal.fire({
-                title: "Error",
-                text: "No se encontró la rutina para el día especificado.",
-                icon: "error",
-            });
-        }
-    } catch (error) {
-        Swal.fire({
-            title: "Error",
-            text: "Ocurrió un error al eliminar la rutina.",
-            icon: "error",
-        });
-        console.error("Error al eliminar la rutina:", error);
-    }
+    querySnapshot.forEach(async (doc) => {
+        await updateDoc(doc.ref, { exercises });
+    });
+
+    Swal.fire("Éxito", "Los cambios han sido guardados.", "success");
+    location.reload();
 }
