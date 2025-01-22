@@ -171,15 +171,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="popup-right">
                         <form id="exercise-form">
                             <div class="form-group">
-                                <label for="series">Series:</label>
+                            <label for="series">Series: <span style="color: red;">*</span></label>
                                 <input type="number" id="series" min="1" required>
                             </div>
                             <div class="form-group">
-                                <label for="repeticiones">Repeticiones:</label>
+                            <label for="repeticiones">Repeticiones: <span style="color: red;">*</span></label>
                                 <input type="number" id="repeticiones" min="1" required>
                             </div>
                             <div class="form-group">
-                                <label for="peso">Peso (kg):</label>
+                            <label for="peso">Peso (kg): <span style="color: red;">*</span></label>
                                 <input type="number" id="peso" min="0" step="0.1" required>
                             </div>
                             <div class="form-group">
