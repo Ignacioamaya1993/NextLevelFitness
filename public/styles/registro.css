@@ -26,6 +26,11 @@ form:hover {
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
 }
 
+.required {
+    color: red;
+    font-weight: bold;
+}
+
 /* Título del formulario */
 h2 {
     text-align: center;

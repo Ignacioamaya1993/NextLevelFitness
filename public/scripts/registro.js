@@ -35,6 +35,19 @@ formularioCampos.forEach(campo => {
     }
 });
 
+// Selección de elementos del formulario
+const celularInput = document.getElementById("celular");
+
+// Agregar un evento 'input' para validar solo números en el campo celular
+celularInput.addEventListener("input", (event) => {
+    const inputValue = event.target.value;
+
+    // Eliminar cualquier valor que no sea numérico
+    if (!/^\d*$/.test(inputValue)) {
+        event.target.value = inputValue.replace(/[^\d]/g, ''); // Reemplaza caracteres no numéricos por vacío
+    }
+});
+
 // Manejar el envío del formulario
 registroForm.addEventListener("submit", async (event) => {
     event.preventDefault(); // Evita que se recargue la página
