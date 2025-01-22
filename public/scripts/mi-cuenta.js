@@ -17,16 +17,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("update-form");
     const phoneInput = document.getElementById("new-phone"); // Campo de celular
 
-        // Validar que solo se permitan números en el campo del celular
-        phoneInput.addEventListener("input", (event) => {
-            const value = event.target.value;
+    // Validar que solo se permitan números en el campo del celular
+    phoneInput.addEventListener("input", (event) => {
+        const value = event.target.value;
 
-            // Elimina cualquier carácter no numérico
-            const numericValue = value.replace(/\D/g, ""); // \D coincide con cualquier carácter no numérico
-            if (value !== numericValue) {
-                event.target.value = numericValue; // Actualiza el valor del campo
-            }
-        });
+        // Elimina cualquier carácter no numérico
+        const numericValue = value.replace(/\D/g, ""); // \D coincide con cualquier carácter no numérico
+        if (value !== numericValue) {
+            event.target.value = numericValue; // Actualiza el valor del campo
+        }
+    });
 
     auth.onAuthStateChanged(async (user) => {
         if (user) {
@@ -127,32 +127,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         const newEmail = document.getElementById("new-email").value;
         const newPassword = document.getElementById("new-password").value;
         const newPhone = document.getElementById("new-phone").value;
-    
+
         const user = auth.currentUser;
         const userDoc = doc(db, "usuarios", user.uid);
         const docSnap = await getDoc(userDoc);
-    
+
         if (!docSnap.exists()) {
             await Swal.fire("Error", "No se encontró el usuario en la base de datos.", "error");
             return;
         }
-    
+
         const userData = docSnap.data();
-    
+
         try {
             // Validar si el correo ingresado es diferente al actual
             if (newEmail && newEmail === user.email) {
                 throw new Error("El correo nuevo debe ser diferente al actual.");
             }
-    
+
             // Validar si el celular ingresado es diferente al actual
             if (newPhone && newPhone === userData.celular) {
                 throw new Error("El número de celular no debe ser igual al anterior.");
             }
-    
-            // Validar si la contraseña ingresada es diferente a la actual
-            if (newPassword) {
-                const password = await Swal.fire({
+
+            // Solicitar la contraseña solo una vez si se cambian campos
+            let password;
+            if (newPassword || newPhone) {
+                password = await Swal.fire({
                     title: "Confirmar cambios",
                     input: "password",
                     inputLabel: "Ingrese su contraseña actual",
@@ -166,52 +167,29 @@ document.addEventListener("DOMContentLoaded", async () => {
                     cancelButtonText: "Cancelar",
                     preConfirm: async (password) => {
                         if (!password) throw new Error("La actualización fue cancelada.");
-    
+
                         const credential = EmailAuthProvider.credential(user.email, password);
                         await reauthenticateWithCredential(user, credential);
                     },
                 }).then((result) => result.value);
-    
+
                 if (!password) throw new Error("La actualización fue cancelada.");
-    
-                // Verificar si la nueva contraseña es diferente a la actual
-                if (newPassword === password) {
-                    throw new Error("La nueva contraseña no debe ser igual a la actual.");
-                }
             }
-    
-            // Solicitar la contraseña para reautenticarse
-            const password = await Swal.fire({
-                title: "Confirmar cambios",
-                input: "password",
-                inputLabel: "Ingrese su contraseña actual",
-                inputPlaceholder: "Contraseña",
-                inputAttributes: {
-                    autocapitalize: "off",
-                    autocorrect: "off",
-                },
-                showCancelButton: true,
-                confirmButtonText: "Confirmar",
-                cancelButtonText: "Cancelar",
-                preConfirm: async (password) => {
-                    if (!password) throw new Error("La actualización fue cancelada.");
-    
-                    const credential = EmailAuthProvider.credential(user.email, password);
-                    await reauthenticateWithCredential(user, credential);
-                },
-            }).then((result) => result.value);
-    
-            if (!password) throw new Error("La actualización fue cancelada.");
-    
+
+            // Verificar si la nueva contraseña es diferente a la actual
+            if (newPassword === password) {
+                throw new Error("La nueva contraseña no debe ser igual a la actual.");
+            }
+
             if (newEmail) {
                 try {
                     // Cambiar el correo y enviar correo de verificación
                     await updateEmail(user, newEmail);
-    
+
                     // Enviar correo de verificación al nuevo correo
                     await user.sendEmailVerification();
                     await Swal.fire("Correo de verificación enviado", "Revisa tu bandeja de entrada y verifica tu nuevo correo.", "info");
-    
+
                     // Recargar la página después de que el correo haya sido verificado
                     window.location.reload();
                 } catch (error) {
@@ -224,22 +202,29 @@ document.addEventListener("DOMContentLoaded", async () => {
                     throw error;
                 }
             }
-    
+
             if (newPhone) {
                 const userDocRef = doc(db, "usuarios", user.uid);
                 await setDoc(userDocRef, { celular: newPhone }, { merge: true });
                 await Swal.fire("Éxito", "Número de celular actualizado correctamente", "success");
-    
+
                 // Recargar la página
                 window.location.reload();
             }
-    
+
             if (newPassword) {
                 await updatePassword(user, newPassword);
                 await Swal.fire("Éxito", "Contraseña actualizada correctamente", "success");
-    
-                // Recargar la página
-                window.location.reload();
+
+                // Cerrar sesión y redirigir al login
+                await signOut(auth);
+                await Swal.fire({
+                    title: "Sesión cerrada",
+                    text: "Has cambiado tu contraseña, por lo que debes iniciar sesión nuevamente.",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                });
+                window.location.href = "login.html";
             }
         } catch (error) {
             let errorMessage = error.message || "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
@@ -252,7 +237,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else if (error.code === "auth/requires-recent-login") {
                 errorMessage = "Debes volver a iniciar sesión.";
             }
-    
+
             await Swal.fire("Error", errorMessage, "error");
         }
     });
