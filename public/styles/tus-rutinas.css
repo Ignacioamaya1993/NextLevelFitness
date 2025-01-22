@@ -413,13 +413,13 @@ main {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media screen and (max-width: 776px) {
     #routine-list {
         grid-template-columns: repeat(2, minmax(220px, 1fr));
     }
 }
 
-@media (max-width: 480px) {
+@media screen and (max-width: 480px) {
     #routine-list {
         grid-template-columns: 1fr;
     }
