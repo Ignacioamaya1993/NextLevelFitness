@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         try {
             const routines = await getUserRoutines(user.uid);
-            if (routines && routines.length > 0) {
+            if (routines.length > 0) {
                 noRoutinesMessage.classList.add("hidden");
                 displayUserRoutines(routines);
             } else {
@@ -33,12 +33,7 @@ async function getUserRoutines(userId) {
     const q = query(routinesRef, where("userId", "==", userId));
     const querySnapshot = await getDocs(q);
 
-    const routines = [];
-    querySnapshot.forEach((doc) => {
-        routines.push({ ...doc.data(), id: doc.id });
-    });
-
-    return routines;
+    return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 }
 
 function displayUserRoutines(routines) {
@@ -46,16 +41,17 @@ function displayUserRoutines(routines) {
     routineList.innerHTML = "";
 
     const groupedRoutines = groupRoutinesByDay(routines);
-
+    
     Object.keys(groupedRoutines).forEach(day => {
         const routineCard = document.createElement("div");
         routineCard.classList.add("routine-card");
 
-        const exercisesList = groupedRoutines[day].map((exercise, index) => `
+        const exercisesList = groupedRoutines[day].map(exercise => `
             <li>${exercise.name || "Ejercicio sin nombre"} - 
                 ${exercise.series || 0} series, 
                 ${exercise.repetitions || 0} reps, 
-                ${exercise.weight || 0} kg
+                ${exercise.weight || 0} kg, 
+                ${exercise.additionalData || "Sin información adicional"}
             </li>
         `).join('');
 
@@ -69,43 +65,47 @@ function displayUserRoutines(routines) {
         routineList.appendChild(routineCard);
     });
 
-    document.querySelectorAll(".edit-button").forEach((button) =>
-        button.addEventListener("click", (e) => {
-            openEditPopup(e.target.dataset.day, routines);
-        })
+    document.querySelectorAll(".edit-button").forEach(button =>
+        button.addEventListener("click", (e) => openEditPopup(e.target.dataset.day, routines))
     );
 
-    document.querySelectorAll(".delete-button").forEach((button) =>
+    document.querySelectorAll(".delete-button").forEach(button =>
         button.addEventListener("click", async (e) => {
             const day = e.target.dataset.day;
-            Swal.fire({
-                title: `¿Eliminar rutina para el día ${day}?`,
+            const confirm = await Swal.fire({
+                title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
                 text: "Esta acción no se puede deshacer.",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Sí, eliminar",
                 cancelButtonText: "Cancelar"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    deleteRoutine(day);
-                }
             });
+            if (confirm.isConfirmed) deleteRoutine(day);
         })
     );
+}
+
+function groupRoutinesByDay(routines) {
+    const grouped = {};
+    routines.forEach(routine => {
+        const day = routine.day || "Día no especificado";
+        if (!grouped[day]) {
+            grouped[day] = [];
+        }
+
+        const exercises = Array.isArray(routine.exercises) ? routine.exercises : [routine.exercises];
+        grouped[day] = grouped[day].concat(exercises);
+    });
+
+    return grouped;
 }
 
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
     const popupContent = document.getElementById("popup-content");
-
     const routine = routines.find(routine => routine.day === day);
-    if (!routine || !routine.exercises) {
-        popupContent.innerHTML = `<p>No se encontró la rutina para el día ${day}</p>`;
-        popup.classList.remove("hidden");
-        return;
-    }
 
-    popupContent.innerHTML = `
+    popupContent.innerHTML = routine ? `
         <h3>Editar Rutina para el día ${day}</h3>
         <select id="exercise-select">
             ${routine.exercises.map((exercise, index) => `<option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>`).join('')}
@@ -113,63 +113,53 @@ function openEditPopup(day, routines) {
         <div id="edit-fields-container"></div>
         <button id="save-changes">Guardar cambios</button>
         <button id="close-popup">Cancelar</button>
-    `;
+    ` : `<p>No se encontró la rutina para el día ${day}</p>`;
 
-    const exerciseSelect = document.getElementById("exercise-select");
+    if (!routine) return popup.classList.remove("hidden");
+
     const editFieldsContainer = document.getElementById("edit-fields-container");
+    const exerciseSelect = document.getElementById("exercise-select");
+    
+    function updateFields() {
+        const index = parseInt(exerciseSelect.value, 10);
+        renderEditFields(editFieldsContainer, routine.exercises[index], index, day, routine.exercises);
+    }
 
-    exerciseSelect.addEventListener("change", () => {
-        renderEditFields(editFieldsContainer, routine.exercises[exerciseSelect.value], exerciseSelect.value, day, routine.exercises);
-    });
-
-    renderEditFields(editFieldsContainer, routine.exercises[0], 0, day, routine.exercises);
+    exerciseSelect.addEventListener("change", updateFields);
+    updateFields();
 
     document.getElementById("save-changes").addEventListener("click", () => {
         saveChanges(day, routine.exercises);
         popup.classList.add("hidden");
     });
 
-    document.getElementById("close-popup").addEventListener("click", () => {
-        popup.classList.add("hidden");
-    });
-
+    document.getElementById("close-popup").addEventListener("click", () => popup.classList.add("hidden"));
+    
     popup.classList.remove("hidden");
 }
 
 function renderEditFields(container, exercise, index, day, exercises) {
     container.innerHTML = `
         <label>Series:</label>
-        <input type="number" id="series-${index}" value="${exercise.series || ''}" min="1">
-        <span id="error-series-${index}" class="error-message"></span>
-
+        <input type="number" id="series" value="${exercise.series || 0}" min="0">
         <label>Repeticiones:</label>
-        <input type="number" id="reps-${index}" value="${exercise.repetitions || ''}" min="1">
-        <span id="error-reps-${index}" class="error-message"></span>
-
+        <input type="number" id="repetitions" value="${exercise.repetitions || 0}" min="0">
         <label>Peso (kg):</label>
-        <input type="number" id="weight-${index}" value="${exercise.weight || ''}" min="1">
-        <span id="error-weight-${index}" class="error-message"></span>
-
-        <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
+        <input type="number" id="weight" value="${exercise.weight || 0}" min="0">
+        <label>Datos adicionales:</label>
+        <input type="text" id="additionalData" value="${exercise.additionalData || ''}">
     `;
 
-    document.querySelector(".delete-exercise").addEventListener("click", () => {
-        deleteExerciseFromRoutine(day, index, exercises);
-    });
-
-    document.querySelectorAll("input[type='number']").forEach(input => {
-        input.addEventListener("input", (event) => {
-            if (event.target.value < 1) {
-                event.target.value = 1;
-            }
-        });
-    });
-}
-
-async function deleteExerciseFromRoutine(day, index, exercises) {
-    exercises.splice(index, 1);
-    await saveChanges(day, exercises);
-    location.reload();
+    document.getElementById("save-changes").onclick = function () {
+        exercises[index] = {
+            ...exercise,
+            series: parseInt(document.getElementById("series").value, 10),
+            repetitions: parseInt(document.getElementById("repetitions").value, 10),
+            weight: parseFloat(document.getElementById("weight").value),
+            additionalData: document.getElementById("additionalData").value
+        };
+        saveChanges(day, exercises);
+    };
 }
 
 async function saveChanges(day, exercises) {
@@ -178,11 +168,63 @@ async function saveChanges(day, exercises) {
         const q = query(routinesRef, where("day", "==", day));
         const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.size === 1) {
+        if (!querySnapshot.empty) {
             await updateDoc(querySnapshot.docs[0].ref, { exercises });
-            Swal.fire("Éxito", "Rutina actualizada.", "success").then(() => location.reload());
+            Swal.fire("Éxito", "La rutina se actualizó correctamente.", "success").then(() => location.reload());
         }
     } catch (error) {
-        console.error("Error al guardar cambios:", error);
+        Swal.fire("Error", "No se pudo guardar la rutina.", "error");
+        console.error("Error:", error);
+    }
+}
+
+   // Configurar evento para eliminar ejercicio
+   const deleteButton = container.querySelector(".delete-exercise");
+   deleteButton.addEventListener("click", () => {
+       Swal.fire({
+           title: '¿Estás seguro de eliminar el ejercicio "${exercise.name}"?',
+           text: 'No podrás deshacer esta acción.',
+           icon: "warning",
+           showCancelButton: true,
+           confirmButtonText: "Sí, eliminar",
+           cancelButtonText: "Cancelar",
+       }).then((result) => {
+           if (result.isConfirmed) {
+               deleteExerciseFromRoutine(day, index, exercises);
+           }
+       });
+   });
+
+async function deleteExerciseFromRoutine(day, index, exercises) {
+    try {
+        // Elimina el ejercicio de la lista de ejercicios
+        exercises.splice(index, 1);
+
+        // Actualiza la rutina en Firestore
+        await saveChanges(day, exercises);
+
+        // Notificar al usuario sobre el éxito de la operación
+        await Swal.fire({
+            title: "Éxito",
+            text: "El ejercicio ha sido eliminado.",
+            icon: "success",
+        });
+
+        // Recargar la página después de la confirmación
+        location.reload();
+    } catch (error) {
+        console.error("Error al eliminar el ejercicio:", error);
+        Swal.fire("Error", "No se pudo eliminar el ejercicio. Revisa la consola para más detalles.", "error");
+    }
+}
+
+async function deleteRoutine(day) {
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    const q = query(collection(db, "routines"), where("userId", "==", user.uid), where("day", "==", day));
+
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+        await deleteDoc(querySnapshot.docs[0].ref);
+        Swal.fire("Éxito", `Rutina del día ${day} eliminada.`, "success").then(() => location.reload());
     }
 }
