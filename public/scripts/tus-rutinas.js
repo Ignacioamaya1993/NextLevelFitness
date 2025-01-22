@@ -327,7 +327,11 @@ async function saveChanges(day, exercises) {
         // Asegúrate de actualizar el valor de "Información adicional" para cada ejercicio
         exercises.forEach((exercise, index) => {
             const additionalDataInput = document.getElementById(`additionalData-${index}`);
-            exercise.additionalData = additionalDataInput.value || "";  // Actualiza el valor de additionalData
+            if (additionalDataInput) {
+                exercise.additionalData = additionalDataInput.value || "";  // Actualiza el valor de additionalData
+            } else {
+                console.warn(`No se encontró el campo de "Información adicional" para el ejercicio ${index}`);
+            }
         });
 
         const routinesRef = collection(db, "routines");
