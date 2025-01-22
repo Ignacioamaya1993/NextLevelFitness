@@ -51,6 +51,8 @@ loginForm.addEventListener("submit", async (event) => {
             window.location.href = "tus-rutinas.html";
         } else {
             console.log("Correo no verificado, deteniendo el flujo");
+            await auth.signOut();
+
             Swal.fire({
                 icon: "warning",
                 title: "Correo no verificado",
