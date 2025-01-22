@@ -12,6 +12,29 @@ const db = getFirestore(app);
 const registroForm = document.getElementById("registro-form");
 const mensaje = document.getElementById("mensaje");
 
+// Modificar el HTML de los campos del formulario para incluir el asterisco rojo
+const formularioCampos = [
+    { id: "nombre", label: "Nombre" },
+    { id: "apellido", label: "Apellido" },
+    { id: "fecha-nacimiento", label: "Fecha de Nacimiento" },
+    { id: "genero", label: "Género" },
+    { id: "celular", label: "Celular" },
+    { id: "email", label: "Correo Electrónico" },
+    { id: "password", label: "Contraseña" },
+    { id: "confirmar-password", label: "Confirmar Contraseña" }
+];
+
+// Modificar el formulario agregando el * rojo
+formularioCampos.forEach(campo => {
+    const label = document.querySelector(`label[for="${campo.id}"]`);
+    if (label) {
+        const span = document.createElement("span");
+        span.classList.add("required");
+        span.textContent = "*";
+        label.appendChild(span);
+    }
+});
+
 // Manejar el envío del formulario
 registroForm.addEventListener("submit", async (event) => {
     event.preventDefault(); // Evita que se recargue la página
