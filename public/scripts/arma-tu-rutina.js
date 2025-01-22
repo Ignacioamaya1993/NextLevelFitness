@@ -221,10 +221,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const adicionales = document.getElementById('adicionales').value;
     
                 if (!series || !repeticiones || !dia || !peso) {
-                    Swal.showValidationMessage("Por favor, completa todos los campos.");
+                    Swal.showValidationMessage("Por favor, completa todos los campos obligatorios.");
                     return;
                 }
-    
+                // Validar valores mínimos
+                if (series <= 0 || repeticiones <= 0 || peso <= 0) {
+                    Swal.showValidationMessage("Series, repeticiones y peso deben ser mayores a 0.");
+                    return;
+                }
+
+                // Validar peso como número decimal positivo
+                if (!/^\d+(\.\d+)?$/.test(peso)) {
+                    Swal.showValidationMessage("Peso debe ser un número válido.");
+                    return;
+                }
                 try {
                     const db = getFirestore(app);
                     const routinesRef = collection(db, "routines");
