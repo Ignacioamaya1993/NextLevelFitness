@@ -48,7 +48,7 @@
     transform: scale(1.05); /* Pequeño efecto de agrandamiento */
 }
 
-@media (max-width: 768px) {
+@media (max-width: 776px) {
     .hero h1 {
         font-size: 2rem;
     }

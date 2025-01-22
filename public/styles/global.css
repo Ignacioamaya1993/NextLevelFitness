@@ -173,7 +173,7 @@ footer {
 }
 
 /* Menú de navegación: ajusta para pantallas pequeñas */
-@media (max-width: 768px) {
+@media (max-width: 776px) {
     .header-container {
         flex-direction: column; /* Cambia a una columna para dispositivos pequeños */
     }
