@@ -1,31 +1,26 @@
-import app from "../scripts/firebaseConfig.js"; // Importa la instancia de Firebase desde firebaseConfig.js
+import app from "../scripts/firebaseConfig.js"; 
 import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-// Obtén la instancia de autenticación desde la app importada
 const auth = getAuth(app);
-
-// Selección de elementos del formulario
 const loginForm = document.getElementById("loginForm");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 
 // Función para restablecer validaciones personalizadas
 function resetCustomValidity(input) {
-    input.setCustomValidity(""); // Limpia el mensaje de error personalizado
-    input.reportValidity(); // Actualiza la validez del campo
+    input.setCustomValidity(""); 
+    input.reportValidity(); 
 }
 
-// Restablecer la validación cuando el usuario interactúa nuevamente con el campo
 emailInput.addEventListener("input", () => resetCustomValidity(emailInput));
 passwordInput.addEventListener("input", () => resetCustomValidity(passwordInput));
 
 loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault(); // Evita que el formulario recargue la página
+    event.preventDefault();
 
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
 
-    // Validar campos vacíos
     if (!email) {
         emailInput.setCustomValidity("Por favor, completa este campo.");
         emailInput.reportValidity();
@@ -38,31 +33,23 @@ loginForm.addEventListener("submit", async (event) => {
         return;
     }
 
-    // Restablecer mensajes de validación personalizada
     resetCustomValidity(emailInput);
     resetCustomValidity(passwordInput);
 
     try {
-        // Intentar iniciar sesión con las credenciales proporcionadas
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Verificar si el correo está verificado
         if (user.emailVerified) {
             console.log("Correo verificado: Continuando con la autenticación.");
-
-            // Limpiar solo los datos necesarios en localStorage
             const currentUser = {
                 isLoggedIn: true,
                 email: user.email,
                 uid: user.uid,
             };
             localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
-            // Redirigir a la página de tus rutinas
             window.location.href = "tus-rutinas.html";
         } else {
-            // Solo muestra el mensaje de advertencia sin hacer signOut
             console.log("Correo no verificado, deteniendo el flujo");
             Swal.fire({
                 icon: "warning",
@@ -78,13 +65,13 @@ loginForm.addEventListener("submit", async (event) => {
 
         switch (error.code) {
             case "auth/invalid-credential":
-                errorMessage = "Las credenciales proporcionadas son incorrectas. Por favor, verifica tu correo y contraseña e intenta nuevamente.";
+                errorMessage = "Las credenciales proporcionadas son incorrectas.";
                 break;
             case "auth/user-not-found":
                 errorMessage = `No existe una cuenta registrada con el correo: ${email}`;
                 break;
             case "auth/wrong-password":
-                errorMessage = "La contraseña es incorrecta. Por favor, intenta nuevamente.";
+                errorMessage = "La contraseña es incorrecta.";
                 break;
             default:
                 console.warn("Error no controlado:", error.code);
@@ -99,7 +86,6 @@ loginForm.addEventListener("submit", async (event) => {
     }
 });
 
-// Función para alternar la visibilidad de la contraseña
 function togglePasswordVisibility() {
     const passwordType = passwordInput.getAttribute("type");
     passwordInput.setAttribute(
@@ -114,7 +100,6 @@ function togglePasswordVisibility() {
 
 window.togglePasswordVisibility = togglePasswordVisibility;
 
-// Recuperación de contraseña
 const forgotPasswordLink = document.getElementById("forgotPassword");
 
 forgotPasswordLink.addEventListener("click", async () => {
@@ -138,7 +123,7 @@ forgotPasswordLink.addEventListener("click", async () => {
     });
 
     if (email) {
-        const cleanedEmail = email.trim().toLowerCase(); // Normaliza el correo
+        const cleanedEmail = email.trim().toLowerCase();
         console.log("Correo ingresado para recuperación:", cleanedEmail);
 
         try {
@@ -172,7 +157,7 @@ forgotPasswordLink.addEventListener("click", async () => {
                 text: "Hubo un problema al procesar tu solicitud. Por favor, intenta nuevamente más tarde.",
                 confirmButtonColor: "#6f42c1",
             });
-        }        
+        }
     } else {
         console.log("El usuario canceló el diálogo de recuperación.");
     }

@@ -7,6 +7,11 @@ main {
     background-color: #f4f4f4; /* Fondo claro */
 }
 
+label span {
+    color: red;
+    font-weight: bold;
+}
+
 .login-container {
     width: 480px; /* Tamaño fijo para mantener el ancho */
     padding: 30px;
