@@ -133,18 +133,20 @@ forgotPasswordLink.addEventListener("click", async () => {
             const methods = await fetchSignInMethodsForEmail(auth, cleanedEmail);
             console.log("Métodos de inicio de sesión disponibles:", methods);
 
+            // Aquí hacemos una verificación más directa del correo
             if (methods.length === 0) {
-                console.log("El correo no está registrado:", cleanedEmail);
+                console.log("El correo no está registrado en Firebase Authentication");
                 Swal.fire({
                     icon: "error",
                     title: "Correo no registrado",
-                    text: "El correo ingresado no está asociado a ninguna cuenta. Verifica el correo e intenta nuevamente.",
+                    text: "El correo ingresado no está asociado a ninguna cuenta en Firebase Authentication. Verifica el correo e intenta nuevamente.",
                     confirmButtonColor: "#6f42c1",
                 });
             } else {
-                console.log("Intentando enviar correo de recuperación...");
+                console.log("Correo registrado en Firebase Authentication. Procediendo con la recuperación.");
+                // Intentar enviar el correo de recuperación
                 await sendPasswordResetEmail(auth, cleanedEmail);
-                console.log("Correo enviado correctamente.");
+                console.log("Correo de recuperación enviado correctamente.");
                 Swal.fire({
                     icon: "success",
                     title: "Correo enviado",
