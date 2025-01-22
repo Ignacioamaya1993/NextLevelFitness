@@ -324,13 +324,18 @@ inputElement.addEventListener("input", preventNegativeValues);
 
 async function saveChanges(day, exercises) {
     try {
+        // Asegúrate de actualizar el valor de "Información adicional" para cada ejercicio
+        exercises.forEach((exercise, index) => {
+            const additionalDataInput = document.getElementById(`additionalData-${index}`);
+            exercise.additionalData = additionalDataInput.value || "";  // Actualiza el valor de additionalData
+        });
+
         const routinesRef = collection(db, "routines");
         const q = query(routinesRef, where("day", "==", day));
         const querySnapshot = await getDocs(q);
 
         // Se espera que solo haya un documento por día
         if (querySnapshot.size === 1) {
-            const docId = querySnapshot.docs[0].id;
             await updateDoc(querySnapshot.docs[0].ref, { exercises });
             Swal.fire("Éxito", "La rutina se actualizó correctamente.", "success").then(() => {
                 location.reload(); // Recarga la página después de guardar
@@ -344,6 +349,7 @@ async function saveChanges(day, exercises) {
         Swal.fire("Error", "No se pudo guardar la rutina. Revisa la consola para más detalles.", "error");
     }
 }
+
 async function deleteExerciseFromRoutine(day, index, exercises) {
     try {
         // Elimina el ejercicio de la lista de ejercicios
