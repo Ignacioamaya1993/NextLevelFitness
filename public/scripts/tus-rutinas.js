@@ -58,17 +58,17 @@ function displayUserRoutines(routines) {
             const reps = exercise.repetitions || 0;
             const weight = exercise.weight || 0;
             const additionalData = exercise.additionalData || "Sin información adicional";
-            return <li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>;
+            return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
         }).join('');
 
-        routineCard.innerHTML = 
+        routineCard.innerHTML = `
             <h3>Rutina para el día ${day}</h3>
             <ul>
                 ${exercisesList}
             </ul>
             <button class="edit-button" data-day="${day}">Editar</button>
             <button class="delete-button" data-day="${day}">Eliminar</button>
-        ;
+        `;
         console.log('HTML de la rutina:', routineCard.innerHTML);
 
         routineList.appendChild(routineCard);
@@ -88,7 +88,7 @@ function displayUserRoutines(routines) {
         button.addEventListener("click", (e) => {
             const day = e.target.dataset.day;
             Swal.fire({
-                title: ¿Estás seguro de eliminar la rutina para el día ${day}?,
+                title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
                 text: "Esta acción no se puede deshacer.",
                 icon: "warning",
                 showCancelButton: true,
@@ -135,13 +135,13 @@ function openEditPopup(day, routines) {
     const routine = routines.find(routine => routine.day === day);
 
     if (!routine) {
-        popupContent.innerHTML = <p>No se encontró la rutina para el día ${day}</p>;
+        popupContent.innerHTML = `<p>No se encontró la rutina para el día ${day}</p>`;
         popup.classList.remove("hidden");
         return;
     }
 
     if (!routine.exercises || !Array.isArray(routine.exercises)) {
-        popupContent.innerHTML = <p>No hay ejercicios disponibles para la rutina de ${day}</p>;
+        popupContent.innerHTML = `<p>No hay ejercicios disponibles para la rutina de ${day}</p>`;
         popup.classList.remove("hidden");
         return;
     }
@@ -149,16 +149,16 @@ function openEditPopup(day, routines) {
     const exercises = routine.exercises;
 
     const header = document.createElement("h3");
-    header.textContent = Editar Rutina para el día ${day};
+    header.textContent = `Editar Rutina para el día ${day}`;
     popupContent.appendChild(header);
 
     const exerciseSelect = document.createElement("select");
     exerciseSelect.id = "exercise-select";
 
     if (exercises.length > 0) {
-        exerciseSelect.innerHTML = exercises.map((exercise, index) => 
-            <option value="${index}">${exercise.name || Ejercicio ${index + 1}}</option>
-        ).join('');
+        exerciseSelect.innerHTML = exercises.map((exercise, index) => `
+            <option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>
+        `).join('');
     }
 
     popupContent.appendChild(exerciseSelect);
@@ -191,12 +191,12 @@ function openEditPopup(day, routines) {
         let valid = true;
     
         exercises.forEach((exercise, index) => {
-            const seriesInput = document.getElementById(series-${index});
-            const repsInput = document.getElementById(reps-${index});
-            const weightInput = document.getElementById(weight-${index});
-            const errorSeries = document.getElementById(error-series-${index});
-            const errorReps = document.getElementById(error-reps-${index});
-            const errorWeight = document.getElementById(error-weight-${index});
+            const seriesInput = document.getElementById(`series-${index}`);
+            const repsInput = document.getElementById(`reps-${index}`);
+            const weightInput = document.getElementById(`weight-${index}`);
+            const errorSeries = document.getElementById(`error-series-${index}`);
+            const errorReps = document.getElementById(`error-reps-${index}`);
+            const errorWeight = document.getElementById(`error-weight-${index}`);
     
             // Verificar campos vacíos o con valor no válido
             if (!seriesInput.value || parseInt(seriesInput.value, 10) <= 0) {
@@ -268,7 +268,7 @@ function setupNegativeValuePrevention() {
 setupNegativeValuePrevention(); // Llamar a la función para evitar valores negativos
 
 function renderEditFields(container, exercise, index, day, exercises) {
-    container.innerHTML = 
+    container.innerHTML = `
         <div>
             <label>Series: <span class="required">*</span></label>
             <input type="number" value="${exercise.series != null ? exercise.series : 1}" id="series-${index}" min="1">
@@ -289,19 +289,19 @@ function renderEditFields(container, exercise, index, day, exercises) {
             <textarea id="additionalData-${index}" rows="4">${exercise.additionalData || ''} </textarea>
         </div>
         <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
-    ;
+    `;
 
     // Configurar eventos de validación en tiempo real
-    const seriesInput = document.getElementById(series-${index});
-    const repsInput = document.getElementById(reps-${index});
-    const weightInput = document.getElementById(weight-${index});
-    const errorSeries = document.getElementById(error-series-${index});
-    const errorReps = document.getElementById(error-reps-${index});
-    const errorWeight = document.getElementById(error-weight-${index});
+    const seriesInput = document.getElementById(`series-${index}`);
+    const repsInput = document.getElementById(`reps-${index}`);
+    const weightInput = document.getElementById(`weight-${index}`);
+    const errorSeries = document.getElementById(`error-series-${index}`);
+    const errorReps = document.getElementById(`error-reps-${index}`);
+    const errorWeight = document.getElementById(`error-weight-${index}`);
 
     const validateInput = (input, errorSpan, fieldName) => {
         if (parseFloat(input.value) <= 0) {
-            errorSpan.textContent = El campo ${fieldName} no puede ser 0 o negativo.;
+            errorSpan.textContent = `El campo ${fieldName} no puede ser 0 o negativo.`;
             input.classList.add("input-error");
         } else {
             errorSpan.textContent = "";
@@ -317,7 +317,7 @@ function renderEditFields(container, exercise, index, day, exercises) {
     const deleteButton = container.querySelector(".delete-exercise");
     deleteButton.addEventListener("click", () => {
         Swal.fire({
-            title: ¿Estás seguro de eliminar el ejercicio "${exercise.name}"?,
+            title: `¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`,
             text: 'No podrás deshacer esta acción.',
             icon: "warning",
             showCancelButton: true,
@@ -336,9 +336,9 @@ saveButton.addEventListener("click", () => {
     let valid = true;
 
     exercises.forEach((exercise, index) => {
-        const seriesInput = document.getElementById(series-${index});
-        const repsInput = document.getElementById(reps-${index});
-        const weightInput = document.getElementById(weight-${index});
+        const seriesInput = document.getElementById(`series-${index}`);
+        const repsInput = document.getElementById(`reps-${index}`);
+        const weightInput = document.getElementById(`weight-${index}`);
 
         if (parseFloat(seriesInput.value) <= 0 || parseFloat(repsInput.value) <= 0 || parseFloat(weightInput.value) <= 0) {
             valid = false;
@@ -352,24 +352,6 @@ saveButton.addEventListener("click", () => {
         Swal.fire("Error", "Corrige los valores en 0 o negativos antes de guardar.", "error");
     }
 });
-
-    // Configurar evento para eliminar ejercicio
-    const deleteButton = container.querySelector(".delete-exercise");
-    deleteButton.addEventListener("click", () => {
-        Swal.fire({
-            title: ¿Estás seguro de eliminar el ejercicio "${exercise.name}"?,
-            text: 'No podrás deshacer esta acción.',
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Llamar a la función de eliminación solo después de confirmar
-                deleteExerciseFromRoutine(day, index, exercises);
-            }
-        });
-    });
 
 const inputElement = document.getElementById("my-input");
 inputElement.addEventListener("input", preventNegativeValues);
@@ -388,7 +370,7 @@ async function saveChanges(day, exercises) {
                 location.reload(); // Recarga la página después de guardar
             });
         } else {
-            console.error(Se encontraron ${querySnapshot.size} documentos para el día ${day});
+            console.error(`Se encontraron ${querySnapshot.size} documentos para el día ${day}`);
             Swal.fire("Error", "No se pudo actualizar la rutina.", "error");
         }
     } catch (error) {
@@ -436,7 +418,7 @@ async function deleteRoutine(day) {
             // Notificar al usuario sobre el éxito de la operación
             Swal.fire({
                 title: "Éxito",
-                text: La rutina para el día ${day} ha sido eliminada.,
+                text: `La rutina para el día ${day} ha sido eliminada.`,
                 icon: "success",
             }).then(() => location.reload()); // Recarga la página después de eliminar la rutina
         } else {
