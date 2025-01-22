@@ -102,6 +102,42 @@ main {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
+/* Estilo para las viñetas modernas */
+.exercise-list {
+    list-style-type: none; /* Elimina las viñetas tradicionales */
+    padding: 0;
+    margin: 0;
+}
+
+.exercise-list li {
+    position: relative;
+    padding-left: 30px; /* Espacio para la viñeta */
+    margin-bottom: 10px; /* Espacio entre los elementos */
+    font-size: 1rem; /* Ajusta el tamaño del texto */
+    line-height: 1.5; /* Altura de la línea para mejorar la legibilidad */
+    color: #374151; /* Color del texto */
+}
+
+/* Estilo para la viñeta moderna */
+.exercise-list li::before {
+    content: "";
+    position: absolute;
+    left: 10px; /* Posición de la viñeta */
+    top: 50%;
+    transform: translateY(-50%); /* Centra verticalmente */
+    width: 10px; /* Tamaño de la viñeta */
+    height: 10px; /* Tamaño de la viñeta */
+    border-radius: 50%; /* Forma circular */
+    background-color: #10b981; /* Color verde, puedes cambiarlo */
+}
+
+/* Agregar un hover para los elementos */
+.exercise-list li:hover {
+    background-color: #f0f0f0; /* Fondo gris claro al pasar el ratón */
+    border-radius: 5px;
+    padding-left: 35px; /* Espacio extra cuando se pasa el ratón */
+}
+
 /* Tarjetas de rutina */
 .routine-card {
     background-color: #ffffff;
@@ -134,6 +170,11 @@ main {
     font-size: 1rem;
     margin-bottom: 8px;
     color: #374151;
+}
+
+/* Agregar la clase 'exercise-list' dentro de tus tarjetas para aplicar el estilo */
+.routine-card ul.exercise-list {
+    padding-left: 0;
 }
 
 .routine-card p {

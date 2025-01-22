@@ -63,7 +63,7 @@ function displayUserRoutines(routines) {
 
         routineCard.innerHTML = `
             <h3>Rutina para el día ${day}</h3>
-            <ul>
+            <ul class="exercise-list">
                 ${exercisesList}
             </ul>
             <button class="edit-button" data-day="${day}">Editar</button>
