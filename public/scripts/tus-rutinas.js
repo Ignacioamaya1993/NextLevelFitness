@@ -270,17 +270,17 @@ setupNegativeValuePrevention(); // Llamar a la función para evitar valores nega
 function renderEditFields(container, exercise, index, day, exercises) {
     container.innerHTML = `
         <div>
-            <label>Series:</label>
+            <label>Series: <span class="required">*</span></label>
             <input type="number" value="${exercise.series != null ? exercise.series : 1}" id="series-${index}" min="1">
             <span class="error-message" id="error-series-${index}"></span>
         </div>
         <div>
-            <label>Repeticiones:</label>
+            <label>Repeticiones: <span class="required">*</span></label>
             <input type="number" value="${exercise.repetitions != null ? exercise.repetitions : 1}" id="reps-${index}" min="1">
             <span class="error-message" id="error-reps-${index}"></span>
         </div>
         <div>
-            <label>Peso (kg):</label>
+            <label>Peso (kg): <span class="required">*</span></label>
             <input type="number" value="${exercise.weight != null ? exercise.weight : 1}" id="weight-${index}" min="1" step="0.01">
             <span class="error-message" id="error-weight-${index}"></span>
         </div>
