@@ -333,7 +333,7 @@ main {
 #close-popup {
     display: block;
     margin: 20px auto 0; /* Centrado con margen superior */
-    background-color: #9ca3af;
+    background-color: #e74c3c;
     color: white;
     padding: 12px 25px;
     border: none;
@@ -417,7 +417,7 @@ main {
 
 /* Botón "Eliminar" a la izquierda */
 #delete-exercise {
-    background-color: #ef4444;
+    background-color: #1d3557;
     color: #ffffff;
     padding: 12px 20px;
     border: none;
