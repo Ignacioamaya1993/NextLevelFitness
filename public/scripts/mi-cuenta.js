@@ -214,18 +214,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (newPassword) {
                 await updatePassword(user, newPassword);
-                await Swal.fire("Éxito", "Contraseña actualizada correctamente", "success");
-
-                // Cerrar sesión y redirigir al login
-                await signOut(auth);
+                
+                // Mostrar mensaje de éxito con el cierre de sesión
                 await Swal.fire({
-                    title: "Sesión cerrada",
-                    text: "Has cambiado tu contraseña, por lo que debes iniciar sesión nuevamente.",
+                    title: "Contraseña actualizada correctamente",
+                    text: "Tu contraseña ha sido actualizada. Se cerrará sesión y deberás iniciar sesión nuevamente con la nueva contraseña.",
                     icon: "success",
                     confirmButtonText: "OK",
                 });
+            
+                // Cerrar sesión y redirigir al login
+                await signOut(auth);
                 window.location.href = "login.html";
-            }
+            }            
+            
         } catch (error) {
             let errorMessage = error.message || "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
             if (error.code === "auth/invalid-credential") {
