@@ -127,21 +127,6 @@ forgotPasswordLink.addEventListener("click", async () => {
 
     if (email) {
         try {
-            // Verificar si el correo está registrado y si el usuario está verificado
-            const userCredential = await signInWithEmailAndPassword(auth, email, "dummyPassword");
-            const user = userCredential.user;
-
-            if (!user.emailVerified) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Correo no verificado",
-                    text: "Por favor, verifica tu correo antes de recuperar la contraseña.",
-                    confirmButtonColor: "#6f42c1",
-                });
-                return; // Detener el flujo si el correo no está verificado
-            }
-
-            // Si todo está bien, enviar el correo de recuperación
             await sendPasswordResetEmail(auth, email);
             Swal.fire({
                 icon: "success",
