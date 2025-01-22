@@ -211,6 +211,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             customClass: {
                 popup: 'custom-popup'
             },
+            width: 'auto', // Permite que el ancho se ajuste automáticamente
+
             preConfirm: async () => {
                 const series = document.getElementById('series').value;
                 const repeticiones = document.getElementById('repeticiones').value;
