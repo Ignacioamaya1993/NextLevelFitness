@@ -322,14 +322,21 @@ main {
     box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
 }
 
-@media (max-width: 768px) {
-    #routine-list {
-        grid-template-columns: repeat(2, minmax(200px, 1fr));
+/* Ajustes para pantallas móviles */
+@media screen and (max-width: 768px) {
+    .custom-popup .exercise-popup {
+        flex-direction: column; /* Cambia a disposición vertical */
+        gap: 10px;
     }
-}
 
-@media (max-width: 480px) {
-    #routine-list {
-        grid-template-columns: 1fr;
+    .custom-popup .popup-left,
+    .custom-popup .popup-right {
+        flex: none; /* Restablece el tamaño flexible */
+        width: 100%; /* Ocupa todo el ancho */
+    }
+
+    .custom-popup .video-container iframe {
+        width: 100%; /* Asegura que el iframe se ajuste al ancho disponible */
+        height: 200px; /* Ajusta la altura según sea necesario */
     }
 }
