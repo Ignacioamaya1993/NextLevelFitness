@@ -15,6 +15,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const emailField = document.getElementById("email");
     const form = document.getElementById("update-form");
+    const phoneInput = document.getElementById("new-phone"); // Campo de celular
+
+        // Validar que solo se permitan números en el campo del celular
+        phoneInput.addEventListener("input", (event) => {
+            const value = event.target.value;
+
+            // Elimina cualquier carácter no numérico
+            const numericValue = value.replace(/\D/g, ""); // \D coincide con cualquier carácter no numérico
+            if (value !== numericValue) {
+                event.target.value = numericValue; // Actualiza el valor del campo
+            }
+        });
 
     auth.onAuthStateChanged(async (user) => {
         if (user) {
