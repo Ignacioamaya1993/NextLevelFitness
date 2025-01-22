@@ -224,10 +224,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                     Swal.showValidationMessage("Por favor, completa todos los campos obligatorios.");
                     return;
                 }
-                // Validar valores mínimos
-                if (series <= 0 || repeticiones <= 0 || peso <= 0) {
-                    Swal.showValidationMessage("Series, repeticiones y peso deben ser mayores a 0.");
+    // Validar que series y repeticiones sean enteros positivos
+                    if (!Number.isInteger(Number(series)) || series <= 0) {
+                    Swal.showValidationMessage("Series debe ser un número entero mayor que 0.");
                     return;
+                }
+
+                if (!Number.isInteger(Number(repeticiones)) || repeticiones <= 0) {
+                    Swal.showValidationMessage("Repeticiones debe ser un número entero mayor que 0.");
+                    return;
+                }
+
+                // Validar valores negativos o cero en el peso
+                if (peso <= 0) {
+                    Swal.showValidationMessage("Peso debe ser mayor a 0.");
+                    return;                
                 }
 
                 // Validar peso como número decimal positivo
@@ -235,7 +246,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     Swal.showValidationMessage("Peso debe ser un número válido.");
                     return;
                 }
-                  
+
                 try {
                     const db = getFirestore(app);
                     const routinesRef = collection(db, "routines");
