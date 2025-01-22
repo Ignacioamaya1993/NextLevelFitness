@@ -331,28 +331,6 @@ function renderEditFields(container, exercise, index, day, exercises) {
     });
 }
 
-// Modificar el evento de guardar cambios para validar antes de cerrar el popup
-saveButton.addEventListener("click", () => {
-    let valid = true;
-
-    exercises.forEach((exercise, index) => {
-        const seriesInput = document.getElementById(`series-${index}`);
-        const repsInput = document.getElementById(`reps-${index}`);
-        const weightInput = document.getElementById(`weight-${index}`);
-
-        if (parseFloat(seriesInput.value) <= 0 || parseFloat(repsInput.value) <= 0 || parseFloat(weightInput.value) <= 0) {
-            valid = false;
-        }
-    });
-
-    if (valid) {
-        saveChanges(day, exercises);
-        popup.classList.add("hidden");
-    } else {
-        Swal.fire("Error", "Corrige los valores en 0 o negativos antes de guardar.", "error");
-    }
-});
-
     // Configurar evento para eliminar ejercicio
     const deleteButton = container.querySelector(".delete-exercise");
     deleteButton.addEventListener("click", () => {
