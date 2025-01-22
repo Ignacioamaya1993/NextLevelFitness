@@ -224,15 +224,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     Swal.showValidationMessage("Por favor, completa todos los campos obligatorios.");
                     return;
                 }
-    // Validar que series y repeticiones sean enteros positivos
-                    if (!Number.isInteger(Number(series)) || series <= 0) {
-                    Swal.showValidationMessage("Series debe ser un número entero mayor que 0.");
-                    return;
-                }
-
-                if (!Number.isInteger(Number(repeticiones)) || repeticiones <= 0) {
-                    Swal.showValidationMessage("Repeticiones debe ser un número entero mayor que 0.");
-                    return;
+                
+                // Unificar la validación de series y repeticiones (entero mayor a 0)
+                if ((!Number.isInteger(Number(series)) || series <= 0) || (!Number.isInteger(Number(repeticiones)) || repeticiones <= 0)) {
+                Swal.showValidationMessage("Series y/o repeticiones deben ser números enteros mayores que 0.");
+                return;
                 }
 
                 // Validar valores negativos o cero en el peso
