@@ -235,6 +235,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     Swal.showValidationMessage("Peso debe ser un número válido.");
                     return;
                 }
+                  
                 try {
                     const db = getFirestore(app);
                     const routinesRef = collection(db, "routines");
