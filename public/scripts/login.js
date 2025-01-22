@@ -102,6 +102,7 @@ function togglePasswordVisibility() {
 
 window.togglePasswordVisibility = togglePasswordVisibility;
 
+// Recuperación de contraseña
 const forgotPasswordLink = document.getElementById("forgotPassword");
 
 forgotPasswordLink.addEventListener("click", async () => {
@@ -125,48 +126,26 @@ forgotPasswordLink.addEventListener("click", async () => {
     });
 
     if (email) {
-        const cleanedEmail = email.trim().toLowerCase();
-        console.log("Correo ingresado para recuperación:", cleanedEmail);
-
         try {
-            console.log("Verificando métodos de inicio de sesión para el correo...");
-            const methods = await fetchSignInMethodsForEmail(auth, cleanedEmail);
-            console.log("Métodos de inicio de sesión disponibles:", methods);
-
-            // Aquí hacemos una verificación más directa del correo
-            if (methods.length === 0) {
-                console.log("El correo no está registrado en Firebase Authentication");
-                Swal.fire({
-                    icon: "error",
-                    title: "Correo no registrado",
-                    text: "El correo ingresado no está asociado a ninguna cuenta en Firebase Authentication. Verifica el correo e intenta nuevamente.",
-                    confirmButtonColor: "#6f42c1",
-                });
-            } else {
-                console.log("Correo registrado en Firebase Authentication. Procediendo con la recuperación.");
-                // Intentar enviar el correo de recuperación
-                await sendPasswordResetEmail(auth, cleanedEmail);
-                console.log("Correo de recuperación enviado correctamente.");
-                Swal.fire({
-                    icon: "success",
-                    title: "Correo enviado",
-                    text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
-                    confirmButtonColor: "#6f42c1",
-                });
-            }
+            await sendPasswordResetEmail(auth, email);
+            Swal.fire({
+                icon: "success",
+                title: "Correo enviado",
+                text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
+                confirmButtonColor: "#6f42c1",
+            });
         } catch (error) {
-            console.error("Error al procesar la solicitud:", error);
-            console.error("Código de error:", error.code); // Muestra el código de error
-            console.error("Mensaje de error:", error.message); // Muestra el mensaje de error
-
+            console.error("Error al enviar el correo de recuperación:", error);
+            let message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
+            if (error.code === "auth/user-not-found") {
+                message = `No existe una cuenta registrada con el correo: ${email}`;
+            }
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: "Hubo un problema al procesar tu solicitud. Por favor, intenta nuevamente más tarde.",
+                text: message,
                 confirmButtonColor: "#6f42c1",
             });
         }
-    } else {
-        console.log("El usuario canceló el diálogo de recuperación.");
     }
 });
