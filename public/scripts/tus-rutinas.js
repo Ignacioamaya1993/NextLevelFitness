@@ -126,7 +126,7 @@ function openEditPopup(day, routines) {
 
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && !popup.classList.contains("hidden")) {
-            popup.classList.add("hidden");
+            closePopup();
         }
     });
 
@@ -136,13 +136,13 @@ function openEditPopup(day, routines) {
 
     if (!routine) {
         popupContent.innerHTML = `<p>No se encontró la rutina para el día ${day}</p>`;
-        popup.classList.remove("hidden");
+        showPopup();
         return;
     }
 
     if (!routine.exercises || !Array.isArray(routine.exercises)) {
         popupContent.innerHTML = `<p>No hay ejercicios disponibles para la rutina de ${day}</p>`;
-        popup.classList.remove("hidden");
+        showPopup();
         return;
     }
 
@@ -177,7 +177,7 @@ function openEditPopup(day, routines) {
     closeButton.textContent = "Cancelar";
     popupContent.appendChild(closeButton);
 
-    popup.classList.remove("hidden");
+    showPopup();
 
     exerciseSelect.addEventListener("change", () => {
         const selectedIndex = parseInt(exerciseSelect.value, 10);
@@ -188,64 +188,30 @@ function openEditPopup(day, routines) {
     renderEditFields(editFieldsContainer, exercises[0], 0, day, exercises);
 
     saveButton.addEventListener("click", () => {
-        let valid = true;
-    
-        exercises.forEach((exercise, index) => {
-            const seriesInput = document.getElementById(`series-${index}`);
-            const repsInput = document.getElementById(`reps-${index}`);
-            const weightInput = document.getElementById(`weight-${index}`);
-            const errorSeries = document.getElementById(`error-series-${index}`);
-            const errorReps = document.getElementById(`error-reps-${index}`);
-            const errorWeight = document.getElementById(`error-weight-${index}`);
-    
-            // Verificar campos vacíos o con valor no válido
-            if (!seriesInput.value || parseInt(seriesInput.value, 10) <= 0) {
-                valid = false;
-                errorSeries.textContent = "El campo Series no puede estar vacío o ser 0/negativo.";
-                seriesInput.classList.add("input-error");
-            } else {
-                errorSeries.textContent = "";
-                seriesInput.classList.remove("input-error");
-            }
-    
-            if (!repsInput.value || parseInt(repsInput.value, 10) <= 0) {
-                valid = false;
-                errorReps.textContent = "El campo Repeticiones no puede estar vacío o ser 0/negativo.";
-                repsInput.classList.add("input-error");
-            } else {
-                errorReps.textContent = "";
-                repsInput.classList.remove("input-error");
-            }
-    
-            if (!weightInput.value || parseFloat(weightInput.value) <= 0) {
-                valid = false;
-                errorWeight.textContent = "El campo Peso no puede estar vacío o ser 0/negativo.";
-                weightInput.classList.add("input-error");
-            } else {
-                errorWeight.textContent = "";
-                weightInput.classList.remove("input-error");
-            }
-    
-            // Actualizar los valores del ejercicio si son válidos
-            if (valid) {
-                exercise.series = parseInt(seriesInput.value, 10);
-                exercise.repetitions = parseInt(repsInput.value, 10);
-                exercise.weight = parseFloat(weightInput.value);
-            }
-        });
-    
-        if (valid) {
-            saveChanges(day, exercises);
-            popup.classList.add("hidden");
-        } else {
-            Swal.fire("Error", "Por favor, completa correctamente todos los campos obligatorios.", "error");
+        saveChanges(day, exercises);
+        closePopup();
+    });
+
+    closeButton.addEventListener("click", closePopup);
+
+    // Cerrar el popup al hacer clic fuera del contenido
+    popup.addEventListener("click", (e) => {
+        if (e.target === popup) {
+            closePopup();
         }
     });
-    
+}
 
-    closeButton.addEventListener("click", () => {
-        popup.classList.add("hidden");
-    });
+function showPopup() {
+    const popup = document.getElementById("edit-popup");
+    popup.classList.remove("hidden");
+    document.body.style.overflow = "hidden"; // Deshabilitar scroll
+}
+
+function closePopup() {
+    const popup = document.getElementById("edit-popup");
+    popup.classList.add("hidden");
+    document.body.style.overflow = ""; // Restaurar scroll
 }
 
 // Evita que los campos de número tengan valores negativos
