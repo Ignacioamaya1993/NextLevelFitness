@@ -60,12 +60,14 @@ loginForm.addEventListener("submit", async (event) => {
         }
     } catch (error) {
         console.error("Error al iniciar sesión:", error);
+        console.error("Código de error:", error.code); // Muestra el código de error
+        console.error("Mensaje de error:", error.message); // Muestra el mensaje de error
 
         let errorMessage = "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
 
         switch (error.code) {
             case "auth/invalid-credential":
-                errorMessage = "Las credenciales proporcionadas son incorrectas.";
+                errorMessage = "Las credenciales proporcionadas son incorrectas. Por favor, verifica tu correo y contraseña e intenta nuevamente";
                 break;
             case "auth/user-not-found":
                 errorMessage = `No existe una cuenta registrada con el correo: ${email}`;
@@ -129,6 +131,7 @@ forgotPasswordLink.addEventListener("click", async () => {
         try {
             console.log("Verificando métodos de inicio de sesión para el correo...");
             const methods = await fetchSignInMethodsForEmail(auth, cleanedEmail);
+            console.log("Métodos de inicio de sesión disponibles:", methods);
 
             if (methods.length === 0) {
                 console.log("El correo no está registrado:", cleanedEmail);
@@ -151,6 +154,9 @@ forgotPasswordLink.addEventListener("click", async () => {
             }
         } catch (error) {
             console.error("Error al procesar la solicitud:", error);
+            console.error("Código de error:", error.code); // Muestra el código de error
+            console.error("Mensaje de error:", error.message); // Muestra el mensaje de error
+
             Swal.fire({
                 icon: "error",
                 title: "Error",
