@@ -143,6 +143,8 @@ main {
     align-items: start;
     text-align: left;
     padding: 20px;
+    max-height: 80vh;
+
 }
 
 .exercise-details h3 {
