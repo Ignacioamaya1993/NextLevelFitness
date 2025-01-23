@@ -319,6 +319,8 @@ main {
         flex-direction: column; /* Cambiar a diseño vertical */
         gap: 15px; /* Reducir el espacio entre elementos */
         max-width: 100%; /* Asegurar que ocupe todo el ancho */
+        max-height: 90vh !important; /* Más espacio para el contenido */
+        overflow-y: auto; /* Permite desplazamiento si es necesario */
     }
 
     .popup-header {
