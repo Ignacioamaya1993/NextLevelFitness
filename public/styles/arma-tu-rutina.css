@@ -331,40 +331,36 @@ main {
     border-color: #457b9d;
     box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
 }
-
-@media screen and (max-width: 768px) {
-    .exercise-popup {
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        position: fixed;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        overflow-y: auto;
-        background-color: rgba(255, 255, 255, 0.95);
-        padding: 20px;
-        box-shadow: none;
-    }
-
-    .popup-header {
-        font-size: 1.5em;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
     .popup-content {
-        flex-grow: 1;
-        font-size: 1em;
-        margin-bottom: 20px;
+        flex-direction: column; /* Apilar los elementos verticalmente */
     }
 
-    .popup-close {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 1.5em;
-        cursor: pointer;
+    .popup-left, .popup-right {
+        flex: none;
+        width: 100%; /* Usar el 100% del ancho disponible */
+    }
+
+    .video-container iframe {
+        max-height: 150px; /* Reducir el alto del video en pantallas pequeñas */
+    }
+}
+
+@media (max-width: 480px) {
+    .exercise-popup {
+        padding: 10px; /* Reducir el padding en dispositivos más pequeños */
+    }
+
+    .popup-header h3 {
+        font-size: 1.2rem; /* Ajustar el tamaño del título */
+    }
+
+    .form-group label {
+        font-size: 0.9rem; /* Reducir el tamaño del texto del formulario */
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+        font-size: 0.9rem; /* Ajustar el tamaño de los campos de entrada */
     }
 }
