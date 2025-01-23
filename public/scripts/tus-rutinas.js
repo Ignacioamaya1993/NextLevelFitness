@@ -413,21 +413,31 @@ async function saveChanges(day, exercises) {
 
 async function deleteExerciseFromRoutine(day, index, exercises) {
     try {
-        // Elimina el ejercicio de la lista de ejercicios
+        // Elimina el ejercicio de la lista
         exercises.splice(index, 1);
 
-        // Actualiza la rutina en Firestore
-        await saveChanges(day, exercises);
+        const routinesRef = collection(db, "routines");
+        const q = query(routinesRef, where("day", "==", day));
+        const querySnapshot = await getDocs(q);
 
-        // Notificar al usuario sobre el éxito de la operación
-        await Swal.fire({
-            title: "Éxito",
-            text: "El ejercicio ha sido eliminado.",
-            icon: "success",
-        });
+        if (querySnapshot.size === 1) {
+            const routineDoc = querySnapshot.docs[0];
 
-        // Recargar la página después de la confirmación
-        location.reload();
+            if (exercises.length === 0) {
+                // Si no quedan ejercicios, eliminar la rutina completa
+                await deleteDoc(routineDoc.ref);
+                Swal.fire("Éxito", "La rutina ha sido eliminada porque no tenía más ejercicios.", "success");
+            } else {
+                // Si aún hay ejercicios, actualizar Firestore
+                await updateDoc(routineDoc.ref, { exercises });
+                Swal.fire("Éxito", "El ejercicio ha sido eliminado correctamente.", "success");
+            }
+
+            // Recargar la página después de confirmar
+            location.reload();
+        } else {
+            Swal.fire("Error", "No se encontró la rutina para actualizar.", "error");
+        }
     } catch (error) {
         console.error("Error al eliminar el ejercicio:", error);
         Swal.fire("Error", "No se pudo eliminar el ejercicio. Revisa la consola para más detalles.", "error");
