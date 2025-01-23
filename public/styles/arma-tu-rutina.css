@@ -282,10 +282,12 @@ main {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/*popup pincipal*/
 .custom-popup {
     width: 900px !important; /* Ajusta el ancho  */
     max-width: 5000px !important; /* Límite máximo de ancho */
-    max-height: 100vh; /* alto del popup principal */
+    height: 900px !important; /* Ajusta el alto  */
+    max-height: 100vh; /* Límite máximo de alto */    
     padding: 20px; /* Añade un poco de espacio interno */
     overflow: auto; /* Permite scroll si el contenido es mayor al tamaño */
     max-height: 80vh;
