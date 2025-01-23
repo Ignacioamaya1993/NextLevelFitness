@@ -212,16 +212,19 @@ main {
 
 /* --- Popup de detalles del ejercicio --- */
 .exercise-popup {
-    display: flex;
-    flex-direction: row; /* Disposición horizontal por defecto */
+    display: grid;
+    grid-template-rows: auto 1fr;
     gap: 20px;
     padding: 20px;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 800px;
+    max-height: 100vh;
     margin: 0 auto;
     text-align: left;
+    padding-top: 10px; /* Reducir espacio superior del popup */
+    padding-bottom: 10px; /* Reducir espacio inferior */
 }
 
 .popup-header {
@@ -330,18 +333,17 @@ main {
     box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
 }
 
-/* Media Query para pantallas pequeñas */
+/* Media Query para pantallas pequeñas (móviles) */
 @media (max-width: 768px) {
     .exercise-popup {
-        flex-direction: column; /* Cambiar a disposición vertical */
-    }
-
-    .video-container iframe {
-        height: 200px; /* Ajustar altura del video */
+        flex-direction: column; /* Cambiar a disposición vertical en pantallas pequeñas */
     }
 
     .popup-content {
-        flex-direction: column; /* Apilar contenido */
-        gap: 15px;
+        flex-direction: column; /* Asegurarse de que el contenido se apile */
+    }
+
+    .video-container iframe {
+        height: 200px; /* Ajustar la altura del video en móviles */
     }
 }
