@@ -224,25 +224,6 @@ function closePopup() {
     document.body.style.overflow = ""; // Restaurar scroll
 }
 
-// Evita que los campos de número tengan valores negativos
-function preventNegativeValues(event) {
-    const input = event.target;
-    // Si el valor contiene un signo negativo, eliminarlo
-    if (input.value.startsWith("-")) {
-        input.value = input.value.replace("-", "");
-    }
-}
-
-// Configurar los campos para evitar valores negativos
-function setupNegativeValuePrevention() {
-    const numberInputs = document.querySelectorAll('input[type="number"]');
-    numberInputs.forEach(input => {
-        input.addEventListener("input", preventNegativeValues);
-    });
-}
-
-setupNegativeValuePrevention(); // Llamar a la función para evitar valores negativos
-
 function renderEditFields(container, exercise, index, day, exercises) {
     container.innerHTML = `
         <div>
@@ -267,17 +248,19 @@ function renderEditFields(container, exercise, index, day, exercises) {
         <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
     `;
 
-    // Configurar eventos de validación en tiempo real
+    // Obtener los inputs
     const seriesInput = document.getElementById(`series-${index}`);
     const repsInput = document.getElementById(`reps-${index}`);
     const weightInput = document.getElementById(`weight-${index}`);
     const errorSeries = document.getElementById(`error-series-${index}`);
     const errorReps = document.getElementById(`error-reps-${index}`);
     const errorWeight = document.getElementById(`error-weight-${index}`);
+    const saveButton = document.getElementById("save-changes");
 
+    // Función de validación
     const validateInput = (input, errorSpan, fieldName) => {
-        if (parseFloat(input.value) <= 0) {
-            errorSpan.textContent = `El campo ${fieldName} no puede ser 0 o negativo.`;
+        if (parseFloat(input.value) <= 0 || input.value === "") {
+            errorSpan.textContent = `El campo ${fieldName} no puede ser vacío, 0 o negativo.`;
             input.classList.add("input-error");
         } else {
             errorSpan.textContent = "";
@@ -285,9 +268,27 @@ function renderEditFields(container, exercise, index, day, exercises) {
         }
     };
 
+    // Validación en tiempo real
     seriesInput.addEventListener("input", () => validateInput(seriesInput, errorSeries, "Series"));
     repsInput.addEventListener("input", () => validateInput(repsInput, errorReps, "Repeticiones"));
     weightInput.addEventListener("input", () => validateInput(weightInput, errorWeight, "Peso (kg)"));
+
+    // Función para habilitar/deshabilitar el botón de guardar
+    const toggleSaveButton = () => {
+        const isValid = 
+            parseFloat(seriesInput.value) > 0 &&
+            parseFloat(repsInput.value) > 0 &&
+            parseFloat(weightInput.value) > 0;
+        saveButton.disabled = !isValid; // Deshabilitar si no es válido
+    };
+
+    // Llamar a la función de validación y habilitar el botón al inicio
+    toggleSaveButton();
+
+    // Llamar a la función para validar en tiempo real
+    seriesInput.addEventListener("input", toggleSaveButton);
+    repsInput.addEventListener("input", toggleSaveButton);
+    weightInput.addEventListener("input", toggleSaveButton);
 
     // Configurar evento para eliminar ejercicio
     const deleteButton = container.querySelector(".delete-exercise");
