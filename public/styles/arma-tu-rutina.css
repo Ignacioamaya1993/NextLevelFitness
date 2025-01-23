@@ -315,7 +315,8 @@ main {
 /* Media Query para dispositivos móviles */
 @media (max-width: 768px) {
     .exercise-popup {
-        flex-direction: column; /* Cambiar a diseño vertical SOLO en móviles */
+        display: flex;
+        flex-direction: column; /* Cambiar a diseño vertical */
         gap: 15px; /* Reducir el espacio entre elementos */
     }
 
@@ -332,6 +333,10 @@ main {
         display: flex;
         flex-direction: column; /* Asegurar contenido apilado */
         gap: 15px;
+    }
+
+    .popup-left, .popup-right {
+        width: 100%; /* Aseguramos que ambos lados ocupen todo el ancho */
     }
 
     .exercise-form {
