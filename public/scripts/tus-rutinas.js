@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const restrictedMessage = document.getElementById("restricted-message");
     const routineViewer = document.getElementById("routine-viewer");
     const noRoutinesMessage = document.getElementById("no-routines-message");
+    const overlay = document.getElementById("overlay");
+    overlay.addEventListener("click", (e) => {
+    e.stopPropagation(); // Evitar que el clic pase al fondo
+});
 
     if (user && user.isLoggedIn) {
         restrictedMessage.classList.add("hidden");
@@ -204,13 +208,19 @@ function openEditPopup(day, routines) {
 
 function showPopup() {
     const popup = document.getElementById("edit-popup");
+    const overlay = document.getElementById("overlay");
+
     popup.classList.remove("hidden");
+    overlay.classList.add("active");
     document.body.style.overflow = "hidden"; // Deshabilitar scroll
 }
 
 function closePopup() {
     const popup = document.getElementById("edit-popup");
+    const overlay = document.getElementById("overlay");
+
     popup.classList.add("hidden");
+    overlay.classList.remove("active");
     document.body.style.overflow = ""; // Restaurar scroll
 }
 

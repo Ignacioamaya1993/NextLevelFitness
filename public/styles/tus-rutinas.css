@@ -78,6 +78,25 @@ main {
     font-size: 0.9em;
 }
 
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    z-index: 999; /* Aparece por encima de otros elementos */
+    display: none; /* Oculto por defecto */
+}
+
+#overlay.active {
+    display: block; /* Mostrar cuando está activo */
+}
+
+#edit-popup {
+    z-index: 1000; /* Popup encima del overlay */
+}
+
 /* Contenedor de rutinas */
 .routine-viewer {
     display: flex;
@@ -212,6 +231,7 @@ main {
     z-index: 1000;
     width: 95%;
     max-width: 500px;
+    max-height: 97vh;
     animation: popup-show 0.3s ease-in-out;
     border: 2px solid #3b82f6;
 }
