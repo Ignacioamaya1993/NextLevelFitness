@@ -93,11 +93,6 @@ main {
     border-radius: 5px;
 }
 
-.exercise-grid div img:empty {
-    content: url('../assets/images/placeholder.png');
-    opacity: 0.7;
-}
-
 .exercise-grid div h3 {
     font-size: 1.1rem;
     font-weight: bold;
@@ -163,13 +158,6 @@ main {
     gap: 15px;
 }
 
-.video-container iframe {
-    width: 100%;
-    max-width: 500px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
 .instructions {
     font-size: 1rem;
     color: #333;
@@ -199,15 +187,6 @@ main {
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f8f9fa;
-}
-
-.exercise-instructions {
-    font-size: 1.3em; /* Tamaño de letra ajustado */
-    color: #1d3557;
-    font-weight: bold;
-}
-.exercise-details {
-    font-size: 1em; /* Tamaño estándar */
 }
 
 /* --- Popup de detalles del ejercicio --- */
