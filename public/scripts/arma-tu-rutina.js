@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             </div>
                             <div class="form-group">
                             <label for="repeticiones">Repeticiones: <span style="color: red;">*</span></label>
-                                <input type="number" id="repeticiones" min="1" placeholder="Ingrese las repeteciones"required>
+                                <input type="number" id="repeticiones" min="1" placeholder="Ingrese las repeticiones"required>
                             </div>
                             <div class="form-group">
                             <label for="peso">Peso (kg): <span style="color: red;">*</span></label>

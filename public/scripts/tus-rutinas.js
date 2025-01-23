@@ -262,7 +262,7 @@ function renderEditFields(container, exercise, index, day, exercises) {
         </div>
         <div>
             <label>Información adicional:</label>
-            <textarea id="additionalData-${index}" rows="4" placeholder="Escribe aquí alguna aclaración...">${exercise.additionalData || ''}</textarea>
+            <textarea id="additionalData-${index}" rows="4">${exercise.additionalData || ''}</textarea>
         </div>
         <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
     `;
