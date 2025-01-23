@@ -333,17 +333,29 @@ main {
     box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
 }
 
-/* Media Query para pantallas pequeñas (móviles) */
+/* Media Query para dispositivos móviles */
 @media (max-width: 768px) {
     .exercise-popup {
-        flex-direction: column; /* Cambiar a disposición vertical en pantallas pequeñas */
+        flex-direction: column; /* Cambiar a diseño vertical SOLO en móviles */
+        gap: 15px; /* Reducir el espacio entre elementos */
     }
 
-    .popup-content {
-        flex-direction: column; /* Asegurarse de que el contenido se apile */
+    .popup-header {
+        text-align: center; /* Mantener el título centrado */
     }
 
     .video-container iframe {
-        height: 200px; /* Ajustar la altura del video en móviles */
+        width: 100%; /* Video ocupa todo el ancho disponible */
+        height: 200px; /* Ajustar la altura del video */
+    }
+
+    .popup-content {
+        display: flex;
+        flex-direction: column; /* Asegurar contenido apilado */
+        gap: 15px;
+    }
+
+    .exercise-form {
+        width: 100%; /* Asegurar que el formulario ocupe todo el ancho */
     }
 }
