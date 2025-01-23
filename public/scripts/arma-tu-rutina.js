@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     // Crear botón y añadir listener
                     const button = document.createElement("button");
-                    button.textContent = "Ver más";
+                    button.textContent = "Seleccionar";
                     button.addEventListener("click", () => showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones));
 
                     exerciseCard.innerHTML = `
