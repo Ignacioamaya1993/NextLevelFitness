@@ -335,30 +335,34 @@ inputElement.addEventListener("input", preventNegativeValues);
 
 async function saveChanges(day, exercises) {
     try {
-        // Asegúrate de actualizar el valor de "Información adicional" para cada ejercicio
-        exercises.forEach((exercise, index) => {
-            const additionalDataInput = document.getElementById(`additionalData-${index}`);
-            if (additionalDataInput) {
-                exercise.additionalData = additionalDataInput.value || "";  // Actualiza el valor de additionalData
-            } else {
-                console.warn(`No se encontró el campo de "Información adicional" para el ejercicio ${index}`);
-            }
-        });
-
         const routinesRef = collection(db, "routines");
         const q = query(routinesRef, where("day", "==", day));
         const querySnapshot = await getDocs(q);
 
-        // Se espera que solo haya un documento por día
-        if (querySnapshot.size === 1) {
-            await updateDoc(querySnapshot.docs[0].ref, { exercises });
-            Swal.fire("Éxito", "La rutina se actualizó correctamente.", "success").then(() => {
-                location.reload(); // Recarga la página después de guardar
-            });
-        } else {
-            console.error(`Se encontraron ${querySnapshot.size} documentos para el día ${day}`);
-            Swal.fire("Error", "No se pudo actualizar la rutina.", "error");
+        if (querySnapshot.empty) {
+            console.error(`No se encontró una rutina para el día ${day}`);
+            Swal.fire("Error", "No se encontró la rutina a actualizar.", "error");
+            return;
         }
+
+        const routineDoc = querySnapshot.docs[0]; // Tomamos el primer documento encontrado
+        const currentData = routineDoc.data();
+
+        // Comparar los ejercicios actuales con los que se intentan guardar
+        const exercisesUnchanged = JSON.stringify(currentData.exercises) === JSON.stringify(exercises);
+
+        if (exercisesUnchanged) {
+            Swal.fire("Sin cambios", "No realizaste ninguna modificación.", "info");
+            return;
+        }
+
+        // Actualizar la rutina en Firestore solo si hubo cambios
+        await updateDoc(routineDoc.ref, { exercises });
+
+        Swal.fire("Éxito", "La rutina se actualizó correctamente.", "success").then(() => {
+            location.reload(); // Recarga la página después de guardar
+        });
+
     } catch (error) {
         console.error("Error al guardar los cambios en la rutina:", error);
         Swal.fire("Error", "No se pudo guardar la rutina. Revisa la consola para más detalles.", "error");
