@@ -351,22 +351,50 @@ async function saveChanges(day, exercises) {
                     exercise.additionalData = additionalDataInput.value || "";
                 }
 
-                // Comparar cada campo con el valor actual en la base de datos
+                // Obtener valores actuales de los inputs
+                const newSeries = parseInt(document.getElementById(`series-${index}`).value, 10);
+                const newReps = parseInt(document.getElementById(`reps-${index}`).value, 10);
+                const newWeight = parseFloat(document.getElementById(`weight-${index}`).value);
+                const newAdditionalData = exercise.additionalData;
+
+                // Valores actuales en la base de datos
                 const existingExercise = existingExercises[index] || {};
+                const existingSeries = existingExercise.series || 0;
+                const existingReps = existingExercise.repetitions || 0;
+                const existingWeight = existingExercise.weight || 0;
+                const existingAdditionalData = existingExercise.additionalData || "";
+
+                // Mostrar en consola los valores antes y después de la modificación
+                console.log(`Ejercicio ${index + 1}:`);
+                console.log(`  Series: ${existingSeries} -> ${newSeries}`);
+                console.log(`  Repeticiones: ${existingReps} -> ${newReps}`);
+                console.log(`  Peso: ${existingWeight} -> ${newWeight}`);
+                console.log(`  Información adicional: "${existingAdditionalData}" -> "${newAdditionalData}"`);
+
+                // Verificar si algún valor ha cambiado
                 if (
-                    exercise.series !== existingExercise.series ||
-                    exercise.repetitions !== existingExercise.repetitions ||
-                    exercise.weight !== existingExercise.weight ||
-                    exercise.additionalData !== existingExercise.additionalData
+                    newSeries !== existingSeries ||
+                    newReps !== existingReps ||
+                    newWeight !== existingWeight ||
+                    newAdditionalData !== existingAdditionalData
                 ) {
                     hasChanges = true;
                 }
+
+                // Actualizar los valores en el objeto exercises
+                exercise.series = newSeries;
+                exercise.repetitions = newReps;
+                exercise.weight = newWeight;
+                exercise.additionalData = newAdditionalData;
             });
 
             if (!hasChanges) {
+                console.warn("No se detectaron cambios en los ejercicios.");
                 Swal.fire("Sin cambios", "No se han realizado modificaciones.", "info");
                 return;
             }
+
+            console.log("Se detectaron cambios, procediendo con la actualización...");
 
             await updateDoc(routineDoc.ref, { exercises });
 
