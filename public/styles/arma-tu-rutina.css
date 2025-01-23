@@ -331,16 +331,22 @@ main {
     border-color: #457b9d;
     box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
 }
+
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
+    .exercise-popup {
+        max-width: 95%; /* Ajusta el máximo al 95% de la pantalla */
+        margin: 0 10px; /* Deja un margen a los lados */
+    }
+
     .popup-content {
-        display: flex; /* Cambia grid a flex */
+        display: flex;
         flex-direction: column; /* Apilar los elementos verticalmente */
     }
 
     .popup-left, .popup-right {
+        width: 100%; /* Asegúrate de que ambos tomen el 100% de la pantalla */
         flex: none;
-        width: 100%; /* Usar el 100% del ancho disponible */
     }
 
     .video-container iframe {
@@ -350,18 +356,22 @@ main {
 
 @media (max-width: 480px) {
     .exercise-popup {
-        padding: 10px; /* Reducir el padding en dispositivos más pequeños */
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        max-width: 100%; /* Asegura que el popup ocupe el ancho completo */
+        margin: 0; /* Elimina el margen de los lados */
     }
 
     .popup-header h3 {
-        font-size: 1.2rem; /* Ajustar el tamaño del título */
+        font-size: 1.2rem;
     }
 
     .form-group label {
-        font-size: 0.9rem; /* Reducir el tamaño del texto del formulario */
+        font-size: 0.9rem;
     }
 
     .form-group input, .form-group select, .form-group textarea {
-        font-size: 0.9rem; /* Ajustar el tamaño de los campos de entrada */
+        font-size: 0.9rem;
     }
 }
