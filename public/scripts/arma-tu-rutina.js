@@ -192,7 +192,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             confirmButtonText: "Guardar",
             cancelButtonText: "Cancelar",
             customClass: {
-                popup: 'custom-popup'
+                popup: 'custom-popup',
+                title: 'swal2-title' // Agregar la clase personalizada
             },
             width: 'auto', // Permite que el ancho se ajuste automáticamente
 

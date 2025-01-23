@@ -286,11 +286,14 @@ main {
 .custom-popup {
     width: 900px !important; /* Ajusta el ancho  */
     max-width: 5000px !important; /* Límite máximo de ancho */
-    height: 900px !important; /* Ajusta el alto  */
-    max-height: 100vh; /* Límite máximo de alto */    
-    padding: 20px; /* Añade un poco de espacio interno */
+    height: 2000px !important; /* Ajusta el alto  */
+    max-height: 96vh; /* Límite máximo de alto */    
     overflow: auto; /* Permite scroll si el contenido es mayor al tamaño */
-    max-height: 80vh;
+}
+
+.swal2-title {
+    margin-top: 5px !important; /* Reducir margen superior */
+    padding-top: 0px !important; /* Eliminar espacio extra */
 }
 
 .form-group textarea {
