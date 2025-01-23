@@ -332,45 +332,39 @@ main {
     box-shadow: 0 0 5px rgba(69, 123, 157, 0.5);
 }
 
-/* Ajustes para pantallas móviles */
 @media screen and (max-width: 768px) {
-    .custom-popup {
-        width: 90%; /* Asegúrate de que el popup no se salga de la pantalla */
-        max-width: 400px;
-        height: auto;
-        overflow-y: auto; /* Scroll si el contenido es largo */
-    }
-
-    .custom-popup .exercise-popup {
+    .popup {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        position: fixed;
         display: flex;
-        flex-direction: column; /* Cambiar a diseño vertical */
-        gap: 20px; /* Espacio entre secciones */
-        text-align: center; /* Centrar texto */
+        flex-direction: column;
+        justify-content: flex-start;
+        overflow-y: auto;
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        box-shadow: none;
     }
 
-    .custom-popup .popup-left,
-    .custom-popup .popup-right {
-        width: 100%; /* Ambas secciones toman el ancho completo */
+    .popup-header {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 10px;
     }
 
-    .custom-popup .video-container iframe {
-        width: 100%; /* El video se adapta al ancho disponible */
-        height: auto;
-        aspect-ratio: 16 / 9; /* Mantén proporción estándar */
+    .popup-content {
+        flex-grow: 1;
+        font-size: 1em;
+        margin-bottom: 20px;
     }
 
-    .custom-popup h3,
-    .custom-popup h4 {
-        font-size: 1.4rem; /* Ajusta tamaño del texto */
-    }
-
-    .custom-popup .form-group {
-        margin-bottom: 15px; /* Ajustar espacio entre campos */
-    }
-
-    .exercise-instructions {
-        font-size: 1rem; /* Texto claro y legible */
-        line-height: 1.5;
-        margin-top: 10px;
+    .popup-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1.5em;
+        cursor: pointer;
     }
 }
