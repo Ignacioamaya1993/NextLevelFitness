@@ -309,6 +309,8 @@ main {
     max-height: 5000px !important; /* Límite máximo de altura */
     padding: 20px; /* Añade un poco de espacio interno */
     overflow: auto; /* Permite scroll si el contenido es mayor al tamaño */
+    max-height: 80vh;
+
 }
 
 .form-group textarea {
