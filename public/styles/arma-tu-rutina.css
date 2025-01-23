@@ -66,10 +66,21 @@ main {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.exercise-grid {
+.exercise-card {
+    width: 200px; /* Ajusta según tu diseño */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Opcional: agrega sombra para diseño */
+    padding: 16px;
+    border-radius: 8px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column; /* Asegura que los hijos se alineen en columna */
+    justify-content: space-between; /* Separa contenido y botón */
+}
+
+#exercise-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Ajusta el número de columnas automáticamente */
+    gap: 16px; /* Espaciado entre las celdas */
 }
 
 .exercise-grid div {
