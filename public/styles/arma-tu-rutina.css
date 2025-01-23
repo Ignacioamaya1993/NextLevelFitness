@@ -334,6 +334,7 @@ main {
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
     .popup-content {
+        display: flex; /* Cambia grid a flex */
         flex-direction: column; /* Apilar los elementos verticalmente */
     }
 
