@@ -335,36 +335,42 @@ main {
 /* Ajustes para pantallas móviles */
 @media screen and (max-width: 768px) {
     .custom-popup {
-        width: 90%; /* Limita el ancho del popup en pantallas pequeñas */
-        max-width: 400px; /* Máximo ancho para evitar que crezca demasiado */
-        height: auto; /* Permite que el contenido ajuste su altura automáticamente */
-        overflow-y: auto; /* Agrega scroll si el contenido es demasiado largo */
+        width: 90%; /* Asegúrate de que el popup no se salga de la pantalla */
+        max-width: 400px;
+        height: auto;
+        overflow-y: auto; /* Scroll si el contenido es largo */
     }
 
     .custom-popup .exercise-popup {
         display: flex;
-        flex-direction: column; /* Cambia a disposición vertical */
-        gap: 10px; /* Espacio entre las secciones */
+        flex-direction: column; /* Cambiar a diseño vertical */
+        gap: 20px; /* Espacio entre secciones */
+        text-align: center; /* Centrar texto */
     }
 
     .custom-popup .popup-left,
     .custom-popup .popup-right {
-        width: 100%; /* Asegura que ambas secciones ocupen el ancho completo */
-        margin: 0; /* Elimina márgenes adicionales */
+        width: 100%; /* Ambas secciones toman el ancho completo */
     }
 
     .custom-popup .video-container iframe {
-        width: 100%; /* El iframe se ajusta al ancho del contenedor */
-        height: 200px; /* Altura fija, ajusta según tus necesidades */
+        width: 100%; /* El video se adapta al ancho disponible */
+        height: auto;
+        aspect-ratio: 16 / 9; /* Mantén proporción estándar */
     }
 
     .custom-popup h3,
     .custom-popup h4 {
-        font-size: 1.2rem; /* Reduce el tamaño del texto en pantallas pequeñas */
-        text-align: center; /* Centra los títulos */
+        font-size: 1.4rem; /* Ajusta tamaño del texto */
     }
 
     .custom-popup .form-group {
-        margin-bottom: 10px; /* Reduce el espacio entre campos del formulario */
+        margin-bottom: 15px; /* Ajustar espacio entre campos */
+    }
+
+    .exercise-instructions {
+        font-size: 1rem; /* Texto claro y legible */
+        line-height: 1.5;
+        margin-top: 10px;
     }
 }
