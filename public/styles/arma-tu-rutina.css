@@ -285,12 +285,10 @@ main {
 .custom-popup {
     width: 900px !important; /* Ajusta el ancho  */
     max-width: 5000px !important; /* Límite máximo de ancho */
-    height: 800px !important; /* Ajusta la altura  */
-    max-height: 5000px !important; /* Límite máximo de altura */
+    max-height: 80vh;
     padding: 20px; /* Añade un poco de espacio interno */
     overflow: auto; /* Permite scroll si el contenido es mayor al tamaño */
     max-height: 80vh;
-
 }
 
 .form-group textarea {
