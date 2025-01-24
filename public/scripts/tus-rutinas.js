@@ -145,7 +145,7 @@ function displayUserRoutines(routines) {
             .join("");
 
         routineCard.innerHTML = `
-            <h3>${day === today ? "⭐ Rutina para hoy ⭐" : "Rutina para el día " + day}</h3>
+            <h3>${day === today ? "Rutina para hoy" : "Rutina para el día " + day}</h3>
             <ul class="exercise-list">
                 ${exercisesList}
             </ul>

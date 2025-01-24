@@ -192,12 +192,11 @@ main {
     padding: 20px;
     border: 1px solid #ccc;
     margin: 10px 0;
-    transition: all 0.3s ease-in-out;
 }
 
 .routine-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.30);
 }
 
 .routine-card h3 {
