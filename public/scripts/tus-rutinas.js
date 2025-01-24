@@ -559,4 +559,3 @@ async function deleteRoutine(day) {
         return false; // Error al eliminar
         }
     }
-}
