@@ -145,10 +145,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 throw new Error("El correo nuevo debe ser diferente al actual.");
             }
 
-            // Validar si el celular ingresado es diferente al actual
-            if (newPhone && newPhone === userData.celular) {
-                throw new Error("El número de celular no debe ser igual al anterior.");
-            }
+            if (newPhone) {
+                // Verificar si el celular tiene al menos 10 dígitos
+                if (newPhone.length < 10) {
+                    throw new Error("El número de celular debe tener al menos 10 dígitos.");
+                }
+            
+                // Validar si el celular ingresado es diferente al actual
+                if (newPhone === userData.celular) {
+                    throw new Error("El número de celular no debe ser igual al anterior.");
+                }
+            }                  
 
             // Solicitar la contraseña solo una vez si se cambian campos
             let password;

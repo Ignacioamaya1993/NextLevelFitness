@@ -127,64 +127,27 @@ forgotPasswordLink.addEventListener("click", async () => {
         },
     });
 
-    if (!email) return;
-
-    try {
-        const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-
-        // Si el array está vacío, significa que el correo no está registrado
-        if (signInMethods.length === 0) {
+    if (email) {
+        try {
+            await sendPasswordResetEmail(auth, email);
             Swal.fire({
-                icon: "error",
-                title: "Correo no registrado",
-                text: `No existe una cuenta asociada al correo: ${email}`,
+                icon: "success",
+                title: "Correo enviado",
+                text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
                 confirmButtonColor: "#6f42c1",
             });
-            return;
-        }
-
-        // Intentar iniciar sesión con una contraseña incorrecta para obtener detalles del usuario
-        await signInWithEmailAndPassword(auth, email, "dummyPassword")
-            .then((userCredential) => {
-                const user = userCredential.user;
-                if (!user.emailVerified) {
-                    throw new Error("EMAIL_NOT_VERIFIED");
-                }
-            })
-            .catch((error) => {
-                if (error.code === "auth/wrong-password") {
-                    // El correo existe, pero la contraseña está mal: Intentamos obtener al usuario
-                    return auth.getUserByEmail(email);
-                } else {
-                    throw error;
-                }
+        } catch (error) {
+            console.error("Error al enviar el correo de recuperación:", error);
+            let message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
+            if (error.code === "auth/user-not-found") {
+                message = `No existe una cuenta registrada con el correo: ${email}`;
+            }
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: message,
+                confirmButtonColor: "#6f42c1",
             });
-
-        // Si el usuario está registrado y verificado, enviar el correo de recuperación
-        await sendPasswordResetEmail(auth, email);
-        Swal.fire({
-            icon: "success",
-            title: "Correo enviado",
-            text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
-            confirmButtonColor: "#6f42c1",
-        });
-
-    } catch (error) {
-        console.error("Error al enviar el correo de recuperación:", error);
-
-        let errorMessage = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
-
-        if (error.message === "EMAIL_NOT_VERIFIED") {
-            errorMessage = "Este correo está registrado, pero la cuenta aún no ha sido verificada. Por favor, revisa tu correo y verifica la cuenta antes de recuperar la contraseña.";
-        } else if (error.code === "auth/user-not-found") {
-            errorMessage = `No existe una cuenta registrada con el correo: ${email}`;
         }
-
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: errorMessage,
-            confirmButtonColor: "#6f42c1",
-        });
     }
 });
