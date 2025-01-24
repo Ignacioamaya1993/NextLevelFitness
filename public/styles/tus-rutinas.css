@@ -85,7 +85,7 @@ main {
     right: -3px;
     bottom: -3px;
     background: linear-gradient(45deg, #00bfff, #ff1493); /* Degradado celeste-fucsia */
-    border-radius: 25px;
+    border-radius: 5px;
     z-index: -1;
 }
 
@@ -96,7 +96,7 @@ main {
 }
 
 .today-routine {
-    animation: highlight 1.5s ease-in-out infinite;
+    animation: highlight 1.5s ease-in-out 3; /* La animación se repite 3 veces */
 }
 
 .required {
@@ -191,11 +191,12 @@ main {
 /* Tarjetas de rutina */
 .routine-card {
     background-color: #ffffff;
-    border: 1px solid #e5e7eb;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #ccc;
+    margin: 10px 0;
+    transition: all 0.3s ease-in-out;
 }
 
 .routine-card:hover {
