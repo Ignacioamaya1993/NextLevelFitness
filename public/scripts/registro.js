@@ -1,6 +1,6 @@
 import app from "../scripts/firebaseConfig.js"; // Importa la instancia de Firebase desde firebaseConfig.js
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
@@ -134,12 +134,14 @@ registroForm.addEventListener("submit", async (event) => {
         }
     });
 
-// Función para mostrar mensajes de error o éxito
+// Función para mostrar mensajes de error o éxito con SweetAlert
 function mostrarMensaje(texto, tipo) {
-    mensaje.textContent = texto;
-    mensaje.className = ""; // Resetear clases
-    mensaje.classList.add(tipo); // Agregar clase correspondiente (success o error)
-    mensaje.classList.remove("hidden");
+    Swal.fire({
+        icon: tipo, // 'success' o 'error'
+        title: tipo === 'success' ? 'Éxito' : 'Error',
+        text: texto,
+        confirmButtonText: 'Aceptar'
+    });
 }
 
 // Función para alternar la visibilidad de las contraseñas
