@@ -84,7 +84,7 @@ main {
     left: -3px;
     right: -3px;
     bottom: -3px;
-    background: linear-gradient(45deg, #87cefa, #add8e6); /* Degradado azul claro */
+    background: linear-gradient(45deg, #87cefa, #98fb98); /* Degradado azul claro y verde menta */
     border-radius: 5px;
     z-index: -1;
 }
@@ -94,7 +94,6 @@ main {
     50% { transform: scale(1.08); }
     100% { transform: scale(1); }
 }
-
 
 .required {
     color: red;
