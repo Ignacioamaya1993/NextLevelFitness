@@ -143,26 +143,22 @@ forgotPasswordLink.addEventListener("click", async () => {
             return;
         }
 
-        // Intentar iniciar sesión temporalmente con una contraseña incorrecta para obtener información del usuario
-        const userCredential = await signInWithEmailAndPassword(auth, email, "dummyPassword")
+        // Intentar iniciar sesión con una contraseña incorrecta para obtener detalles del usuario
+        await signInWithEmailAndPassword(auth, email, "dummyPassword")
+            .then((userCredential) => {
+                const user = userCredential.user;
+                if (!user.emailVerified) {
+                    throw new Error("EMAIL_NOT_VERIFIED");
+                }
+            })
             .catch((error) => {
                 if (error.code === "auth/wrong-password") {
-                    return auth.getUserByEmail(email); // Intentar obtener el usuario
+                    // El correo existe, pero la contraseña está mal: Intentamos obtener al usuario
+                    return auth.getUserByEmail(email);
+                } else {
+                    throw error;
                 }
-                throw error;
             });
-
-        const user = userCredential?.user;
-
-        if (user && !user.emailVerified) {
-            Swal.fire({
-                icon: "warning",
-                title: "Cuenta no verificada",
-                text: "Este correo está registrado, pero la cuenta aún no ha sido verificada. Por favor, revisa tu correo y verifica la cuenta antes de recuperar la contraseña.",
-                confirmButtonColor: "#6f42c1",
-            });
-            return;
-        }
 
         // Si el usuario está registrado y verificado, enviar el correo de recuperación
         await sendPasswordResetEmail(auth, email);
@@ -176,10 +172,18 @@ forgotPasswordLink.addEventListener("click", async () => {
     } catch (error) {
         console.error("Error al enviar el correo de recuperación:", error);
 
+        let errorMessage = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
+
+        if (error.message === "EMAIL_NOT_VERIFIED") {
+            errorMessage = "Este correo está registrado, pero la cuenta aún no ha sido verificada. Por favor, revisa tu correo y verifica la cuenta antes de recuperar la contraseña.";
+        } else if (error.code === "auth/user-not-found") {
+            errorMessage = `No existe una cuenta registrada con el correo: ${email}`;
+        }
+
         Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.",
+            text: errorMessage,
             confirmButtonColor: "#6f42c1",
         });
     }
