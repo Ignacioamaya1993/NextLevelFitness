@@ -70,10 +70,10 @@ main {
 
 .today-routine {
     border: 3px solid transparent; /* Borde transparente por defecto */
-    background-color: rgba(0, 191, 255, 0.2); /* Fondo tenue azul celeste */
-    box-shadow: 0 4px 15px rgba(255, 20, 147, 0.6); /* Sombra fucsia */
+    background-color: rgba(173, 216, 230, 0.4); /* Fondo tenue azul claro */
+    box-shadow: 0 4px 15px rgba(100, 149, 237, 0.3); /* Sombra azul moderada */
     transform: scale(1.05); /* Efecto de agrandamiento ligero */
-    transition: all 0.3s ease-in-out;
+    animation: highlight 1.5s ease-in-out 3; /* La animación se repite 3 veces */
     position: relative;
 }
 
@@ -84,7 +84,7 @@ main {
     left: -3px;
     right: -3px;
     bottom: -3px;
-    background: linear-gradient(45deg, #00bfff, #ff1493); /* Degradado celeste-fucsia */
+    background: linear-gradient(45deg, #87cefa, #add8e6); /* Degradado azul claro */
     border-radius: 5px;
     z-index: -1;
 }
@@ -95,9 +95,6 @@ main {
     100% { transform: scale(1); }
 }
 
-.today-routine {
-    animation: highlight 1.5s ease-in-out 3; /* La animación se repite 3 veces */
-}
 
 .required {
     color: red;
