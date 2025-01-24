@@ -127,49 +127,60 @@ forgotPasswordLink.addEventListener("click", async () => {
         },
     });
 
-    if (email) {
-        try {
-            const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+    if (!email) return;
 
-            if (signInMethods.length === 0) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Correo no registrado",
-                    text: `No existe una cuenta asociada al correo: ${email}`,
-                    confirmButtonColor: "#6f42c1",
-                });
-                return;
-            }
+    try {
+        const signInMethods = await fetchSignInMethodsForEmail(auth, email);
 
-            // Verificar si la cuenta está registrada pero no verificada
-            const userCredential = await signInWithEmailAndPassword(auth, email, "dummyPassword").catch(() => null);
-
-            if (userCredential && !userCredential.user.emailVerified) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Cuenta no verificada",
-                    text: "Este correo está registrado, pero la cuenta aún no ha sido verificada. Por favor, revisa tu correo y verifica la cuenta antes de recuperar la contraseña.",
-                    confirmButtonColor: "#6f42c1",
-                });
-                return;
-            }
-
-            // Si todo está bien, enviar el correo de recuperación
-            await sendPasswordResetEmail(auth, email);
-            Swal.fire({
-                icon: "success",
-                title: "Correo enviado",
-                text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
-                confirmButtonColor: "#6f42c1",
-            });
-        } catch (error) {
-            console.error("Error al enviar el correo de recuperación:", error);
+        // Si el array está vacío, significa que el correo no está registrado
+        if (signInMethods.length === 0) {
             Swal.fire({
                 icon: "error",
-                title: "Error",
-                text: "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.",
+                title: "Correo no registrado",
+                text: `No existe una cuenta asociada al correo: ${email}`,
                 confirmButtonColor: "#6f42c1",
             });
+            return;
         }
+
+        // Intentar iniciar sesión temporalmente con una contraseña incorrecta para obtener información del usuario
+        const userCredential = await signInWithEmailAndPassword(auth, email, "dummyPassword")
+            .catch((error) => {
+                if (error.code === "auth/wrong-password") {
+                    return auth.getUserByEmail(email); // Intentar obtener el usuario
+                }
+                throw error;
+            });
+
+        const user = userCredential?.user;
+
+        if (user && !user.emailVerified) {
+            Swal.fire({
+                icon: "warning",
+                title: "Cuenta no verificada",
+                text: "Este correo está registrado, pero la cuenta aún no ha sido verificada. Por favor, revisa tu correo y verifica la cuenta antes de recuperar la contraseña.",
+                confirmButtonColor: "#6f42c1",
+            });
+            return;
+        }
+
+        // Si el usuario está registrado y verificado, enviar el correo de recuperación
+        await sendPasswordResetEmail(auth, email);
+        Swal.fire({
+            icon: "success",
+            title: "Correo enviado",
+            text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
+            confirmButtonColor: "#6f42c1",
+        });
+
+    } catch (error) {
+        console.error("Error al enviar el correo de recuperación:", error);
+
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.",
+            confirmButtonColor: "#6f42c1",
+        });
     }
 });
