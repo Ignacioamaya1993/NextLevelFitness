@@ -69,21 +69,34 @@ main {
 }
 
 .current-day {
-    border: 3px solid #ff9800; /* Borde naranja */
-    background-color: rgba(255, 152, 0, 0.2); /* Fondo tenue */
-    box-shadow: 0 4px 10px rgba(255, 152, 0, 1); /* Sombra resaltada */
+    border: 3px solid transparent; /* Borde transparente por defecto */
+    background-color: rgba(0, 191, 255, 0.2); /* Fondo tenue azul celeste */
+    box-shadow: 0 4px 15px rgba(255, 20, 147, 0.6); /* Sombra fucsia */
     transform: scale(1.05); /* Efecto de agrandamiento ligero */
     transition: all 0.3s ease-in-out;
+    position: relative;
+}
+
+.current-day::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #00bfff, #ff1493); /* Degradado celeste-fucsia */
+    border-radius: 5px;
+    z-index: -1;
 }
 
 @keyframes highlight {
     0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    50% { transform: scale(1.08); }
     100% { transform: scale(1); }
 }
 
 .current-day {
-    animation: highlight 1s ease-in-out 0.3s;
+    animation: highlight 1.5s ease-in-out infinite;
 }
 
 .required {

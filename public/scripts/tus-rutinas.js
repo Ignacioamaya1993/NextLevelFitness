@@ -83,24 +83,53 @@ function groupRoutinesByDay(routines) {
         }, {});
 }
 
+function isMobileDevice() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = "";
 
     const groupedRoutines = groupRoutinesByDay(routines);
-    const today = new Date().toLocaleDateString("es-ES", { weekday: "long" });
-    
-    Object.keys(groupedRoutines).forEach((day) => {
+    let today = new Date().toLocaleDateString("es-ES", { weekday: "long" }).toLowerCase();
+
+    if (isMobileDevice() && groupedRoutines[today]) {
+        // Crear y mostrar la rutina del día actual primero
+        const todayRoutineCard = document.createElement("div");
+        todayRoutineCard.classList.add("routine-card", "today-routine");
+        
+        const todayExercisesList = groupedRoutines[today]
+            .map(exercise => {
+                const name = exercise.name || "Ejercicio sin nombre";
+                const series = exercise.series || 0;
+                const reps = exercise.repetitions || 0;
+                const weight = exercise.weight || 0;
+                const additionalData = exercise.additionalData || "Sin información adicional";
+                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
+            })
+            .join("");
+
+        todayRoutineCard.innerHTML = `
+            <h2 class="highlight-title">Esta es tu rutina para hoy (${today})</h2>
+            <ul class="exercise-list">
+                ${todayExercisesList}
+            </ul>
+            <button class="edit-button" data-day="${today}">Editar</button>
+            <button class="delete-button" data-day="${today}">Eliminar</button>
+        `;
+
+        routineList.appendChild(todayRoutineCard);
+        delete groupedRoutines[today]; // Eliminar el día actual de la lista
+    }
+
+    // Mostrar el resto de las rutinas en orden semanal
+    Object.keys(groupedRoutines).forEach(day => {
         const routineCard = document.createElement("div");
         routineCard.classList.add("routine-card");
 
-        // Resaltar el día actual
-        if (day.toLowerCase() === today.toLowerCase()) {
-            routineCard.classList.add("current-day");
-        }
-
         const exercisesList = groupedRoutines[day]
-            .map((exercise) => {
+            .map(exercise => {
                 const name = exercise.name || "Ejercicio sin nombre";
                 const series = exercise.series || 0;
                 const reps = exercise.repetitions || 0;
@@ -122,15 +151,21 @@ function displayUserRoutines(routines) {
         routineList.appendChild(routineCard);
     });
 
-    const editButtons = routineList.querySelectorAll(".edit-button");
-    const deleteButtons = routineList.querySelectorAll(".delete-button");
-
-    editButtons.forEach((button) =>
-        button.addEventListener("click", (e) => {
+    // Agregar eventos a los botones de edición y eliminación
+    document.querySelectorAll(".edit-button").forEach(button =>
+        button.addEventListener("click", e => {
             const day = e.target.dataset.day;
             openEditPopup(day, routines);
         })
     );
+
+    document.querySelectorAll(".delete-button").forEach(button =>
+        button.addEventListener("click", e => {
+            const day = e.target.dataset.day;
+            confirmDeleteRoutine(day);
+        })
+    );
+}
 
 // Controlador de eventos para los botones de eliminación
 deleteButtons.forEach((button) =>
