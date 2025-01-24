@@ -129,6 +129,32 @@ forgotPasswordLink.addEventListener("click", async () => {
 
     if (email) {
         try {
+            const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+
+            if (signInMethods.length === 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Correo no registrado",
+                    text: `No existe una cuenta asociada al correo: ${email}`,
+                    confirmButtonColor: "#6f42c1",
+                });
+                return;
+            }
+
+            // Verificar si la cuenta está registrada pero no verificada
+            const userCredential = await signInWithEmailAndPassword(auth, email, "dummyPassword").catch(() => null);
+
+            if (userCredential && !userCredential.user.emailVerified) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Cuenta no verificada",
+                    text: "Este correo está registrado, pero la cuenta aún no ha sido verificada. Por favor, revisa tu correo y verifica la cuenta antes de recuperar la contraseña.",
+                    confirmButtonColor: "#6f42c1",
+                });
+                return;
+            }
+
+            // Si todo está bien, enviar el correo de recuperación
             await sendPasswordResetEmail(auth, email);
             Swal.fire({
                 icon: "success",
@@ -138,14 +164,10 @@ forgotPasswordLink.addEventListener("click", async () => {
             });
         } catch (error) {
             console.error("Error al enviar el correo de recuperación:", error);
-            let message = "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.";
-            if (error.code === "auth/user-not-found") {
-                message = `No existe una cuenta registrada con el correo: ${email}`;
-            }
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: message,
+                text: "Hubo un problema al procesar tu solicitud. Intenta nuevamente más tarde.",
                 confirmButtonColor: "#6f42c1",
             });
         }
