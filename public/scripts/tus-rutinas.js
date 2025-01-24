@@ -95,10 +95,10 @@ function displayUserRoutines(routines) {
     let today = new Date().toLocaleDateString("es-ES", { weekday: "long" }).toLowerCase();
 
     if (isMobileDevice() && groupedRoutines[today]) {
-        // Crear y mostrar la rutina del día actual primero
+        // En móvil, mostrar el día actual primero con diseño especial
         const todayRoutineCard = document.createElement("div");
         todayRoutineCard.classList.add("routine-card", "today-routine");
-        
+
         const todayExercisesList = groupedRoutines[today]
             .map(exercise => {
                 const name = exercise.name || "Ejercicio sin nombre";
@@ -120,13 +120,18 @@ function displayUserRoutines(routines) {
         `;
 
         routineList.appendChild(todayRoutineCard);
-        delete groupedRoutines[today]; // Eliminar el día actual de la lista
+        delete groupedRoutines[today]; // Eliminar el día actual de la lista para no repetirlo
     }
 
-    // Mostrar el resto de las rutinas en orden semanal
+    // En escritorio, resaltar el día actual sin cambiar el orden
     Object.keys(groupedRoutines).forEach(day => {
         const routineCard = document.createElement("div");
         routineCard.classList.add("routine-card");
+
+        // Si es el día actual, agregar la clase para resaltarlo en escritorio
+        if (!isMobileDevice() && day === today) {
+            routineCard.classList.add("today-routine");
+        }
 
         const exercisesList = groupedRoutines[day]
             .map(exercise => {
@@ -140,7 +145,7 @@ function displayUserRoutines(routines) {
             .join("");
 
         routineCard.innerHTML = `
-            <h3>Rutina para el día ${day}</h3>
+            <h3>${day === today ? "⭐ Rutina para hoy ⭐" : "Rutina para el día " + day}</h3>
             <ul class="exercise-list">
                 ${exercisesList}
             </ul>
