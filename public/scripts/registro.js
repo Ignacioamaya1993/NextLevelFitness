@@ -41,11 +41,16 @@ celularInput.addEventListener("input", (event) => {
     event.target.value = event.target.value.replace(/\D/g, ""); // Elimina cualquier caracter que no sea número
 });
 
+const registroButton = document.getElementById("registro-button");
 
 // Manejar el envío del formulario
 registroForm.addEventListener("submit", async (event) => {
     event.preventDefault(); // Evita que se recargue la página
     console.log("Formulario de registro enviado");
+
+    // Deshabilitar el botón y cambiar el texto a "Registrando..."
+    registroButton.disabled = true;
+    registroButton.textContent = "Registrando...";
 
     // Obtener los valores de los campos
     const nombre = document.getElementById("nombre").value.trim();
@@ -121,9 +126,13 @@ registroForm.addEventListener("submit", async (event) => {
                 break;
             default:
                 mostrarMensaje("Hubo un problema al registrar al usuario. Intenta nuevamente.", "error");
+            }
+        } finally {
+            // Volver a habilitar el botón y restaurar el texto
+            registroButton.disabled = false;
+            registroButton.textContent = "Registrarse";
         }
-    }
-}); // Cerrar el bloque del addEventListener
+    });
 
 // Función para mostrar mensajes de error o éxito
 function mostrarMensaje(texto, tipo) {

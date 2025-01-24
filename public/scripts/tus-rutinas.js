@@ -164,17 +164,9 @@ function displayUserRoutines(routines) {
         })
     );
 
-    document.querySelectorAll(".delete-button").forEach(button =>
-        button.addEventListener("click", e => {
-            const day = e.target.dataset.day;
-            confirmDeleteRoutine(day);
-        })
-    );
-}
-
 // Controlador de eventos para los botones de eliminación
-deleteButtons.forEach((button) =>
-    button.addEventListener("click", (e) => {
+document.querySelectorAll(".delete-button").forEach(button =>
+    button.addEventListener("click", e => {
         const day = e.target.dataset.day;
 
         // Confirmar eliminación
@@ -564,3 +556,4 @@ async function deleteRoutine(day) {
         return false; // Error al eliminar
         }
     }
+}
