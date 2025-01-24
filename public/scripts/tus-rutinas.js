@@ -7,9 +7,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const routineViewer = document.getElementById("routine-viewer");
     const noRoutinesMessage = document.getElementById("no-routines-message");
     const overlay = document.getElementById("overlay");
+
     overlay.addEventListener("click", (e) => {
-    e.stopPropagation(); // Evitar que el clic pase al fondo
-});
+        e.stopPropagation(); // Evitar que el clic pase al fondo
+    });
 
     if (user && user.isLoggedIn) {
         restrictedMessage.classList.add("hidden");
@@ -45,25 +46,69 @@ async function getUserRoutines(userId) {
     return routines;
 }
 
+function groupRoutinesByDay(routines) {
+    const daysOrder = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+    const grouped = {};
+
+    routines.forEach((routine) => {
+        let day = routine.day || "Día no especificado";
+
+        // Verificar si el día está en el array permitido
+        if (!daysOrder.includes(day)) {
+            day = "Día no especificado";
+        }
+
+        if (!grouped[day]) {
+            grouped[day] = [];
+        }
+        const exercises = Array.isArray(routine.exercises) ? routine.exercises : [routine.exercises];
+        grouped[day] = grouped[day].concat(exercises);
+    });
+
+    // Reordenar los días según el orden establecido
+    return Object.keys(grouped)
+        .sort((a, b) => {
+            const indexA = daysOrder.indexOf(a);
+            const indexB = daysOrder.indexOf(b);
+
+            // Si un día no está en el array, lo dejamos al final
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+
+            return indexA - indexB;
+        })
+        .reduce((acc, day) => {
+            acc[day] = grouped[day];
+            return acc;
+        }, {});
+}
+
 function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = "";
 
     const groupedRoutines = groupRoutinesByDay(routines);
-    console.log('Rutinas agrupadas por día:', groupedRoutines);
+    const today = new Date().toLocaleDateString("es-ES", { weekday: "long" });
     
-    Object.keys(groupedRoutines).forEach(day => {
+    Object.keys(groupedRoutines).forEach((day) => {
         const routineCard = document.createElement("div");
         routineCard.classList.add("routine-card");
 
-        const exercisesList = groupedRoutines[day].map(exercise => {
-            const name = exercise.name || "Ejercicio sin nombre";
-            const series = exercise.series || 0;
-            const reps = exercise.repetitions || 0;
-            const weight = exercise.weight || 0;
-            const additionalData = exercise.additionalData || "Sin información adicional";
-            return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
-        }).join('');
+        // Resaltar el día actual
+        if (day.toLowerCase() === today.toLowerCase()) {
+            routineCard.classList.add("current-day");
+        }
+
+        const exercisesList = groupedRoutines[day]
+            .map((exercise) => {
+                const name = exercise.name || "Ejercicio sin nombre";
+                const series = exercise.series || 0;
+                const reps = exercise.repetitions || 0;
+                const weight = exercise.weight || 0;
+                const additionalData = exercise.additionalData || "Sin información adicional";
+                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
+            })
+            .join("");
 
         routineCard.innerHTML = `
             <h3>Rutina para el día ${day}</h3>
@@ -73,7 +118,6 @@ function displayUserRoutines(routines) {
             <button class="edit-button" data-day="${day}">Editar</button>
             <button class="delete-button" data-day="${day}">Eliminar</button>
         `;
-        console.log('HTML de la rutina:', routineCard.innerHTML);
 
         routineList.appendChild(routineCard);
     });
@@ -88,41 +132,48 @@ function displayUserRoutines(routines) {
         })
     );
 
-    deleteButtons.forEach((button) =>
-        button.addEventListener("click", (e) => {
-            const day = e.target.dataset.day;
-            Swal.fire({
-                title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
-                text: "Esta acción no se puede deshacer.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Sí, eliminar",
-                cancelButtonText: "Cancelar"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Llamar a la función para eliminar la rutina solo después de confirmar
-                    deleteRoutine(day);
+// Controlador de eventos para los botones de eliminación
+deleteButtons.forEach((button) =>
+    button.addEventListener("click", (e) => {
+        const day = e.target.dataset.day;
+
+        // Confirmar eliminación
+        Swal.fire({
+            title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
+            text: "Esta acción no se puede deshacer.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                // Llamar a la función de eliminación
+                const success = await deleteRoutine(day);
+
+                // Mostrar mensaje según el resultado
+                if (success) {
+                    Swal.fire({
+                        title: "Eliminado",
+                        text: "La rutina ha sido eliminada exitosamente.",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                        allowOutsideClick: false,
+                    }).then(() => {
+                        location.reload(); // Recargar después de confirmar
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: "No se encontró la rutina o hubo un problema al eliminarla.",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                        allowOutsideClick: false,
+                    });
                 }
-            });
-        })
-    );
-}
-
-function groupRoutinesByDay(routines) {
-    const grouped = {};
-    routines.forEach(routine => {
-        const day = routine.day || "Día no especificado";
-        if (!grouped[day]) {
-            grouped[day] = [];
-        }
-
-        // Asegúrate de que exercise sea siempre un array
-        const exercises = Array.isArray(routine.exercises) ? routine.exercises : [routine.exercises];
-        grouped[day] = grouped[day].concat(exercises);
-    });
-
-    return grouped;
-}
+            }
+        });
+    })
+);
 
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
@@ -132,8 +183,12 @@ function openEditPopup(day, routines) {
         if (event.key === "Escape" && !popup.classList.contains("hidden")) {
             closePopup();
         }
+    
+        if (event.key === "Enter" && !popup.classList.contains("hidden")) {
+            event.preventDefault();  // Previene el comportamiento por defecto
+            saveChanges();  // Guarda los cambios
+        }
     });
-
     popupContent.innerHTML = "";
 
     const routine = routines.find(routine => routine.day === day);
@@ -196,8 +251,11 @@ function openEditPopup(day, routines) {
         closePopup();
     });
 
-    closeButton.addEventListener("click", closePopup);
-
+    closeButton.addEventListener("click", () => {
+        console.log("Botón cancelar presionado");
+        closePopup();
+    });
+    
     // Cerrar el popup al hacer clic fuera del contenido
     popup.addEventListener("click", (e) => {
         if (e.target === popup) {
@@ -312,7 +370,7 @@ function renderEditFields(container, exercise, index, day, exercises) {
 saveButton.addEventListener("click", () => {
     let valid = true;
 
-    exercises.forEach((exercise, index) => {
+    exercises.forEach((_, index) => {
         const seriesInput = document.getElementById(`series-${index}`);
         const repsInput = document.getElementById(`reps-${index}`);
         const weightInput = document.getElementById(`weight-${index}`);
@@ -445,6 +503,7 @@ async function deleteExerciseFromRoutine(day, index, exercises) {
     }
 }
 
+// Función para eliminar la rutina
 async function deleteRoutine(day) {
     const user = JSON.parse(localStorage.getItem("currentUser"));
     const routinesRef = collection(db, "routines");
@@ -455,29 +514,14 @@ async function deleteRoutine(day) {
 
         if (!querySnapshot.empty) {
             const routineDoc = querySnapshot.docs[0];
-
-            // Eliminar la rutina directamente sin pedir confirmación nuevamente
             await deleteDoc(routineDoc.ref);
-
-            // Notificar al usuario sobre el éxito de la operación
-            Swal.fire({
-                title: "Éxito",
-                text: `La rutina para el día ${day} ha sido eliminada.`,
-                icon: "success",
-            }).then(() => location.reload()); // Recarga la página después de eliminar la rutina
+            return true; // Éxito
         } else {
-            Swal.fire({
-                title: "Error",
-                text: "No se encontró la rutina para el día especificado.",
-                icon: "error",
-            });
+            return false; // No se encontró la rutina
         }
     } catch (error) {
-        Swal.fire({
-            title: "Error",
-            text: "Ocurrió un error al eliminar la rutina.",
-            icon: "error",
-        });
         console.error("Error al eliminar la rutina:", error);
+        return false; // Error al eliminar
+        }
     }
 }

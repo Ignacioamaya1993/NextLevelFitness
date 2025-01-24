@@ -68,6 +68,24 @@ main {
     background-color: #ffe6e6;
 }
 
+.current-day {
+    border: 3px solid #ff9800; /* Borde naranja */
+    background-color: rgba(255, 152, 0, 0.2); /* Fondo tenue */
+    box-shadow: 0 4px 10px rgba(255, 152, 0, 1); /* Sombra resaltada */
+    transform: scale(1.05); /* Efecto de agrandamiento ligero */
+    transition: all 0.3s ease-in-out;
+}
+
+@keyframes highlight {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.current-day {
+    animation: highlight 1s ease-in-out 0.3s;
+}
+
 .required {
     color: red;
     font-weight: bold;
