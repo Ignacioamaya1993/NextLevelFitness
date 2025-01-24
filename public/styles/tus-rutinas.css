@@ -77,6 +77,11 @@ main {
     position: relative;
 }
 
+.today-routine .exercise-list li:hover {
+    background-color: rgba(173, 216, 230, 0.4); /* Azul pastel translúcido */
+    transition: background-color 0.3s ease-in-out;
+}
+
 .today-routine::before {
     content: "";
     position: absolute;

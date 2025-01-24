@@ -144,14 +144,14 @@ function displayUserRoutines(routines) {
             })
             .join("");
 
-        routineCard.innerHTML = `
-            <h3>${day === today ? "Rutina para hoy" : "Rutina para el día " + day}</h3>
+            routineCard.innerHTML = `
+            <h3>${day === today ? `Esta es tu rutina para hoy (${today})` : `Rutina para el día ${day}`}</h3>
             <ul class="exercise-list">
                 ${exercisesList}
             </ul>
             <button class="edit-button" data-day="${day}">Editar</button>
             <button class="delete-button" data-day="${day}">Eliminar</button>
-        `;
+        `;       
 
         routineList.appendChild(routineCard);
     });
