@@ -10,7 +10,6 @@ const db = getFirestore(app);
 
 // Selección de elementos del formulario
 const registroForm = document.getElementById("registro-form");
-const mensaje = document.getElementById("mensaje");
 
 // Modificar el HTML de los campos del formulario para incluir el asterisco rojo
 const formularioCampos = [
@@ -41,16 +40,10 @@ celularInput.addEventListener("input", (event) => {
     event.target.value = event.target.value.replace(/\D/g, ""); // Elimina cualquier caracter que no sea número
 });
 
-const registroButton = document.getElementById("registro-button");
-
 // Manejar el envío del formulario
 registroForm.addEventListener("submit", async (event) => {
     event.preventDefault(); // Evita que se recargue la página
     console.log("Formulario de registro enviado");
-
-    // Deshabilitar el botón y cambiar el texto a "Registrando..."
-    registroButton.disabled = true;
-    registroButton.textContent = "Registrando...";
 
     // Obtener los valores de los campos
     const nombre = document.getElementById("nombre").value.trim();
