@@ -2,14 +2,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Función para verificar si el usuario es administrador
-    function isAdmin() {
-      return request.auth.token.email in [
-        "ignacioamaya04@gmail.com",
-        "soutrelleagustin64@gmail.com"
-      ];
-    }
-
     // Reglas para la colección "categories"
     match /categories/{category} {
       allow read: if request.auth != null; // Permitir lectura de categorías para usuarios autenticados
@@ -23,21 +15,21 @@ service cloud.firestore {
     // Reglas para la colección "usuarios"
     match /usuarios/{userId} {
       // Permitir lectura y escritura solo si el usuario es el dueño de su cuenta o un administrador
-      allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow read, write: if request.auth != null;
 
       // Permitir que los administradores puedan leer todos los usuarios
-      allow read: if request.auth != null && isAdmin();
+      allow read: if request.auth != null;
     }
 
     // Reglas para la colección "routines"
     match /routines/{routineId} {
       // Permitir lectura si el usuario es el propietario de la rutina o un administrador
-      allow read: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
+      allow read: if request.auth != null;
 
       // Permitir creación, actualización y eliminación solo al dueño de la rutina o un administrador
-      allow create: if request.auth != null && (request.auth.uid == request.resource.data.userId || isAdmin());
-      allow update: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
-      allow delete: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
     }
   }
 }
