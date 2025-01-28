@@ -156,56 +156,35 @@ function displayUserRoutines(routines) {
         routineList.appendChild(routineCard);
     });
 
-    // Agregar eventos a los botones de edición y eliminación
-    document.querySelectorAll(".edit-button").forEach(button =>
-        button.addEventListener("click", e => {
+    const editButtons = routineList.querySelectorAll(".edit-button");
+    const deleteButtons = routineList.querySelectorAll(".delete-button");
+
+    editButtons.forEach((button) =>
+        button.addEventListener("click", (e) => {
             const day = e.target.dataset.day;
             openEditPopup(day, routines);
         })
     );
 
-// Controlador de eventos para los botones de eliminación
-document.querySelectorAll(".delete-button").forEach(button =>
-    button.addEventListener("click", e => {
-        const day = e.target.dataset.day;
-
-        // Confirmar eliminación
-        Swal.fire({
-            title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
-            text: "Esta acción no se puede deshacer.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar",
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                // Llamar a la función de eliminación
-                const success = await deleteRoutine(day);
-
-                // Mostrar mensaje según el resultado
-                if (success) {
-                    Swal.fire({
-                        title: "Eliminado",
-                        text: "La rutina ha sido eliminada exitosamente.",
-                        icon: "success",
-                        confirmButtonText: "OK",
-                        allowOutsideClick: false,
-                    }).then(() => {
-                        location.reload(); // Recargar después de confirmar
-                    });
-                } else {
-                    Swal.fire({
-                        title: "Error",
-                        text: "No se encontró la rutina o hubo un problema al eliminarla.",
-                        icon: "error",
-                        confirmButtonText: "OK",
-                        allowOutsideClick: false,
-                    });
+    deleteButtons.forEach((button) =>
+        button.addEventListener("click", (e) => {
+            const day = e.target.dataset.day;
+            Swal.fire({
+                title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
+                text: "Esta acción no se puede deshacer.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Llamar a la función para eliminar la rutina solo después de confirmar
+                    deleteRoutine(day);
                 }
-            }
-        });
-    })
-);
+            });
+        })
+    );
+}
 
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
@@ -440,11 +419,19 @@ async function saveChanges(day, exercises) {
                 if (additionalDataInput) {
                     exercise.additionalData = additionalDataInput.value || "";
                 }
-
-                // Obtener valores actuales de los inputs
-                const newSeries = parseInt(document.getElementById(`series-${index}`).value, 10);
-                const newReps = parseInt(document.getElementById(`reps-${index}`).value, 10);
-                const newWeight = parseFloat(document.getElementById(`weight-${index}`).value);
+            
+                const seriesInput = document.getElementById(`series-${index}`);
+                const repsInput = document.getElementById(`reps-${index}`);
+                const weightInput = document.getElementById(`weight-${index}`);
+            
+                if (!seriesInput || !repsInput || !weightInput) {
+                    console.error(`No se encontraron los elementos de entrada para el ejercicio en el índice ${index}`);
+                    return; // Salta este ejercicio y pasa al siguiente
+                }
+            
+                const newSeries = parseInt(seriesInput.value, 10);
+                const newReps = parseInt(repsInput.value, 10);
+                const newWeight = parseFloat(weightInput.value);
                 const newAdditionalData = exercise.additionalData;
 
                 // Valores actuales en la base de datos
@@ -556,4 +543,3 @@ async function deleteRoutine(day) {
         return false; // Error al eliminar
         }
     }
-}

@@ -1,5 +1,6 @@
 import app from './firebaseConfig.js';
 import { getFirestore, collection, doc, getDocs, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     // Asegúrate de que este código solo se ejecute una vez
@@ -212,11 +213,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 try {
                     const db = getFirestore(app);
                     const routinesRef = collection(db, "routines");
-    
-                    // Verificar si ya existe una rutina para ese día y usuario
-                    const routinesSnapshot = await getDocs(routinesRef);
-                    const existingRoutineDoc = routinesSnapshot.docs.find(doc => doc.data().userId === user.uid && doc.data().day === dia);
-    
+                
+                    // Consulta Firestore para buscar una rutina con el mismo usuario y día
+                    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", dia));
+                    const querySnapshot = await getDocs(q);
+                
+                    let existingRoutineDoc = null;
+                
+                    if (!querySnapshot.empty) {
+                        existingRoutineDoc = querySnapshot.docs[0]; // Debería haber solo uno
+                    }
+
                     // Generar un ID único para el ejercicio
                     const exerciseId = crypto.randomUUID();
     
@@ -240,6 +247,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
                         Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
                     } else {
+                        // Crear una nueva rutina si no existe
                         await addDoc(routinesRef, {
                             userId: user.uid,
                             day: dia,
