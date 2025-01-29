@@ -23,7 +23,7 @@ function formatearFecha(fecha) {
     return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
 }
 
-// Función para cargar usuarios si el usuario está autenticado
+// Función para cargar usuarios
 async function cargarUsuarios() {
     const auth = getAuth(app);
     onAuthStateChanged(auth, async (user) => {
@@ -41,7 +41,7 @@ async function cargarUsuarios() {
                 let html = "";
                 usuariosSnapshot.forEach(doc => {
                     const userData = doc.data();
-                    const userId = doc.id;  // Obtenemos el ID del usuario
+                    const userId = doc.id;  // Agregar el ID del usuario
                     const nombre = userData.nombre || "Sin nombre";
                     const apellido = userData.apellido || "Sin apellido";
                     const email = userData.email || "No disponible";
@@ -61,7 +61,6 @@ async function cargarUsuarios() {
                         fechaFormateada = formatearFecha(fechaNacimiento);
                     }
 
-                    // Agregar los botones
                     html += `
                         <div class="usuario-card">
                             <h2>${nombre} ${apellido}</h2>
@@ -70,16 +69,41 @@ async function cargarUsuarios() {
                             <p><strong>Fecha de nacimiento:</strong> ${fechaFormateada}</p>
                             <p><strong>Edad:</strong> ${edad}</p>
                             <p><strong>Género:</strong> ${genero}</p>
-                            <div class="user-actions">
-                                <button onclick="verRutinas('${userId}')">Ver Rutinas</button>
-                                <button onclick="inhabilitarUsuario('${userId}')">Inhabilitar</button>
-                                <button onclick="eliminarUsuario('${userId}')">Eliminar</button>
-                            </div>
+
+                            <button class="delete-btn" data-user-id="${userId}">Eliminar</button>
+                            <button class="disable-btn" data-user-id="${userId}">Inhabilitar</button>
+                            <button class="view-rutinas-btn" data-user-id="${userId}">Ver Rutinas</button>
                         </div>
                     `;
                 });
 
                 usuariosContainer.innerHTML = html;
+
+                // Agregar eventos a los botones después de cargar los usuarios
+                const eliminarButtons = document.querySelectorAll('.delete-btn');
+                eliminarButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const userId = button.dataset.userId;
+                        eliminarUsuario(userId);  // Llamar a la función eliminarUsuario
+                    });
+                });
+
+                const inhabilitarButtons = document.querySelectorAll('.disable-btn');
+                inhabilitarButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const userId = button.dataset.userId;
+                        inhabilitarUsuario(userId);  // Llamar a la función inhabilitarUsuario
+                    });
+                });
+
+                const verRutinasButtons = document.querySelectorAll('.view-rutinas-btn');
+                verRutinasButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const userId = button.dataset.userId;
+                        verRutinasUsuario(userId);  // Llamar a la función verRutinasUsuario
+                    });
+                });
+
             } catch (error) {
                 console.error("Error al cargar usuarios:", error);
                 usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
@@ -91,7 +115,7 @@ async function cargarUsuarios() {
 }
 
 // Función para ver rutinas (redirige a una nueva página con el ID del usuario)
-function verRutinas(userId) {
+function verRutinasUsuario(userId) {
     window.location.href = `rutinas-usuario.html?userId=${userId}`;
 }
 
