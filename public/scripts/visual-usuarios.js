@@ -1,6 +1,6 @@
 import app, { db } from "../scripts/firebaseConfig.js";
-import { getAuth, onAuthStateChanged, deleteUser, updateUser } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { collection, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const usuariosContainer = document.getElementById("usuarios-container");
 
@@ -127,7 +127,7 @@ async function inhabilitarUsuario(userId) {
         const user = await auth.getUser(userId);  // Aquí no es necesario, ya que userId debería ser el uid
 
         // Deshabilitar la cuenta del usuario en Firebase Authentication
-        await updateUser(user, { disabled: true });
+        await auth.updateUser(user.uid, { disabled: true });
         console.log(`Usuario con ID ${userId} deshabilitado exitosamente.`);
 
         alert("El usuario ha sido deshabilitado y no podrá iniciar sesión.");
