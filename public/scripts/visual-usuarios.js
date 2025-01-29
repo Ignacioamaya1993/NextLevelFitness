@@ -1,6 +1,6 @@
 import app, { db } from "../scripts/firebaseConfig.js";
-import { getAuth, onAuthStateChanged, updateEmail, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const usuariosContainer = document.getElementById("usuarios-container");
 
@@ -23,43 +23,14 @@ function formatearFecha(fecha) {
     return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
 }
 
-// Función para actualizar el campo emailVerificado en Firestore
-async function actualizarEmailVerificado() {
-    const auth = getAuth(app);
-    const user = auth.currentUser;
-
-    if (user) {
-        try {
-            console.log("Verificando correo para el usuario:", user.email); // Log para verificar el estado del usuario
-            // Esperar hasta que el correo esté verificado
-            if (user.emailVerified) {
-                // Actualizamos el campo 'emailVerificado' en Firestore (ahora como booleano)
-                const userRef = doc(db, "usuarios", user.uid); // Obtener el documento del usuario autenticado
-                console.log("Actualizando Firestore para el usuario:", user.uid); // Log del usuario
-                await updateDoc(userRef, {
-                    emailVerificado: true, // Usamos un valor booleano en lugar de una cadena
-                });
-                console.log("Campo 'emailVerificado' actualizado a 'true' en Firestore.");
-            } else {
-                console.log("El correo aún no está verificado.");
-            }
-        } catch (error) {
-            console.error("Error al actualizar el campo 'emailVerificado' en Firestore:", error);
-        }
-    }
-}
-
 // Función para cargar usuarios si el usuario está autenticado
 async function cargarUsuarios() {
-    const auth = getAuth(app); // Usa la instancia de auth que depende de la app
+    const auth = getAuth(app);
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            console.log("Usuario autenticado:", user.email); // Log del usuario autenticado
+            console.log("Usuario autenticado:", user.email);
 
             try {
-                // Asegurarnos de que el estado 'emailVerificado' en Firestore se actualice
-                await actualizarEmailVerificado();
-
                 const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
                 
                 if (usuariosSnapshot.empty) {
@@ -89,14 +60,6 @@ async function cargarUsuarios() {
                         fechaFormateada = formatearFecha(fechaNacimiento);
                     }
 
-                    // Comparar si el correo está verificado (en Firestore y en el usuario autenticado)
-                    const emailVerificado = userData.emailVerificado ? "Sí" : "No"; // Usamos el valor booleano de Firestore y lo mostramos como cadena
-
-                    // Log para ver el estado de emailVerified y los datos
-                    console.log("Datos de Firestore para el usuario:", userData.email);
-                    console.log("Estado de emailVerified del usuario autenticado:", user.emailVerified);
-                    console.log("Resultado final email validado:", emailVerificado);
-
                     html += `
                         <div class="usuario-card">
                             <h2>${nombre} ${apellido}</h2>
@@ -105,7 +68,6 @@ async function cargarUsuarios() {
                             <p><strong>Fecha de nacimiento:</strong> ${fechaFormateada}</p>
                             <p><strong>Edad:</strong> ${edad}</p>
                             <p><strong>Género:</strong> ${genero}</p>
-                            <p><strong>Email validado:</strong> ${emailVerificado}</p>
                         </div>
                     `;
                 });
