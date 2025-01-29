@@ -52,3 +52,30 @@ body {
     color: #333;
     font-size: 14px;
 }
+
+.user-actions {
+    margin-top: 10px;
+}
+
+.user-actions button {
+    background-color: #f44336; /* Rojo para eliminar */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.user-actions button:hover {
+    opacity: 0.8;
+}
+
+.user-actions button:nth-child(2) {
+    background-color: #ff9800; /* Naranja para inhabilitar */
+}
+
+.user-actions button:nth-child(1) {
+    background-color: #4CAF50; /* Verde para ver rutinas */
+}

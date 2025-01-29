@@ -1,6 +1,6 @@
 import app, { db } from "../scripts/firebaseConfig.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const usuariosContainer = document.getElementById("usuarios-container");
 
@@ -41,6 +41,7 @@ async function cargarUsuarios() {
                 let html = "";
                 usuariosSnapshot.forEach(doc => {
                     const userData = doc.data();
+                    const userId = doc.id;  // Obtenemos el ID del usuario
                     const nombre = userData.nombre || "Sin nombre";
                     const apellido = userData.apellido || "Sin apellido";
                     const email = userData.email || "No disponible";
@@ -60,6 +61,7 @@ async function cargarUsuarios() {
                         fechaFormateada = formatearFecha(fechaNacimiento);
                     }
 
+                    // Agregar los botones
                     html += `
                         <div class="usuario-card">
                             <h2>${nombre} ${apellido}</h2>
@@ -68,6 +70,11 @@ async function cargarUsuarios() {
                             <p><strong>Fecha de nacimiento:</strong> ${fechaFormateada}</p>
                             <p><strong>Edad:</strong> ${edad}</p>
                             <p><strong>Género:</strong> ${genero}</p>
+                            <div class="user-actions">
+                                <button onclick="verRutinas('${userId}')">Ver Rutinas</button>
+                                <button onclick="inhabilitarUsuario('${userId}')">Inhabilitar</button>
+                                <button onclick="eliminarUsuario('${userId}')">Eliminar</button>
+                            </div>
                         </div>
                     `;
                 });
@@ -81,6 +88,40 @@ async function cargarUsuarios() {
             usuariosContainer.innerHTML = `<p style="color:red;">Por favor, inicia sesión para ver los usuarios.</p>`;
         }
     });
+}
+
+// Función para ver rutinas (redirige a una nueva página con el ID del usuario)
+function verRutinas(userId) {
+    window.location.href = `rutinas-usuario.html?userId=${userId}`;
+}
+
+// Función para inhabilitar un usuario (cambiar estado)
+async function inhabilitarUsuario(userId) {
+    try {
+        const userRef = doc(db, "usuarios", userId);
+        await updateDoc(userRef, { estado: "inhabilitado" });  // Cambiar el estado del usuario
+        alert("El usuario ha sido inhabilitado.");
+        cargarUsuarios();  // Recargar la lista de usuarios
+    } catch (error) {
+        console.error("Error al inhabilitar usuario:", error);
+        alert("Hubo un error al inhabilitar al usuario.");
+    }
+}
+
+// Función para eliminar un usuario
+async function eliminarUsuario(userId) {
+    const confirmacion = confirm("¿Estás seguro de que deseas eliminar este usuario?");
+    if (confirmacion) {
+        try {
+            const userRef = doc(db, "usuarios", userId);
+            await deleteDoc(userRef);  // Eliminar el usuario
+            alert("El usuario ha sido eliminado.");
+            cargarUsuarios();  // Recargar la lista de usuarios
+        } catch (error) {
+            console.error("Error al eliminar usuario:", error);
+            alert("Hubo un error al eliminar al usuario.");
+        }
+    }
 }
 
 // Cargar usuarios al cargar la página
