@@ -172,8 +172,6 @@ async function inhabilitarUsuario(userId) {
     }
 }
 
-import { getAuth, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-
 // Función para eliminar un usuario
 async function eliminarUsuario() {
     const auth = getAuth();
