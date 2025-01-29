@@ -123,13 +123,18 @@ function verRutinasUsuario(userId) {
 async function inhabilitarUsuario(userId) {
     const auth = getAuth();
     try {
-        // Obtener el usuario actualmente autenticado
-        const user = await auth.getUser(userId);  // Aquí no es necesario, ya que userId debería ser el uid
+        // Obtener el usuario actualmente autenticado desde onAuthStateChanged
+        const user = await auth.currentUser;
+
+        if (!user) {
+            throw new Error("No se pudo obtener el usuario autenticado.");
+        }
 
         // Deshabilitar la cuenta del usuario en Firebase Authentication
         await auth.updateUser(user.uid, { disabled: true });
         console.log(`Usuario con ID ${userId} deshabilitado exitosamente.`);
 
+        // Mostrar mensaje de éxito con SweetAlert
         Swal.fire({
             title: 'Usuario inhabilitado',
             text: "El usuario ha sido deshabilitado y no podrá iniciar sesión.",
@@ -138,6 +143,8 @@ async function inhabilitarUsuario(userId) {
         });
     } catch (error) {
         console.error("Error al inhabilitar el usuario:", error);
+
+        // Mostrar mensaje de error con SweetAlert
         Swal.fire({
             title: 'Error',
             text: "Hubo un error al inhabilitar el usuario.",
@@ -151,30 +158,39 @@ async function inhabilitarUsuario(userId) {
 async function eliminarUsuario(userId) {
     const auth = getAuth();
     try {
-        // Obtener el usuario actualmente autenticado
-        const user = await auth.getUser(userId);  // Aquí no es necesario, ya que userId debería ser el uid
-        
+        // Obtener el usuario actualmente autenticado desde onAuthStateChanged
+        const user = await auth.currentUser;
+
+        if (!user) {
+            throw new Error("No se pudo obtener el usuario autenticado.");
+        }
+
         // Eliminar la cuenta del usuario
-        await deleteUser(user);
+        await deleteUser(user);  // Eliminar al usuario autenticado
+
         console.log(`Usuario con ID ${userId} eliminado de Firebase Authentication.`);
 
         // Eliminar el documento del usuario en Firestore
         await deleteDoc(doc(db, "usuarios", userId));
         console.log(`Documento de usuario con ID ${userId} eliminado de Firestore.`);
 
+        // Mostrar mensaje de éxito con SweetAlert
         Swal.fire({
-            title: 'Usuario eliminado',
-            text: "El usuario ha sido completamente eliminado.",
             icon: 'success',
-            confirmButtonText: 'Aceptar'
+            title: 'El usuario ha sido eliminado.',
+            showConfirmButton: false,
+            timer: 1500
         });
+
     } catch (error) {
         console.error("Error al eliminar el usuario:", error);
+
+        // Mostrar mensaje de error con SweetAlert
         Swal.fire({
-            title: 'Error',
-            text: "Hubo un error al eliminar el usuario.",
             icon: 'error',
-            confirmButtonText: 'Aceptar'
+            title: 'Hubo un error al eliminar el usuario.',
+            text: error.message,
+            showConfirmButton: true
         });
     }
 }
