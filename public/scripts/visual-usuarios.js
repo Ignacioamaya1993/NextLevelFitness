@@ -1,5 +1,5 @@
 import app, { db } from "../scripts/firebaseConfig.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, deleteUser, updateUser } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const usuariosContainer = document.getElementById("usuarios-container");
@@ -119,32 +119,43 @@ function verRutinasUsuario(userId) {
     window.location.href = `rutinas-usuario.html?userId=${userId}`;
 }
 
-// Función para inhabilitar un usuario (cambiar estado)
+// Función para inhabilitar (desautorizar) al usuario
 async function inhabilitarUsuario(userId) {
+    const auth = getAuth();
     try {
-        const userRef = doc(db, "usuarios", userId);
-        await updateDoc(userRef, { estado: "inhabilitado" });  // Cambiar el estado del usuario
-        alert("El usuario ha sido inhabilitado.");
-        cargarUsuarios();  // Recargar la lista de usuarios
+        // Obtener el usuario actualmente autenticado
+        const user = await auth.getUser(userId);  // Aquí no es necesario, ya que userId debería ser el uid
+
+        // Deshabilitar la cuenta del usuario en Firebase Authentication
+        await updateUser(user, { disabled: true });
+        console.log(`Usuario con ID ${userId} deshabilitado exitosamente.`);
+
+        alert("El usuario ha sido deshabilitado y no podrá iniciar sesión.");
     } catch (error) {
-        console.error("Error al inhabilitar usuario:", error);
-        alert("Hubo un error al inhabilitar al usuario.");
+        console.error("Error al inhabilitar el usuario:", error);
+        alert("Hubo un error al inhabilitar el usuario.");
     }
 }
 
-// Función para eliminar un usuario
+// Funcion para eliminar completamente al usuario
 async function eliminarUsuario(userId) {
-    const confirmacion = confirm("¿Estás seguro de que deseas eliminar este usuario?");
-    if (confirmacion) {
-        try {
-            const userRef = doc(db, "usuarios", userId);
-            await deleteDoc(userRef);  // Eliminar el usuario
-            alert("El usuario ha sido eliminado.");
-            cargarUsuarios();  // Recargar la lista de usuarios
-        } catch (error) {
-            console.error("Error al eliminar usuario:", error);
-            alert("Hubo un error al eliminar al usuario.");
-        }
+    const auth = getAuth();
+    try {
+        // Obtener el usuario actualmente autenticado
+        const user = await auth.getUser(userId);  // Aquí no es necesario, ya que userId debería ser el uid
+        
+        // Eliminar la cuenta del usuario
+        await deleteUser(user);
+        console.log(`Usuario con ID ${userId} eliminado de Firebase Authentication.`);
+
+        // Eliminar el documento del usuario en Firestore
+        await deleteDoc(doc(db, "usuarios", userId));
+        console.log(`Documento de usuario con ID ${userId} eliminado de Firestore.`);
+
+        alert("El usuario ha sido completamente eliminado.");
+    } catch (error) {
+        console.error("Error al eliminar el usuario:", error);
+        alert("Hubo un error al eliminar el usuario.");
     }
 }
 
