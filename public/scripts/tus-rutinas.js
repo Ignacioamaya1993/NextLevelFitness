@@ -34,16 +34,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function getUserRoutines(userId) {
-    const routinesRef = collection(db, "routines");
-    const q = query(routinesRef, where("userId", "==", userId));
-    const querySnapshot = await getDocs(q);
+    try {
+        const routinesRef = collection(db, "routines");
+        const q = query(routinesRef, where("userId", "==", userId));
 
-    const routines = [];
-    querySnapshot.forEach((doc) => {
-        routines.push({ ...doc.data(), id: doc.id });
-    });
+        // Intentar obtener los datos desde caché primero
+        let querySnapshot = await getDocs(q, { source: "cache" });
 
-    return routines;
+        if (querySnapshot.empty) {
+            console.log("No hay datos en caché, obteniendo desde Firestore...");
+            querySnapshot = await getDocs(q, { source: "server" }); // Consultar Firestore si la caché está vacía
+        }
+
+        const routines = [];
+        querySnapshot.forEach((doc) => {
+            routines.push({ ...doc.data(), id: doc.id });
+        });
+
+        return routines;
+    } catch (error) {
+        console.error("Error obteniendo rutinas:", error);
+        return [];
+    }
 }
 
 function groupRoutinesByDay(routines) {

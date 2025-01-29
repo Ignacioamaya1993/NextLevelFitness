@@ -43,28 +43,45 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    async function loadCategories(db, categoryFilter) {
+    async function loadCategories() {
         try {
             const categoriesRef = collection(db, "categories");
-            const categoriesSnapshot = await getDocs(categoriesRef);
-
-            // Limpiar opciones previas
-            categoryFilter.innerHTML = "<option value='all'>Todas las categorías</option>";
-
-            // Agregar categorías al filtro
-            categoriesSnapshot.forEach((categoryDoc) => {
-                const categoryName = categoryDoc.id;
-                const option = document.createElement("option");
-                option.value = categoryName;
-                option.textContent = categoryName;
-                categoryFilter.appendChild(option);
+    
+            // Intentar cargar desde caché primero
+            let categoriesSnapshot = await getDocs(categoriesRef, { source: "cache" });
+    
+            if (categoriesSnapshot.empty) {
+                console.log("No hay datos en caché, obteniendo desde Firestore...");
+                categoriesSnapshot = await getDocs(categoriesRef, { source: "server" });
+            }
+    
+            renderCategories(categoriesSnapshot);
+    
+            // Escuchar cambios en tiempo real para mantener actualizado
+            onSnapshot(categoriesRef, (snapshot) => {
+                console.log("Actualización en Firestore detectada...");
+                renderCategories(snapshot);
             });
-
-            console.log("Categorías cargadas correctamente.");
+    
         } catch (error) {
             console.error("Error al cargar categorías:", error);
         }
     }
+    
+    // Función auxiliar para renderizar las categorías
+    function renderCategories(snapshot) {
+        categoryFilter.innerHTML = "<option value='all'>Todas las categorías</option>";
+    
+        snapshot.forEach((doc) => {
+            const option = document.createElement("option");
+            option.value = doc.id;
+            option.textContent = doc.id;
+            categoryFilter.appendChild(option);
+        });
+    
+        console.log("Categorías actualizadas.");
+    }
+    
 
     async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "") {
         exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
@@ -72,18 +89,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const exercises = []; // Array para almacenar todos los ejercicios
     
+            // Intentar cargar desde caché primero
+            let exercisesSnapshot;
             if (category === "all") {
                 const categoriesSnapshot = await getDocs(collection(db, "categories"));
-    
                 for (const categoryDoc of categoriesSnapshot.docs) {
-                    const exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`));
+                    exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "cache" });
+                    if (exercisesSnapshot.empty) {
+                        exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "server" });
+                    }
                     exercisesSnapshot.forEach((doc) => {
                         const exercise = doc.data();
                         exercises.push(exercise);
                     });
                 }
             } else {
-                const exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`));
+                exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "cache" });
+                if (exercisesSnapshot.empty) {
+                    exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "server" });
+                }
                 exercisesSnapshot.forEach((doc) => {
                     const exercise = doc.data();
                     exercises.push(exercise);
@@ -119,6 +143,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     
                 exerciseGrid.appendChild(exerciseCard);
             });
+    
+            console.log("Ejercicios cargados correctamente.");
+    
+            // Escuchar cambios en tiempo real para mantener actualizado
+            const categoryRef = category === "all" ? collection(db, "categories") : collection(db, `categories/${category}/exercises`);
+            onSnapshot(categoryRef, (snapshot) => {
+                console.log("Actualización en Firestore detectada...");
+                loadExercises(db, exerciseGrid, category, searchQuery); // Recargar los ejercicios con los nuevos datos
+            });
+    
         } catch (error) {
             console.error("Error al cargar ejercicios:", error);
         }
