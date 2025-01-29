@@ -55,86 +55,74 @@ function formatearFecha(fecha) {
 
 // Función para cargar usuarios si el usuario está autenticado
 async function cargarUsuarios() {
-    const auth = getAuth(app); // Usa la instancia de auth que depende de la app
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            console.log("Usuario autenticado:", user.email); // Log del usuario autenticado
+    usuariosContainer.innerHTML = "<p>Cargando usuarios...</p>";
 
-            try {
-                const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
-                
-                if (usuariosSnapshot.empty) {
-                    usuariosContainer.innerHTML = "<p>No hay usuarios registrados.</p>";
-                    return;
-                }
+    try {
+        const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
 
-                let html = "";
-                usuariosSnapshot.forEach(doc => {
-                    const userData = doc.data();
-                    const uid = docSnap.id;
-                    const nombre = userData.nombre || "Sin nombre";
-                    const apellido = userData.apellido || "Sin apellido";
-                    const email = userData.email || "No disponible";
-                    const celular = userData.celular || "No disponible";
-                    const fechaNacimiento = userData.fechaNacimiento || "No disponible";
-                    const genero = userData.genero || "No disponible";
-                    const inhabilitado = userData.inhabilitado ? "Sí" : "No";
-
-                    
-                    // Calcular edad si se tiene fecha de nacimiento
-                    let edad = "No disponible";
-                    if (fechaNacimiento !== "No disponible") {
-                        edad = calcularEdad(fechaNacimiento);
-                    }
-
-                    // Formatear la fecha de nacimiento si está disponible
-                    let fechaFormateada = "No disponible";
-                    if (fechaNacimiento !== "No disponible") {
-                        fechaFormateada = formatearFecha(fechaNacimiento);
-                    }
-
-                    html += `
-                            <div class="usuario-card" id="usuario-${uid}">
-                            <h2>${nombre} ${apellido}</h2>
-                            <p><strong>Email:</strong> ${email}</p>
-                            <p><strong>Celular:</strong> ${celular}</p>
-                            <p><strong>Fecha de nacimiento:</strong> ${fechaFormateada}</p>
-                            <p><strong>Edad:</strong> ${edad}</p>
-                            <p><strong>Género:</strong> ${genero}</p>
-                            <p><strong>Inhabilitado:</strong> ${inhabilitado}</p>
-                            <button onclick="eliminarUsuario('${uid}')">Eliminar</button>
-                            <button onclick="inhabilitarUsuario('${uid}')">Inhabilitar</button>
-                            <button onclick="verRutina('${uid}')">Ver Rutina</button>
-                        </div>
-                    `;
-                });
-
-                usuariosContainer.innerHTML = html;
-
-                // Asignar eventos a los botones después de renderizar el HTML
-                document.querySelectorAll(".btn-eliminar").forEach(button => {
-                    button.addEventListener("click", () => eliminarUsuario(button.dataset.uid));
-                });
-
-                document.querySelectorAll(".btn-inhabilitar").forEach(button => {
-                    button.addEventListener("click", () => inhabilitarUsuario(button.dataset.uid));
-                });
-
-                document.querySelectorAll(".btn-ver-rutina").forEach(button => {
-                    button.addEventListener("click", () => {
-                        window.location.href = `rutina.html?uid=${button.dataset.uid}`;
-                    });
-                });
-
-            } catch (error) {
-                console.error("Error al cargar usuarios:", error);
-                usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
-            }
-        } else {
-            usuariosContainer.innerHTML = `<p style="color:red;">Por favor, inicia sesión para ver los usuarios.</p>`;
+        if (usuariosSnapshot.empty) {
+            usuariosContainer.innerHTML = "<p>No hay usuarios registrados.</p>";
+            return;
         }
-    });
-}
 
-// Cargar usuarios al cargar la página
-cargarUsuarios();
+        let html = "";
+        usuariosSnapshot.forEach((doc) => { // <-- Aquí corregí el nombre del parámetro
+            const userData = doc.data();  // <-- Accede correctamente a los datos del documento
+            const uid = doc.id;  // <-- Obtiene el ID del documento
+
+            const nombre = userData.nombre || "Sin nombre";
+            const apellido = userData.apellido || "Sin apellido";
+            const email = userData.email || "No disponible";
+            const celular = userData.celular || "No disponible";
+            const fechaNacimiento = userData.fechaNacimiento || "No disponible";
+            const genero = userData.genero || "No disponible";
+            const inhabilitado = userData.inhabilitado ? "Sí" : "No";
+
+            let edad = "No disponible";
+            if (fechaNacimiento !== "No disponible") {
+                edad = calcularEdad(fechaNacimiento);
+            }
+
+            let fechaFormateada = "No disponible";
+            if (fechaNacimiento !== "No disponible") {
+                fechaFormateada = formatearFecha(fechaNacimiento);
+            }
+
+            html += `
+                <div class="usuario-card" id="usuario-${uid}">
+                    <h2>${nombre} ${apellido}</h2>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Celular:</strong> ${celular}</p>
+                    <p><strong>Fecha de nacimiento:</strong> ${fechaFormateada}</p>
+                    <p><strong>Edad:</strong> ${edad}</p>
+                    <p><strong>Género:</strong> ${genero}</p>
+                    <p><strong>Inhabilitado:</strong> ${inhabilitado}</p>
+                    <button class="btn-eliminar" data-uid="${uid}">Eliminar</button>
+                    <button class="btn-inhabilitar" data-uid="${uid}">Inhabilitar</button>
+                    <button class="btn-ver-rutina" data-uid="${uid}">Ver Rutina</button>
+                </div>
+            `;
+        });
+
+        usuariosContainer.innerHTML = html;
+
+        // Asignar eventos a los botones después de renderizar el HTML
+        document.querySelectorAll(".btn-eliminar").forEach(button => {
+            button.addEventListener("click", () => eliminarUsuario(button.dataset.uid));
+        });
+
+        document.querySelectorAll(".btn-inhabilitar").forEach(button => {
+            button.addEventListener("click", () => inhabilitarUsuario(button.dataset.uid));
+        });
+
+        document.querySelectorAll(".btn-ver-rutina").forEach(button => {
+            button.addEventListener("click", () => {
+                window.location.href = `rutina.html?uid=${button.dataset.uid}`;
+            });
+        });
+
+    } catch (error) {
+        console.error("Error al cargar usuarios:", error);
+        usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
+    }
+}
