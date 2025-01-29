@@ -17,56 +17,6 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Logo */
-.logo img {
-    height: 50px;
-}
-
-.login-container {
-    background: white;
-    padding: 40px;
-    width: 100%;
-    max-width: 400px;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-}
-
-.login-container h2 {
-    margin-bottom: 20px;
-    color: #1d3557;
-    font-size: 24px;
-    font-weight: bold;
-}
-
-.login-container input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-    color: #333;
-}
-
-.login-container button {
-    width: 100%;
-    padding: 12px;
-    background: #1d3557;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.login-container button:hover {
-    background: #5a3794;
-}
-
 /* Título del panel */
 h2 {
     text-align: center;
@@ -126,51 +76,6 @@ h2 {
 .admin-menu a:hover {
     background: #5a3794;
     transform: scale(1.05);
-}
-
-/* Footer Sticky */
-footer {
-    width: 100%;
-    padding: 15px 0; /* Tamaño reducido para el footer */
-    background-color: #1d3557;
-    color: white;
-    text-align: center;
-}
-
-.footer-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-}
-
-.footer-info {
-    margin-bottom: 10px;
-}
-
-.footer-social {
-    margin-bottom: 10px;
-}
-
-.footer-social a {
-    margin: 0 10px;
-    color: white;
-    font-size: 18px; /* Iconos de tamaño más pequeño */
-    text-decoration: none;
-}
-
-.footer-social a:hover {
-    color: #5a3794;
-}
-
-.footer-design {
-    font-size: 12px;
-}
-
-/* Estilo para los iconos de redes sociales */
-.social-icon {
-    display: inline-block;
-    color: inherit;
-    transition: color 0.3s ease;
 }
 
 /* Responsividad */

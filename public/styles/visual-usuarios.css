@@ -1,187 +1,54 @@
-/* Estilos globales */
 body {
-    font-family: 'Arial', sans-serif;
+    padding: 5px;
     margin: 0;
-    padding: 0;
-    background-color: #f7f7f7;
-    color: #333;
+    font-family: Verdana, sans-serif;
+    background-color: #f4f4f4;
 }
 
-.hidden {
-    display: none;
-}
-
-
-/* Logo */
-.logo img {
-    height: 50px;
-}
-
-/* Contenedor principal */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-/* Estilos del formulario de búsqueda */
-.search-container {
-    margin: 20px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-}
-
-.search-container input[type="text"] {
-    padding: 10px;
-    font-size: 16px;
-    width: 50%;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    transition: border 0.3s ease;
-}
-
-.search-container input[type="text"]:focus {
-    border-color: #f5a623;
-    outline: none;
-}
-
-.search-container button {
-    background-color: #f5a623;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-.search-container button:hover {
-    background-color: #e5941e;
-}
-
-/* Estilos del mensaje de usuario no encontrado */
-#no-user-message {
-    color: #e94e77;
-    font-size: 18px;
-    margin-top: 20px;
-}
-
-/* Estilos de la vista de rutinas */
-#routine-viewer {
-    display: none;
-    margin-top: 30px;
-}
-
-#routine-viewer h2 {
+.encabezado {
+    background-color: #08c3f1;
+    text-align: center;
+    padding: 15px;
+    color: #fff;
     font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
 }
 
-#no-routines-message {
-    display: none;
-    color: #e94e77;
-    font-size: 18px;
-    margin-top: 20px;
-}
-
-#routine-list {
+.usuarios-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-/* Estilos de las rutinas */
-.routine {
-    background-color: white;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    justify-content: center;
 }
 
-.routine:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+.usuario-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s;
 }
 
-.routine h3 {
-    font-size: 20px;
-    color: #333;
+.usuario-card:hover {
+    transform: scale(1.05);
+}
+
+.usuario-card img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
     margin-bottom: 10px;
 }
 
-.routine p {
-    font-size: 16px;
-    color: #555;
+.usuario-card h2 {
+    color: #5C6AC4;
+    margin: 5px 0;
 }
 
-/* Estilos del mensaje de no rutinas */
-#no-routines-message {
-    display: none;
-    color: #e94e77;
-    font-size: 18px;
-    margin-top: 20px;
-}
-
-/* Estilos del footer */
-footer {
-    background-color: #333;
-    color: white;
-    padding: 20px 0;
-    text-align: center;
-}
-
-footer .social-icons a {
-    margin: 0 10px;
-    color: white;
-    font-size: 20px;
-    transition: color 0.3s ease;
-}
-
-footer .social-icons a:hover {
-    color: #f5a623;
-}
-
-footer .footer-info p {
+.usuario-card p {
+    margin: 3px 0;
+    color: #333;
     font-size: 14px;
-    margin-top: 10px;
-}
-
-footer .footer-info a {
-    color: #f5a623;
-    text-decoration: none;
-}
-
-footer .footer-info a:hover {
-    text-decoration: underline;
-}
-
-/* Responsividad */
-@media screen and (max-width: 768px) {
-    header nav ul {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .search-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .search-container input[type="text"] {
-        width: 80%;
-        margin-bottom: 10px;
-    }
-
-    .search-container button {
-        width: 80%;
-    }
-
-    #routine-list {
-        grid-template-columns: 1fr;
-    }
 }

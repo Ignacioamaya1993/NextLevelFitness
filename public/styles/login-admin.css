@@ -21,10 +21,6 @@ header {
     align-items: center;
 }
 
-.logo img {
-    height: 50px;
-}
-
 main {
     display: flex;
     justify-content: center;
@@ -82,49 +78,4 @@ main {
 #login-error {
     color: red;
     margin-top: 10px;
-}
-
-/* Footer Sticky */
-footer {
-    width: 100%;
-    padding: 15px 0; /* Tamaño reducido para el footer */
-    background-color: #1d3557;
-    color: white;
-    text-align: center;
-}
-
-.footer-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-}
-
-.footer-info {
-    margin-bottom: 10px;
-}
-
-.footer-social {
-    margin-bottom: 10px;
-}
-
-.footer-social a {
-    margin: 0 10px;
-    color: white;
-    font-size: 18px; /* Iconos de tamaño más pequeño */
-    text-decoration: none;
-}
-
-.footer-social a:hover {
-    color: #5a3794;
-}
-
-.footer-design {
-    font-size: 12px;
-}
-
-/* Estilo para los iconos de redes sociales */
-.social-icon {
-    display: inline-block;
-    color: inherit;
-    transition: color 0.3s ease;
 }

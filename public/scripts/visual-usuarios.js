@@ -1,151 +1,125 @@
-import { db } from './firebaseConfig.js';
-import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
+import app, { db } from "../scripts/firebaseConfig.js";
+import { getAuth, onAuthStateChanged, updateEmail, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-    const auth = getAuth();
-    let currentUser = null;
+const usuariosContainer = document.getElementById("usuarios-container");
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUser = user;
-            console.log('✅ Usuario autenticado:', user.email);
-        } else {
-            alert('No tienes permiso para acceder. Inicia sesión.');
-            window.location.href = 'login-admin.html';
-        }
-    });
+// Función para calcular la edad basada en la fecha de nacimiento
+function calcularEdad(fechaNacimiento) {
+    const [year, month, day] = fechaNacimiento.split("-").map(Number);
+    const birthDate = new Date(year, month - 1, day);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    if (today.getMonth() < birthDate.getMonth() || 
+        (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
 
-    const searchButton = document.getElementById('search-button');
-    const searchInput = document.getElementById('search-input');
-    const noUserMessage = document.getElementById('no-user-message');
-    const routineViewer = document.getElementById('routine-viewer');
-    const userNameDisplay = document.getElementById('user-name');
-    const noRoutinesMessage = document.getElementById('no-routines-message');
-    const routineList = document.getElementById('routine-list');
+// Función para formatear la fecha en formato DD/MM/YYYY
+function formatearFecha(fecha) {
+    const [year, month, day] = fecha.split("-").map(Number);
+    return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+}
 
-    async function searchUser() {
-        if (!currentUser) {
-            alert('Debes estar autenticado para buscar usuarios.');
-            return;
-        }
-    
-        const queryText = searchInput.value.trim();
-        if (!queryText) {
-            alert('Por favor, ingresa un nombre o correo para buscar.');
-            return;
-        }
-    
-        // Ocultamos mensajes previos y limpiamos la lista
-        noUserMessage.classList.add('hidden'); // Aseguramos que el mensaje de "No se encontró" esté oculto
-        routineViewer.classList.add('hidden');
-        noRoutinesMessage.classList.add('hidden');
-        routineList.innerHTML = '';
-    
+// Función para actualizar el campo emailVerificado en Firestore
+async function actualizarEmailVerificado() {
+    const auth = getAuth(app);
+    const user = auth.currentUser;
+
+    if (user) {
         try {
-            let userQuery;
-            if (queryText.includes('@')) {
-                userQuery = query(collection(db, 'usuarios'), where('email', '==', queryText));
-                console.log(`📧 Búsqueda por correo: ${queryText}`);
+            console.log("Verificando correo para el usuario:", user.email); // Log para verificar el estado del usuario
+            // Esperar hasta que el correo esté verificado
+            if (user.emailVerified) {
+                // Actualizamos el campo 'emailVerificado' en Firestore (ahora como booleano)
+                const userRef = doc(db, "usuarios", user.uid); // Obtener el documento del usuario autenticado
+                console.log("Actualizando Firestore para el usuario:", user.uid); // Log del usuario
+                await updateDoc(userRef, {
+                    emailVerificado: true, // Usamos un valor booleano en lugar de una cadena
+                });
+                console.log("Campo 'emailVerificado' actualizado a 'true' en Firestore.");
             } else {
-                const [firstName, lastName] = queryText.split(' ');
-                userQuery = query(
-                    collection(db, 'usuarios'),
-                    where('nombre', '==', firstName.toLowerCase()),
-                    where('apellido', '==', lastName.toLowerCase())
-                );
-                console.log(`📑 Búsqueda por nombre: ${firstName} ${lastName}`);
+                console.log("El correo aún no está verificado.");
             }
-    
-            const querySnapshot = await getDocs(userQuery);
-    
-            if (querySnapshot.empty) {
-                noUserMessage.classList.remove('hidden');
-                console.log('🔍 No se encontró un usuario.');
-                return;
-            }
-    
-            const userDoc = querySnapshot.docs[0];
-            const userData = userDoc.data();
-            const userId = userDoc.id;
-    
-            userNameDisplay.textContent = `${userData.nombre} ${userData.apellido}`;
-    
-            // **Buscar rutinas del usuario**
-            const routinesQuery = query(collection(db, 'routines'), where('userId', '==', userId));
-            const routinesSnapshot = await getDocs(routinesQuery);
-            const routines = routinesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-    
-            if (routines.length === 0) {
-                noRoutinesMessage.classList.remove('hidden');
-            } else {
-                displayRoutines(routines);
-            }
-    
-            routineViewer.classList.remove('hidden');
-            console.log('👀 Vista de rutinas activada.');
-    
         } catch (error) {
-            console.error('Error buscando usuario o rutinas:', error);
+            console.error("Error al actualizar el campo 'emailVerificado' en Firestore:", error);
         }
     }
+}
 
-    function displayRoutines(routines) {
-        routineList.innerHTML = ''; // Limpiar lista previa
-        console.log('🔧 Mostrando rutinas:', routines); // Ver qué rutinas se están pasando a la función
-    
-        routines.forEach((routineDoc) => {
-            const { day, exercise } = routineDoc;
-            console.log(`📅 Día de la rutina: ${day}`); // Verificar día
-            console.log('🏋️‍♂️ Ejercicio:', exercise); // Verificar ejercicios
-    
-            // Título del día
-            const dayTitle = document.createElement('h2');
-            dayTitle.textContent = `Día: ${day || 'Sin día especificado'}`;
-            routineList.appendChild(dayTitle);
-    
-            if (Array.isArray(exercise)) {
-                // Procesar exercise como array
-                exercise.forEach((routine, i) => displayRoutineDetails(routine, i + 1));
-            } else if (typeof exercise === 'object') {
-                // Procesar exercise como objeto
-                displayRoutineDetails(exercise, 1); // Muestra el ejercicio del objeto
-            } else {
-                // Caso donde no hay ejercicios válidos
-                const noExerciseMessage = document.createElement('p');
-                noExerciseMessage.textContent = 'No hay ejercicios registrados para este día.';
-                routineList.appendChild(noExerciseMessage);
+// Función para cargar usuarios si el usuario está autenticado
+async function cargarUsuarios() {
+    const auth = getAuth(app); // Usa la instancia de auth que depende de la app
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            console.log("Usuario autenticado:", user.email); // Log del usuario autenticado
+
+            try {
+                // Asegurarnos de que el estado 'emailVerificado' en Firestore se actualice
+                await actualizarEmailVerificado();
+
+                const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
+                
+                if (usuariosSnapshot.empty) {
+                    usuariosContainer.innerHTML = "<p>No hay usuarios registrados.</p>";
+                    return;
+                }
+
+                let html = "";
+                usuariosSnapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const nombre = userData.nombre || "Sin nombre";
+                    const apellido = userData.apellido || "Sin apellido";
+                    const email = userData.email || "No disponible";
+                    const celular = userData.celular || "No disponible";
+                    const fechaNacimiento = userData.fechaNacimiento || "No disponible";
+                    const genero = userData.genero || "No disponible";
+                    
+                    // Calcular edad si se tiene fecha de nacimiento
+                    let edad = "No disponible";
+                    if (fechaNacimiento !== "No disponible") {
+                        edad = calcularEdad(fechaNacimiento);
+                    }
+
+                    // Formatear la fecha de nacimiento si está disponible
+                    let fechaFormateada = "No disponible";
+                    if (fechaNacimiento !== "No disponible") {
+                        fechaFormateada = formatearFecha(fechaNacimiento);
+                    }
+
+                    // Comparar si el correo está verificado (en Firestore y en el usuario autenticado)
+                    const emailVerificado = userData.emailVerificado ? "Sí" : "No"; // Usamos el valor booleano de Firestore y lo mostramos como cadena
+
+                    // Log para ver el estado de emailVerified y los datos
+                    console.log("Datos de Firestore para el usuario:", userData.email);
+                    console.log("Estado de emailVerified del usuario autenticado:", user.emailVerified);
+                    console.log("Resultado final email validado:", emailVerificado);
+
+                    html += `
+                        <div class="usuario-card">
+                            <h2>${nombre} ${apellido}</h2>
+                            <p><strong>Email:</strong> ${email}</p>
+                            <p><strong>Celular:</strong> ${celular}</p>
+                            <p><strong>Fecha de nacimiento:</strong> ${fechaFormateada}</p>
+                            <p><strong>Edad:</strong> ${edad}</p>
+                            <p><strong>Género:</strong> ${genero}</p>
+                            <p><strong>Email validado:</strong> ${emailVerificado}</p>
+                        </div>
+                    `;
+                });
+
+                usuariosContainer.innerHTML = html;
+            } catch (error) {
+                console.error("Error al cargar usuarios:", error);
+                usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
             }
-        });
-    
-        routineViewer.classList.remove('hidden');
-        console.log('👀 Vista de rutinas activada.');
-    }
-
-    // **Función para mostrar los detalles de un ejercicio**
-    function displayRoutineDetails(routine, index) {
-        console.log(`🔧 Detalles del ejercicio ${index}:`, routine);
-        
-        const routineDiv = document.createElement('div');
-        routineDiv.classList.add('routine');
-
-        const routineTitle = document.createElement('h3');
-        routineTitle.textContent = `Ejercicio ${index}: ${routine.name || 'Sin nombre'}`;
-
-        const routineDetails = document.createElement('p');
-        routineDetails.textContent = `Series: ${routine.series || 'N/A'}, 
-            Repeticiones: ${routine.repetitions || 'N/A'}, 
-            Peso: ${routine.weight || 'N/A'} kg
-        `;
-
-        routineDiv.appendChild(routineTitle);
-        routineDiv.appendChild(routineDetails);
-        routineList.appendChild(routineDiv);
-    }
-
-    // **Eventos de búsqueda**
-    searchButton.addEventListener('click', searchUser);
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') searchUser();
+        } else {
+            usuariosContainer.innerHTML = `<p style="color:red;">Por favor, inicia sesión para ver los usuarios.</p>`;
+        }
     });
-});
+}
+
+// Cargar usuarios al cargar la página
+cargarUsuarios();
