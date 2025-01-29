@@ -1,5 +1,5 @@
 import app, { db } from "../scripts/firebaseConfig.js";
-import { getAuth, onAuthStateChanged, deleteUser, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, deleteUser, EmailAuthProvider, reauthenticateWithCredential, updateUser } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { collection, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const usuariosContainer = document.getElementById("usuarios-container");
@@ -122,33 +122,47 @@ function verRutinasUsuario(userId) {
 // Función para inhabilitar (desautorizar) al usuario
 async function inhabilitarUsuario(userId) {
     const auth = getAuth();
-    try {
-        // Obtener el usuario actualmente autenticado
-        const user = auth.currentUser;
+    const user = auth.currentUser;
 
-        if (!user) {
-            throw new Error("No se pudo obtener el usuario autenticado.");
+    if (!user) {
+        Swal.fire({
+            title: 'Error',
+            text: "No se encontró un usuario autenticado.",
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+        return;
+    }
+
+    try {
+        // Pedir la contraseña al usuario para reautenticación
+        const password = prompt('Introduce tu contraseña para continuar.');
+
+        if (!password) {
+            throw new Error("Debes ingresar una contraseña para continuar.");
         }
 
-        // Si el usuario no tiene sesión reciente, debe reautenticarse
-        const credential = EmailAuthProvider.credential(user.email, prompt('Introduce tu contraseña para continuar.'));
-        await user.reauthenticateWithCredential(credential);
+        // Crear las credenciales del usuario autenticado
+        const credential = EmailAuthProvider.credential(user.email, password);
+
+        // Reautenticar al usuario
+        await reauthenticateWithCredential(auth.currentUser, credential);
 
         // Deshabilitar la cuenta del usuario en Firebase Authentication
         await updateUser(user.uid, { disabled: true });
-        console.log(`Usuario con ID ${userId} deshabilitado exitosamente.`);
 
-        // Mostrar mensaje de éxito con SweetAlert
+        console.log(`Usuario con ID ${userId} inhabilitado exitosamente.`);
+
         Swal.fire({
             title: 'Usuario inhabilitado',
             text: "El usuario ha sido inhabilitado y no podrá iniciar sesión.",
             icon: 'success',
             confirmButtonText: 'Aceptar'
         });
+
     } catch (error) {
         console.error("Error al inhabilitar el usuario:", error);
 
-        // Mostrar mensaje de error con SweetAlert
         Swal.fire({
             title: 'Error',
             text: "Hubo un error al inhabilitar el usuario. Es posible que necesite reautenticarse.",
@@ -158,49 +172,62 @@ async function inhabilitarUsuario(userId) {
     }
 }
 
-// Función para eliminar completamente al usuario
-async function eliminarUsuario(userId) {
-    const auth = getAuth();
-    try {
-        // Obtener el usuario actualmente autenticado
-        const user = auth.currentUser;
+import { getAuth, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-        if (!user) {
-            throw new Error("No se pudo obtener el usuario autenticado.");
+// Función para eliminar un usuario
+async function eliminarUsuario() {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+        Swal.fire({
+            title: 'Error',
+            text: "No se encontró un usuario autenticado.",
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+        return;
+    }
+
+    try {
+        // Pedir la contraseña al usuario para reautenticación
+        const password = prompt('Introduce tu contraseña para confirmar la eliminación.');
+
+        if (!password) {
+            throw new Error("Debes ingresar una contraseña para continuar.");
         }
 
-        // Si el usuario no tiene sesión reciente, debe reautenticarse
-        const credential = EmailAuthProvider.credential(user.email, prompt('Introduce tu contraseña para continuar.'));
-        await user.reauthenticateWithCredential(credential);
+        // Crear las credenciales del usuario autenticado
+        const credential = EmailAuthProvider.credential(user.email, password);
+
+        // Reautenticar al usuario
+        await reauthenticateWithCredential(auth.currentUser, credential);
 
         // Eliminar la cuenta del usuario
         await deleteUser(user);
-        console.log(`Usuario con ID ${userId} eliminado de Firebase Authentication.`);
 
-        // Eliminar el documento del usuario en Firestore
-        await deleteDoc(doc(db, "usuarios", userId));
-        console.log(`Documento de usuario con ID ${userId} eliminado de Firestore.`);
+        console.log(`Usuario ${user.email} eliminado exitosamente.`);
 
-        // Mostrar mensaje de éxito con SweetAlert
         Swal.fire({
             title: 'Usuario eliminado',
-            text: "El usuario ha sido completamente eliminado.",
+            text: "La cuenta ha sido eliminada permanentemente.",
             icon: 'success',
             confirmButtonText: 'Aceptar'
         });
+
     } catch (error) {
         console.error("Error al eliminar el usuario:", error);
 
-        // Mostrar mensaje de error con SweetAlert
         Swal.fire({
             title: 'Error',
-            text: "Hubo un error al eliminar el usuario. Es posible que necesite reautenticarse.",
+            text: error.message.includes("auth/requires-recent-login")
+                ? "Por seguridad, debes volver a iniciar sesión antes de eliminar la cuenta."
+                : "Hubo un error al eliminar la cuenta.",
             icon: 'error',
             confirmButtonText: 'Aceptar'
         });
     }
 }
-
 
 // Cargar usuarios al cargar la página
 cargarUsuarios();
