@@ -1,6 +1,6 @@
 import app, { db } from "../scripts/firebaseConfig.js";
-import { getAuth, onAuthStateChanged, deleteUser, EmailAuthProvider, reauthenticateWithCredential, updateUser } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const usuariosContainer = document.getElementById("usuarios-container");
 
@@ -41,7 +41,7 @@ async function cargarUsuarios() {
                 let html = "";
                 usuariosSnapshot.forEach(doc => {
                     const userData = doc.data();
-                    const userId = doc.id;  // Agregar el ID del usuario
+                    const userId = doc.id;
                     const nombre = userData.nombre || "Sin nombre";
                     const apellido = userData.apellido || "Sin apellido";
                     const email = userData.email || "No disponible";
@@ -49,13 +49,11 @@ async function cargarUsuarios() {
                     const fechaNacimiento = userData.fechaNacimiento || "No disponible";
                     const genero = userData.genero || "No disponible";
                     
-                    // Calcular edad si se tiene fecha de nacimiento
                     let edad = "No disponible";
                     if (fechaNacimiento !== "No disponible") {
                         edad = calcularEdad(fechaNacimiento);
                     }
 
-                    // Formatear la fecha de nacimiento si está disponible
                     let fechaFormateada = "No disponible";
                     if (fechaNacimiento !== "No disponible") {
                         fechaFormateada = formatearFecha(fechaNacimiento);
@@ -69,9 +67,6 @@ async function cargarUsuarios() {
                             <p><strong>Fecha de nacimiento:</strong> ${fechaFormateada}</p>
                             <p><strong>Edad:</strong> ${edad}</p>
                             <p><strong>Género:</strong> ${genero}</p>
-
-                            <button class="delete-btn" data-user-id="${userId}">Eliminar</button>
-                            <button class="disable-btn" data-user-id="${userId}">Inhabilitar</button>
                             <button class="view-rutinas-btn" data-user-id="${userId}">Ver Rutinas</button>
                         </div>
                     `;
@@ -79,28 +74,11 @@ async function cargarUsuarios() {
 
                 usuariosContainer.innerHTML = html;
 
-                // Agregar eventos a los botones después de cargar los usuarios
-                const eliminarButtons = document.querySelectorAll('.delete-btn');
-                eliminarButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        const userId = button.dataset.userId;
-                        eliminarUsuario(userId);  // Llamar a la función eliminarUsuario
-                    });
-                });
-
-                const inhabilitarButtons = document.querySelectorAll('.disable-btn');
-                inhabilitarButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        const userId = button.dataset.userId;
-                        inhabilitarUsuario(userId);  // Llamar a la función inhabilitarUsuario
-                    });
-                });
-
                 const verRutinasButtons = document.querySelectorAll('.view-rutinas-btn');
                 verRutinasButtons.forEach(button => {
                     button.addEventListener('click', function() {
                         const userId = button.dataset.userId;
-                        verRutinasUsuario(userId);  // Llamar a la función verRutinasUsuario
+                        verRutinasUsuario(userId);
                     });
                 });
 
@@ -117,114 +95,6 @@ async function cargarUsuarios() {
 // Función para ver rutinas (redirige a una nueva página con el ID del usuario)
 function verRutinasUsuario(userId) {
     window.location.href = `rutinas-usuario.html?userId=${userId}`;
-}
-
-// Función para inhabilitar (desautorizar) al usuario
-async function inhabilitarUsuario(userId) {
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (!user) {
-        Swal.fire({
-            title: 'Error',
-            text: "No se encontró un usuario autenticado.",
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-        });
-        return;
-    }
-
-    try {
-        // Pedir la contraseña al usuario para reautenticación
-        const password = prompt('Introduce tu contraseña para continuar.');
-
-        if (!password) {
-            throw new Error("Debes ingresar una contraseña para continuar.");
-        }
-
-        // Crear las credenciales del usuario autenticado
-        const credential = EmailAuthProvider.credential(user.email, password);
-
-        // Reautenticar al usuario
-        await reauthenticateWithCredential(auth.currentUser, credential);
-
-        // Deshabilitar la cuenta del usuario en Firebase Authentication
-        await updateUser(user.uid, { disabled: true });
-
-        console.log(`Usuario con ID ${userId} inhabilitado exitosamente.`);
-
-        Swal.fire({
-            title: 'Usuario inhabilitado',
-            text: "El usuario ha sido inhabilitado y no podrá iniciar sesión.",
-            icon: 'success',
-            confirmButtonText: 'Aceptar'
-        });
-
-    } catch (error) {
-        console.error("Error al inhabilitar el usuario:", error);
-
-        Swal.fire({
-            title: 'Error',
-            text: "Hubo un error al inhabilitar el usuario. Es posible que necesite reautenticarse.",
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-        });
-    }
-}
-
-// Función para eliminar un usuario
-async function eliminarUsuario() {
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (!user) {
-        Swal.fire({
-            title: 'Error',
-            text: "No se encontró un usuario autenticado.",
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-        });
-        return;
-    }
-
-    try {
-        // Pedir la contraseña al usuario para reautenticación
-        const password = prompt('Introduce tu contraseña para confirmar la eliminación.');
-
-        if (!password) {
-            throw new Error("Debes ingresar una contraseña para continuar.");
-        }
-
-        // Crear las credenciales del usuario autenticado
-        const credential = EmailAuthProvider.credential(user.email, password);
-
-        // Reautenticar al usuario
-        await reauthenticateWithCredential(auth.currentUser, credential);
-
-        // Eliminar la cuenta del usuario
-        await deleteUser(user);
-
-        console.log(`Usuario ${user.email} eliminado exitosamente.`);
-
-        Swal.fire({
-            title: 'Usuario eliminado',
-            text: "La cuenta ha sido eliminada permanentemente.",
-            icon: 'success',
-            confirmButtonText: 'Aceptar'
-        });
-
-    } catch (error) {
-        console.error("Error al eliminar el usuario:", error);
-
-        Swal.fire({
-            title: 'Error',
-            text: error.message.includes("auth/requires-recent-login")
-                ? "Por seguridad, debes volver a iniciar sesión antes de eliminar la cuenta."
-                : "Hubo un error al eliminar la cuenta.",
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-        });
-    }
 }
 
 // Cargar usuarios al cargar la página
