@@ -1,6 +1,6 @@
 import app, { db } from "../scripts/firebaseConfig.js";
-import { getAuth, onAuthStateChanged, updateEmail, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const usuariosContainer = document.getElementById("usuarios-container");
 
@@ -17,36 +17,40 @@ function calcularEdad(fechaNacimiento) {
     return age;
 }
 
+//funcion para eliminar usuario
+async function eliminarUsuario(uid) {
+    if (confirm("¿Estás seguro de que quieres eliminar este usuario?")) {
+        try {
+            await deleteDoc(doc(db, "usuarios", uid));
+            alert("Usuario eliminado correctamente.");
+            cargarUsuarios();
+        } catch (error) {
+            console.error("Error al eliminar usuario:", error);
+            alert("Error al eliminar usuario.");
+        }
+    }
+}
+
+//funcion para inhabilitar usuario
+async function inhabilitarUsuario(uid) {
+    try {
+        await updateDoc(doc(db, "usuarios", uid), { inhabilitado: true });
+        alert("Usuario inhabilitado correctamente.");
+        cargarUsuarios();
+    } catch (error) {
+        console.error("Error al inhabilitar usuario:", error);
+        alert("Error al inhabilitar usuario.");
+    }
+}
+
+function verRutina(uid) {
+    window.location.href = `rutina.html?uid=${uid}`;
+}
+
 // Función para formatear la fecha en formato DD/MM/YYYY
 function formatearFecha(fecha) {
     const [year, month, day] = fecha.split("-").map(Number);
     return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-}
-
-// Función para actualizar el campo emailVerificado en Firestore
-async function actualizarEmailVerificado() {
-    const auth = getAuth(app);
-    const user = auth.currentUser;
-
-    if (user) {
-        try {
-            console.log("Verificando correo para el usuario:", user.email); // Log para verificar el estado del usuario
-            // Esperar hasta que el correo esté verificado
-            if (user.emailVerified) {
-                // Actualizamos el campo 'emailVerificado' en Firestore (ahora como booleano)
-                const userRef = doc(db, "usuarios", user.uid); // Obtener el documento del usuario autenticado
-                console.log("Actualizando Firestore para el usuario:", user.uid); // Log del usuario
-                await updateDoc(userRef, {
-                    emailVerificado: true, // Usamos un valor booleano en lugar de una cadena
-                });
-                console.log("Campo 'emailVerificado' actualizado a 'true' en Firestore.");
-            } else {
-                console.log("El correo aún no está verificado.");
-            }
-        } catch (error) {
-            console.error("Error al actualizar el campo 'emailVerificado' en Firestore:", error);
-        }
-    }
 }
 
 // Función para cargar usuarios si el usuario está autenticado
@@ -57,9 +61,6 @@ async function cargarUsuarios() {
             console.log("Usuario autenticado:", user.email); // Log del usuario autenticado
 
             try {
-                // Asegurarnos de que el estado 'emailVerificado' en Firestore se actualice
-                await actualizarEmailVerificado();
-
                 const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
                 
                 if (usuariosSnapshot.empty) {
@@ -70,12 +71,15 @@ async function cargarUsuarios() {
                 let html = "";
                 usuariosSnapshot.forEach(doc => {
                     const userData = doc.data();
+                    const uid = docSnap.id;
                     const nombre = userData.nombre || "Sin nombre";
                     const apellido = userData.apellido || "Sin apellido";
                     const email = userData.email || "No disponible";
                     const celular = userData.celular || "No disponible";
                     const fechaNacimiento = userData.fechaNacimiento || "No disponible";
                     const genero = userData.genero || "No disponible";
+                    const inhabilitado = userData.inhabilitado ? "Sí" : "No";
+
                     
                     // Calcular edad si se tiene fecha de nacimiento
                     let edad = "No disponible";
@@ -89,28 +93,39 @@ async function cargarUsuarios() {
                         fechaFormateada = formatearFecha(fechaNacimiento);
                     }
 
-                    // Comparar si el correo está verificado (en Firestore y en el usuario autenticado)
-                    const emailVerificado = userData.emailVerificado ? "Sí" : "No"; // Usamos el valor booleano de Firestore y lo mostramos como cadena
-
-                    // Log para ver el estado de emailVerified y los datos
-                    console.log("Datos de Firestore para el usuario:", userData.email);
-                    console.log("Estado de emailVerified del usuario autenticado:", user.emailVerified);
-                    console.log("Resultado final email validado:", emailVerificado);
-
                     html += `
-                        <div class="usuario-card">
+                            <div class="usuario-card" id="usuario-${uid}">
                             <h2>${nombre} ${apellido}</h2>
                             <p><strong>Email:</strong> ${email}</p>
                             <p><strong>Celular:</strong> ${celular}</p>
                             <p><strong>Fecha de nacimiento:</strong> ${fechaFormateada}</p>
                             <p><strong>Edad:</strong> ${edad}</p>
                             <p><strong>Género:</strong> ${genero}</p>
-                            <p><strong>Email validado:</strong> ${emailVerificado}</p>
+                            <p><strong>Inhabilitado:</strong> ${inhabilitado}</p>
+                            <button onclick="eliminarUsuario('${uid}')">Eliminar</button>
+                            <button onclick="inhabilitarUsuario('${uid}')">Inhabilitar</button>
+                            <button onclick="verRutina('${uid}')">Ver Rutina</button>
                         </div>
                     `;
                 });
 
                 usuariosContainer.innerHTML = html;
+
+                // Asignar eventos a los botones después de renderizar el HTML
+                document.querySelectorAll(".btn-eliminar").forEach(button => {
+                    button.addEventListener("click", () => eliminarUsuario(button.dataset.uid));
+                });
+
+                document.querySelectorAll(".btn-inhabilitar").forEach(button => {
+                    button.addEventListener("click", () => inhabilitarUsuario(button.dataset.uid));
+                });
+
+                document.querySelectorAll(".btn-ver-rutina").forEach(button => {
+                    button.addEventListener("click", () => {
+                        window.location.href = `rutina.html?uid=${button.dataset.uid}`;
+                    });
+                });
+
             } catch (error) {
                 console.error("Error al cargar usuarios:", error);
                 usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
