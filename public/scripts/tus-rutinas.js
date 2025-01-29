@@ -533,13 +533,29 @@ async function deleteRoutine(day) {
 
         if (!querySnapshot.empty) {
             const routineDoc = querySnapshot.docs[0];
+
+            // Eliminar la rutina directamente sin pedir confirmación nuevamente
             await deleteDoc(routineDoc.ref);
-            return true; // Éxito
+
+            // Notificar al usuario sobre el éxito de la operación
+            Swal.fire({
+                title: "Éxito",
+                text: `La rutina para el día ${day} ha sido eliminada.`,
+                icon: "success",
+            }).then(() => location.reload()); // Recarga la página después de eliminar la rutina
         } else {
-            return false; // No se encontró la rutina
+            Swal.fire({
+                title: "Error",
+                text: "No se encontró la rutina para el día especificado.",
+                icon: "error",
+            });
         }
     } catch (error) {
+        Swal.fire({
+            title: "Error",
+            text: "Ocurrió un error al eliminar la rutina.",
+            icon: "error",
+        });
         console.error("Error al eliminar la rutina:", error);
-        return false; // Error al eliminar
         }
     }

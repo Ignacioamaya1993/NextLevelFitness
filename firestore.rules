@@ -2,34 +2,34 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Definir una lista de administradores
+    function isAdmin(userEmail) {
+      return userEmail == "ignacioamaya04@gmail.com" || userEmail == "soutrelleagustin64@gmail.com";
+    }
+
     // Reglas para la colección "categories"
     match /categories/{category} {
-      allow read: if request.auth != null; // Permitir lectura de categorías para usuarios autenticados
+      allow read: if request.auth != null || isAdmin(request.auth.token.email);
 
       // Permitir lectura en subcolecciones dentro de cada categoría
       match /{exerciseId}/{exerciseDocId} {
-        allow read: if request.auth != null;
+        allow read: if request.auth != null || isAdmin(request.auth.token.email);
       }
     }
 
     // Reglas para la colección "usuarios"
     match /usuarios/{userId} {
-      // Permitir lectura y escritura solo si el usuario es el dueño de su cuenta o un administrador
-      allow read, write: if request.auth != null;
-
-      // Permitir que los administradores puedan leer todos los usuarios
-      allow read: if request.auth != null;
+      // Permitir lectura y escritura si el usuario es el dueño de su cuenta o un administrador
+      allow read, write: if request.auth != null || isAdmin(request.auth.token.email);
     }
 
     // Reglas para la colección "routines"
     match /routines/{routineId} {
       // Permitir lectura si el usuario es el propietario de la rutina o un administrador
-      allow read: if request.auth != null;
+      allow read: if request.auth != null || isAdmin(request.auth.token.email);
 
       // Permitir creación, actualización y eliminación solo al dueño de la rutina o un administrador
-      allow create: if request.auth != null;
-      allow update: if request.auth != null;
-      allow delete: if request.auth != null;
+      allow create, update, delete: if request.auth != null || isAdmin(request.auth.token.email);
     }
   }
 }
