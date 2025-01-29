@@ -3,24 +3,21 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-
-"hosting": {
-  "public": "public",
-  "ignore": [
-    "firebase.json",
-    "**/.*",
-    "**/node_modules/**"
-  ],
-
-  "rewrites": [
-    {
-      "source": "/pages/**",
-      "destination": "/index.html"
-    }
-  ],
-
-  "errorPages": {
-    "404": "/404.html"
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/pages/**",
+        "destination": "/index.html"
+      }
+    ],
+    "errorPages": {
+      "404": "/404.html"
     }
   }
 }
