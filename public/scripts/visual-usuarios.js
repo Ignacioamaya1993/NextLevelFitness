@@ -130,10 +130,20 @@ async function inhabilitarUsuario(userId) {
         await auth.updateUser(user.uid, { disabled: true });
         console.log(`Usuario con ID ${userId} deshabilitado exitosamente.`);
 
-        alert("El usuario ha sido deshabilitado y no podrá iniciar sesión.");
+        Swal.fire({
+            title: 'Usuario inhabilitado',
+            text: "El usuario ha sido deshabilitado y no podrá iniciar sesión.",
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        });
     } catch (error) {
         console.error("Error al inhabilitar el usuario:", error);
-        alert("Hubo un error al inhabilitar el usuario.");
+        Swal.fire({
+            title: 'Error',
+            text: "Hubo un error al inhabilitar el usuario.",
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
     }
 }
 
@@ -152,10 +162,20 @@ async function eliminarUsuario(userId) {
         await deleteDoc(doc(db, "usuarios", userId));
         console.log(`Documento de usuario con ID ${userId} eliminado de Firestore.`);
 
-        alert("El usuario ha sido completamente eliminado.");
+        Swal.fire({
+            title: 'Usuario eliminado',
+            text: "El usuario ha sido completamente eliminado.",
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        });
     } catch (error) {
         console.error("Error al eliminar el usuario:", error);
-        alert("Hubo un error al eliminar el usuario.");
+        Swal.fire({
+            title: 'Error',
+            text: "Hubo un error al eliminar el usuario.",
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
     }
 }
 
