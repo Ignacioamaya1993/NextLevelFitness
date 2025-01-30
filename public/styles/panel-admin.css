@@ -61,7 +61,7 @@ body {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    background-color: rgb(224, 13, 13); /* Color con transparencia */
+    background-color: rgba(255, 0, 0, 0.5); /* Rojo translúcido (opacidad 0.5) */
     color: white;
     border: none;
     padding: 10px 15px;
@@ -72,7 +72,7 @@ body {
 }
 
 .logout-button:hover {
-    background-color: rgba(74, 7, 133, 0.8); /* Oscurecer al pasar el mouse con un poco más de opacidad */
+    background-color: rgba(255, 0, 0, 0.7); /* Rojo más opaco al pasar el mouse */
 }
 
 /* Estilo del menú de administración */
