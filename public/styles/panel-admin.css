@@ -9,16 +9,17 @@ body {
 
 /* Banner de administración */
 .admin-banner {
-    background: url('../assets/images/banner/banner-panel-admin.webp') no-repeat center center/cover;
-    padding: 100px 0;
+    position: relative;
     text-align: center;
-    color: white;
-}
-
-.admin-banner h2 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin: 0;
+    background-image: url('../assets/images/banner/banner-panel-admin.webp'); /* Ruta de tu imagen */
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px; /* Bordes redondeados */
+    padding: 60px 20px; /* Ajusta el espaciado */
+    color: #ffffff; /* Color del texto */
+    max-width: 1200px; /* Ancho máximo */
+    margin: 0 auto; /* Centrado horizontal */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar */
 }
 
 /* Contenedor principal del panel */
