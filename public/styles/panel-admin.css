@@ -7,18 +7,15 @@ body {
     color: #333;
 }
 
-/* Banner de administración */
+/* Ajuste del banner de administración */
 .admin-banner {
-    position: relative;
-    text-align: center;
     background-image: url('../assets/images/banner/banner-panel-admin.webp'); /* Ruta de tu imagen */
     background-size: cover;
     background-position: center;
     border-radius: 15px; /* Bordes redondeados */
-    padding: 60px 20px; /* Ajusta el espaciado */
-    color: #ffffff; /* Color del texto */
-    max-width: 1200px; /* Ancho máximo */
-    margin: 0 auto; /* Centrado horizontal */
+    padding: 60px 20px; /* Ajusta el espaciado interno */
+    max-width: 1000px; /* Reduce el ancho máximo */
+    margin: 40px auto; /* Aumenta la separación respecto al nav */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar */
 }
 
