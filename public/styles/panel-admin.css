@@ -1,3 +1,6 @@
+/* Importando la fuente "Cinzel" desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel&display=swap');
+
 /* Estilos globales */
 body {
     font-family: 'Roboto', sans-serif;
@@ -21,6 +24,19 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin: 20px auto; /* Centrado */
     position: relative;
+}
+
+/* Posicionamos el texto "ADMINISTRADOR" en la esquina superior derecha */
+.admin-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: 'Cinzel', serif; /* Estilo gótico */
+    font-size: 60px; /* Tamaño de fuente */
+    font-weight: bold;
+    color: white; /* Puedes cambiar el color según el diseño */
+    padding: 5px 10px; /* Espaciado alrededor del texto */
+    border-radius: 5px; /* Bordes redondeados para el fondo */
 }
 
 .admin-banner img {
