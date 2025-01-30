@@ -94,7 +94,8 @@ async function cargarUsuarios() {
 
 // Función para ver rutinas (redirige a una nueva página con el ID del usuario)
 function verRutinasUsuario(userId) {
-    window.location.href = `rutinas-usuario.html?userId=${userId}`;
+    localStorage.setItem("selectedUserId", userId); // Guarda el ID del usuario
+    window.location.href = "ver-rutinas.html"; // Redirige sin parámetros en la URL
 }
 
 // Cargar usuarios al cargar la página

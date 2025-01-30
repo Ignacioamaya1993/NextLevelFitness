@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutinas de Usuario</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/ver-rutinas.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 🟢 NAVBAR GLOBAL (Se maneja desde global.css) -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="../assets/images/logos/nextlevel1.png" alt="Next Level Fitness Logo">
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="panel-admin.html">Inicio</a></li>
+                    <li><a href="visual-usuarios.html">Usuarios</a></li>
+                    <li><a href="ver-rutinas.html" class="active">Rutinas</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 📌 SECCIÓN PRINCIPAL -->
+    <main>
+        <h1>Rutinas del Usuario</h1>
+        <div id="routine-list"></div> <!-- Aquí se generarán las rutinas dinámicamente -->
+    </main>
+
+    <!-- Popup para editar rutina -->
+    <div id="edit-popup" class="popup hidden" aria-hidden="true" role="dialog">
+        <div id="popup-content" class="popup-content">
+            <!-- El contenido del popup se llenará dinámicamente desde JavaScript -->
+            <div>
+                <label for="series-0">Series:</label>
+                <input id="series-0" type="number" min="1" placeholder="Ingresa las series" required>
+            </div>
+            <div>
+                <label for="reps-0">Repeticiones:</label>
+                <input id="reps-0" type="number" min="1" placeholder="Ingresa las repeticiones" required>
+            </div>
+            <div>
+                <label for="weight-0">Peso:</label>
+                <input id="weight-0" type="number" min="1" placeholder="Ingresa el peso" required>
+            </div>
+            <!-- Agregar el campo de Información adicional -->
+            <div>
+                <label for="additionalData-0">Información adicional:</label>
+                <textarea id="additionalData-0" rows="4" placeholder="Ingresa información adicional aquí"></textarea>
+            </div>
+            <!-- Aquí pueden agregarse más campos dinámicos si se requieren -->
+        </div>
+    </div>
+
+    <!-- 🔵 FOOTER GLOBAL (Se maneja desde global.css) -->
+    <footer>
+        <div class="footer-container">
+            <p class="footer-info">© 2025 Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="../scripts/firebaseConfig.js"></script>
+    <script type="module" src="../scripts/ver-rutinas.js"></script>
+
+</body>
+</html>
