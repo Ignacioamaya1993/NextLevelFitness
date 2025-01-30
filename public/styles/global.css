@@ -123,53 +123,63 @@ footer {
     background-color: #34495e; /* Azul grisáceo oscuro */
     color: #ecf0f1; /* Blanco suave */
     font-size: 0.9rem;
-    padding: 20px 0;
+    padding: 15px 0; /* Reducimos el padding */
     text-align: center;
 }
 
+/* Estructura del footer en fila */
 .footer-container {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between; /* Distribuye los elementos */
     align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px; /* Espaciado interno */
+}
+
+/* Alineamos cada sección correctamente */
+.footer-info {
+    text-align: left;
+    flex: 1;
+}
+
+.footer-social {
     text-align: center;
+    flex: 1;
+    display: flex;
+    justify-content: center;
     gap: 15px;
 }
 
-.footer-info {
-    font-size: 0.9rem;
-    line-height: 1.5;
+.footer-design {
+    text-align: right;
+    flex: 1;
+    font-size: 0.8rem;
+    color: #bdc3c7;
 }
 
+/* Enlaces y efectos */
 .footer-info a {
-    color: #ecf0f1; /* Blanco suave */
+    color: #ecf0f1;
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s;
 }
 
 .footer-info a:hover {
-    color: #a8dadc; /* Azul claro para hover */
+    color: #a8dadc;
 }
 
-.footer-social {
-    display: flex;
-    gap: 15px;
-}
-
+/* Íconos */
 .social-icon {
-    color: #ecf0f1; /* Blanco suave */
+    color: #ecf0f1;
     font-size: 1.5rem;
     text-decoration: none;
     transition: color 0.3s;
 }
 
 .social-icon:hover {
-    color: #a8dadc; /* Azul claro para hover */
-}
-
-.footer-design {
-    font-size: 0.8rem;
-    color: #bdc3c7; /* Gris claro para texto secundario */
+    color: #a8dadc;
 }
 
 /* Media Query para pantallas pequeñas */
@@ -186,5 +196,24 @@ footer {
     .nav-menu {
         flex-direction: column; /* Cambia el menú a una columna */
         gap: 5px; /* Espaciado reducido */
+    }
+
+    /* Ajustes para el Footer en pantallas pequeñas */
+    .footer-container {
+        flex-direction: column; /* Cambiamos de fila a columna */
+        text-align: center;
+        gap: 10px;
+    }
+
+    .footer-info, 
+    .footer-social, 
+    .footer-design {
+        flex: none;
+        width: 100%;
+    }
+
+    .footer-social {
+        justify-content: center; /* Asegura que los iconos estén centrados */
+        gap: 10px;
     }
 }
