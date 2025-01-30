@@ -1,11 +1,9 @@
 import app from "../scripts/firebaseConfig.js"; 
 import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
 
 const auth = getAuth(app);
-const db = getFirestore(app);
 
+// No es necesario mantener los correos de los administradores aquí si ya los manejas desde las reglas de seguridad
 document.getElementById("admin-login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     
@@ -16,14 +14,12 @@ document.getElementById("admin-login-form").addEventListener("submit", async (e)
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Verificar el acceso usando Firestore (las reglas de seguridad validan si es admin)
-        const userDoc = await getDoc(doc(db, "usuarios", user.uid)); // Obtener el documento del usuario
-
-        if (userDoc.exists()) {
-            // El usuario tiene acceso basado en las reglas de seguridad
+        // Verifica si el usuario es administrador (esto lo puedes manejar en las reglas de Firebase)
+        if (user.email === "ignacioamaya04@gmail.com" || user.email === "soutrelleagustin64@gmail.com") {
+            // Redirige al panel de administración
             window.location.href = "panel-admin.html";
         } else {
-            // En caso de no encontrar el usuario o si las reglas de seguridad lo bloquean
+            // Muestra el mensaje de acceso denegado con SweetAlert
             await Swal.fire({
                 icon: 'error',
                 title: 'Acceso denegado',
