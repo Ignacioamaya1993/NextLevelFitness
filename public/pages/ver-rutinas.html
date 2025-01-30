@@ -17,6 +17,9 @@
             <div class="logo">
                 <img src="../assets/images/logos/nextlevel1.png" alt="Next Level Fitness Logo">
             </div>
+
+            <div id="overlay" class="hidden"></div>
+
             <nav>
                 <ul class="nav-menu">
                     <li><a href="panel-admin.html">Inicio</a></li>
@@ -29,9 +32,13 @@
 
     <!-- 📌 SECCIÓN PRINCIPAL -->
     <main>
-        <h1>Rutinas del Usuario</h1>
-        <div id="routine-list"></div> <!-- Aquí se generarán las rutinas dinámicamente -->
-    </main>
+        <section class="routine-viewer hidden" id="routine-viewer">
+            <h2>Rutinas del Usuario</h2>
+            <p id="no-routines-message" class="hidden">No hay rutinas creadas para este usuario.</p>
+            <div id="routine-list">
+                <!-- Las rutinas creadas se mostrarán aquí -->
+            </div>
+        </section>
 
     <!-- Popup para editar rutina -->
     <div id="edit-popup" class="popup hidden" aria-hidden="true" role="dialog">
@@ -57,6 +64,8 @@
             <!-- Aquí pueden agregarse más campos dinámicos si se requieren -->
         </div>
     </div>
+
+</main>
 
     <!-- 🔵 FOOTER GLOBAL (Se maneja desde global.css) -->
     <footer>
