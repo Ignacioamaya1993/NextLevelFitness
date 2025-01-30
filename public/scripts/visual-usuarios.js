@@ -137,7 +137,9 @@ const clearSearchButton = document.getElementById("clear-search");
 clearSearchButton.addEventListener("click", () => {
     searchInput.value = ""; // Limpiar el campo de búsqueda
     searchInput.focus(); // Poner el foco en el campo de búsqueda
-    mostrarUsuarios(usuarios); // Mostrar todos los usuarios nuevamente
+    
+    // Mostrar todos los usuarios nuevamente
+    mostrarUsuarios(usuarios);
 });
 
 // Función para ver rutinas (redirige a una nueva página con el ID del usuario)
