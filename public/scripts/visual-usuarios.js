@@ -125,6 +125,16 @@ async function cargarUsuarios() {
     });
 }
 
+// Seleccionamos el botón de borrar búsqueda
+const clearSearchButton = document.getElementById("clear-search");
+
+// Agregar el evento de clic a la "X"
+clearSearchButton.addEventListener("click", () => {
+    searchInput.value = ""; // Limpiar el campo de búsqueda
+    searchInput.focus(); // Poner el foco en el campo de búsqueda
+    mostrarUsuarios(usuarios); // Mostrar todos los usuarios nuevamente
+});
+
 // Función para ver rutinas (redirige a una nueva página con el ID del usuario)
 function verRutinasUsuario(userId) {
     localStorage.setItem("selectedUserId", userId); // Guarda el ID del usuario
