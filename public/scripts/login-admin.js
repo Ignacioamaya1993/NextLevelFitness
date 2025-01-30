@@ -1,10 +1,9 @@
 import app from "../scripts/firebaseConfig.js"; 
 import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const auth = getAuth(app);
-
-// Lista de correos de administradores
-const adminEmails = ["ignacioamaya04@gmail.com", "soutrelleagustin64@gmail.com"];
+const db = getFirestore(app);
 
 document.getElementById("admin-login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -16,14 +15,27 @@ document.getElementById("admin-login-form").addEventListener("submit", async (e)
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        if (adminEmails.includes(user.email)) {
-            // Redirige al panel de administración
+        // Verificar si el usuario tiene permisos de administrador a través de Firestore
+        const userDoc = await getDoc(doc(db, "usuarios", user.uid)); // Asumiendo que cada usuario tiene un documento en "usuarios"
+        
+        if (userDoc.exists() && userDoc.data().isAdmin) {
+            // Redirige al panel de administración si el usuario es admin
             window.location.href = "panel-admin.html";
         } else {
-            document.getElementById("login-error").innerText = "Acceso denegado. No eres administrador.";
+            // Muestra un mensaje de acceso denegado con SweetAlert
+            await Swal.fire({
+                icon: 'error',
+                title: 'Acceso denegado',
+                text: 'No eres administrador.',
+            });
             await signOut(auth); // Cierra sesión si no es admin
         }
     } catch (error) {
-        document.getElementById("login-error").innerText = "Error al iniciar sesión: " + error.message;
+        // Muestra el error de inicio de sesión con SweetAlert
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error al iniciar sesión',
+            text: error.message,
+        });
     }
 });

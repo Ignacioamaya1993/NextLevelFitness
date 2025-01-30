@@ -7,6 +7,14 @@ body {
     color: #333;
 }
 
+main {
+    /* Usar flexbox para centrar el contenido dentro del main */
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    height: 100vh; /* Asegura que el main ocupe toda la altura de la ventana */
+}
+
 .login-container {
     background: white;
     padding: 40px;
