@@ -13,10 +13,14 @@ body {
     background-size: cover;
     background-position: center;
     border-radius: 15px; /* Bordes redondeados */
-    padding: 60px 20px; /* Ajusta el espaciado interno */
-    max-width: 1000px; /* Reduce el ancho máximo */
-    margin: 40px auto; /* Aumenta la separación respecto al nav */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar */
+    padding: 100px 20px; /* Aumentar altura */
+    max-width: 90%; /* Ajusta el ancho */
+    height: 250px; /* Aumenta la altura */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 50px auto; /* Más separación respecto al nav */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
 }
 
 /* Contenedor principal del panel */
