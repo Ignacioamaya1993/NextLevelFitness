@@ -5,6 +5,9 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/f
 const usuariosContainer = document.getElementById("usuarios-container");
 const searchInput = document.getElementById("search-input"); // Campo de búsqueda
 
+// Variable global para almacenar todos los usuarios
+let usuarios = [];
+
 // Función para calcular la edad basada en la fecha de nacimiento
 function calcularEdad(fechaNacimiento) {
     const [year, month, day] = fechaNacimiento.split("-").map(Number);
@@ -40,7 +43,9 @@ async function cargarUsuarios() {
                 }
 
                 let html = "";
-                const usuarios = [];
+
+                // Reiniciar la lista de usuarios y agregar los usuarios nuevos
+                usuarios = [];
 
                 usuariosSnapshot.forEach(doc => {
                     const userData = doc.data();
