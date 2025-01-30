@@ -79,3 +79,31 @@ body {
 .user-actions button:nth-child(1) {
     background-color: #4CAF50; /* Verde para ver rutinas */
 }
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+#search-input {
+    padding: 10px;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#clear-search {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 5px;
+}
+
+#clear-search:hover {
+    background: #d32f2f;
+}
