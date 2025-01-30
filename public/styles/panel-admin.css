@@ -104,7 +104,7 @@ body {
     /* Ajustamos la imagen para que ocupe más espacio vertical */
     .admin-banner img {
         width: 100%; /* Aseguramos que ocupe todo el ancho */
-        height: 60vh; /* La altura de la imagen será el 60% del alto de la ventana */
+        height: 35vh; /* La altura de la imagen será el 60% del alto de la ventana */
     }
 
     /* Ajustamos la posición del texto "ADMINISTRADOR" en dispositivos móviles */
@@ -116,7 +116,7 @@ body {
 
     /* Ajustes adicionales de los elementos */
     .admin-banner {
-        width: 100%; /* Ajustamos el ancho al 100% en pantallas pequeñas */
+        width: 100%; /* Ajustamos el ancho al 70% en pantallas pequeñas */
         max-width: none; /* Sin límite de ancho máximo */
         padding: 10px; /* Espaciado interno ajustado */
     }
