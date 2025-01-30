@@ -101,6 +101,27 @@ body {
 
 /* Responsividad */
 @media (max-width: 768px) {
+    /* Ajustamos la imagen para que ocupe más espacio vertical */
+    .admin-banner img {
+        width: 100%; /* Aseguramos que ocupe todo el ancho */
+        height: 60vh; /* La altura de la imagen será el 60% del alto de la ventana */
+    }
+
+    /* Ajustamos la posición del texto "ADMINISTRADOR" en dispositivos móviles */
+    .admin-label {
+        font-size: 40px; /* Reducimos el tamaño de la fuente */
+        top: 20px; /* Lo movemos un poco más abajo */
+        right: 20px; /* Lo movemos hacia la derecha */
+    }
+
+    /* Ajustes adicionales de los elementos */
+    .admin-banner {
+        width: 100%; /* Ajustamos el ancho al 100% en pantallas pequeñas */
+        max-width: none; /* Sin límite de ancho máximo */
+        padding: 10px; /* Espaciado interno ajustado */
+    }
+
+    /* Ajustamos el tamaño del menú de administración */
     .admin-menu {
         flex-direction: column;
     }
@@ -110,7 +131,11 @@ body {
         text-align: center;
     }
 
-    #logout {
-        width: 100%;
+    /* Aseguramos que el botón de logout también sea responsive */
+    .logout-button {
+        bottom: 10px;
+        right: 10px;
+        font-size: 16px;
+        padding: 12px 18px;
     }
 }
