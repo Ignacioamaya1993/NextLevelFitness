@@ -9,18 +9,24 @@ body {
 
 /* Ajuste del banner de administración */
 .admin-banner {
-    background-image: url('../assets/images/banner/banner-panel-admin.webp'); /* Ruta de tu imagen */
-    background-size: cover;
-    background-position: center;
-    border-radius: 15px; /* Bordes redondeados */
-    padding: 100px 20px; /* Aumentar altura */
-    max-width: 90%; /* Ajusta el ancho */
-    height: 250px; /* Aumenta la altura */
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 50px auto; /* Más separación respecto al nav */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+    width: 80vw; /* Ajusta el ancho al 80% de la pantalla */
+    max-width: 1200px; /* Evita que sea demasiado grande en pantallas grandes */
+    height: auto; /* Altura proporcional */
+    padding: 0px; /* Espaciado interno */
+    background: none; /* Eliminamos el background-image */
+    border-radius: 15px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin: 20px auto; /* Centrado */
+    position: relative;
+}
+
+.admin-banner img {
+    width: 100%; /* Imagen ocupa todo el ancho disponible */
+    height: auto; /* Mantiene la proporción */
+    border-radius: 15px; /* Opcional, si quieres bordes redondeados también en la imagen */
 }
 
 /* Contenedor principal del panel */
@@ -35,21 +41,22 @@ body {
 }
 
 /* Botón de logout */
-#logout {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    background-color: #5a3794;
+.logout-button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: #6a0dad; /* Color del botón */
     color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 1rem;
+    padding: 10px 15px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-size: 14px;
+    transition: background 0.3s;
 }
 
-#logout:hover {
-    background-color: #1d3557;
+.logout-button:hover {
+    background-color: #4a0785; /* Oscurecer al pasar el mouse */
 }
 
 /* Estilo del menú de administración */
