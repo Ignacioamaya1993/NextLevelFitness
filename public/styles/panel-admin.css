@@ -61,7 +61,7 @@ body {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    background-color: #6a0dad; /* Color del botón */
+    background-color: #dd0b0b; /* Color del botón */
     color: white;
     border: none;
     padding: 10px 15px;
@@ -110,13 +110,13 @@ body {
     /* Ajustamos la posición del texto "ADMINISTRADOR" en dispositivos móviles */
     .admin-label {
         font-size: 40px; /* Reducimos el tamaño de la fuente */
-        top: 20px; /* Lo movemos un poco más abajo */
+        top: 5px; /* Lo movemos un poco más abajo */
         right: 20px; /* Lo movemos hacia la derecha */
     }
 
     /* Ajustes adicionales de los elementos */
     .admin-banner {
-        width: 100%; /* Ajustamos el ancho al 100% en pantallas pequeñas */
+        width: 70%; /* Ajustamos el ancho al 100% en pantallas pequeñas */
         max-width: none; /* Sin límite de ancho máximo */
         padding: 10px; /* Espaciado interno ajustado */
     }
