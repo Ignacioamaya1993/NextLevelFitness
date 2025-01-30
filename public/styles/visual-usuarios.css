@@ -1,8 +1,9 @@
 body {
-    padding: 5px;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f9;
     margin: 0;
-    font-family: Verdana, sans-serif;
-    background-color: #f4f4f4;
+    padding: 0;
+    color: #333;
 }
 
 .usuarios-container {
