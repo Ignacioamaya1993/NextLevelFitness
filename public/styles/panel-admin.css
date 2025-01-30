@@ -7,12 +7,18 @@ body {
     color: #333;
 }
 
-/* Título del panel */
-h2 {
+/* Banner de administración */
+.admin-banner {
+    background: url('../assets/images/banner/banner-panel-admin.webp') no-repeat center center/cover;
+    padding: 100px 0;
     text-align: center;
-    margin: 40px 0;
+    color: white;
+}
+
+.admin-banner h2 {
     font-size: 2.5rem;
-    color: #1d3557;
+    font-weight: bold;
+    margin: 0;
 }
 
 /* Contenedor principal del panel */
