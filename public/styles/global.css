@@ -132,9 +132,8 @@ footer {
     display: flex;
     justify-content: space-between; /* Distribuye los elementos */
     align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px; /* Espaciado interno */
+    text-align: center;
+    padding: 10px 20px; /* Reduce altura y agrega margen lateral */
 }
 
 /* Alineamos cada sección correctamente */
@@ -144,10 +143,9 @@ footer {
 }
 
 .footer-social {
-    text-align: center;
-    flex: 1;
+    flex-grow: 1; /* Permite que los iconos ocupen el espacio necesario */
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Centramos los iconos */
     gap: 15px;
 }
 
@@ -200,7 +198,7 @@ footer {
 
     /* Ajustes para el Footer en pantallas pequeñas */
     .footer-container {
-        flex-direction: column; /* Cambiamos de fila a columna */
+        flex-direction: column;
         text-align: center;
         gap: 10px;
     }
@@ -208,12 +206,10 @@ footer {
     .footer-info, 
     .footer-social, 
     .footer-design {
-        flex: none;
         width: 100%;
     }
 
     .footer-social {
-        justify-content: center; /* Asegura que los iconos estén centrados */
-        gap: 10px;
+        margin: 0 auto; /* Centra los iconos horizontalmente */
     }
 }
