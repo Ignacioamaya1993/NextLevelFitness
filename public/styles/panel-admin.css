@@ -109,7 +109,7 @@ body {
 
     /* Ajustamos la posición del texto "ADMINISTRADOR" en dispositivos móviles */
     .admin-label {
-        font-size: 40px; /* Reducimos el tamaño de la fuente */
+        font-size: 20px; /* Reducimos el tamaño de la fuente */
         top: 5px; /* Lo movemos un poco más abajo */
         right: 20px; /* Lo movemos hacia la derecha */
     }
