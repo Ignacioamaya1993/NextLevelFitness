@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (routines.length > 0) {
                 displayUserRoutines(routines);
             } else {
-                routineList.innerHTML = "<p>No hay rutinas disponibles para este usuario.</p>";
+                routineList.innerHTML = "<p>No hay rutinas creadas para este usuario.</p>";
             }
         } catch (error) {
             console.error("Error al obtener rutinas:", error);
@@ -189,78 +189,6 @@ function displayUserRoutines(routines) {
         })
     );
 
-// Función para eliminar la rutina
-async function deleteRoutine(day) {
-    const selectedUserId = localStorage.getItem("selectedUserId");
-    const routinesRef = collection(db, "routines");
-    const q = query(routinesRef, where("userId", "==", selectedUserId), where("day", "==", day));
-
-    try {
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            const routineDoc = querySnapshot.docs[0];
-
-            // Eliminar la rutina directamente sin pedir confirmación nuevamente
-            await deleteDoc(routineDoc.ref);
-
-            // Notificar al usuario sobre el éxito de la operación
-            Swal.fire({
-                title: "Éxito",
-                text: `La rutina para el día ${day} ha sido eliminada.`,
-                icon: "success",
-            }).then(() => location.reload()); // Recarga la página después de eliminar la rutina
-        } else {
-            Swal.fire({
-                title: "Error",
-                text: "No se encontró la rutina para el día especificado.",
-                icon: "error",
-            });
-        }
-    } catch (error) {
-        Swal.fire({
-            title: "Error",
-            text: "Ocurrió un error al eliminar la rutina.",
-            icon: "error",
-        });
-        console.error("Error al eliminar la rutina:", error);
-        }
-    }
-
-    async function deleteExerciseFromRoutine(day, index, exercises) {
-        try {
-            // Elimina el ejercicio de la lista
-            exercises.splice(index, 1);
-    
-            const routinesRef = collection(db, "routines");
-            const q = query(routinesRef, where("day", "==", day));
-            const querySnapshot = await getDocs(q);
-    
-            if (querySnapshot.size === 1) {
-                const routineDoc = querySnapshot.docs[0];
-    
-                if (exercises.length === 0) {
-                    // Si no quedan ejercicios, eliminar la rutina completa
-                    await deleteDoc(routineDoc.ref);
-                    Swal.fire("Éxito", "La rutina ha sido eliminada porque no tenía más ejercicios.", "success").then(() => {
-                        location.reload(); // Espera a que el usuario haga clic en OK
-                    });
-                } else {
-                    // Si aún hay ejercicios, actualizar Firestore
-                    await updateDoc(routineDoc.ref, { exercises });
-                    Swal.fire("Éxito", "El ejercicio ha sido eliminado correctamente.", "success").then(() => {
-                        location.reload(); // Espera a que el usuario haga clic en OK
-                    });
-                }
-            } else {
-                Swal.fire("Error", "No se encontró la rutina para actualizar.", "error");
-            }
-        } catch (error) {
-            console.error("Error al eliminar el ejercicio:", error);
-            Swal.fire("Error", "No se pudo eliminar el ejercicio. Revisa la consola para más detalles.", "error");
-        }
-    }
-
 // 🔹 Abrir el popup de edición
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");
@@ -292,17 +220,21 @@ function openEditPopup(day, routines) {
         return;
     }
 
-    const exercises = routine.exercises || [];
-
+    const exercises = routine.exercises;
+    
     const header = document.createElement("h3");
     header.textContent = `Editar Rutina para el día ${day}`;
     popupContent.appendChild(header);
 
     const exerciseSelect = document.createElement("select");
     exerciseSelect.id = "exercise-select";
-    exerciseSelect.innerHTML = exercises.map((exercise, index) =>
-        `<option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>`
-    ).join('');
+
+   if (exercises.length > 0) {
+        exerciseSelect.innerHTML = exercises.map((exercise, index) => `
+            <option value="${index}">${exercise.name || `Ejercicio ${index + 1}`}</option>
+        `).join('');
+    }
+
     popupContent.appendChild(exerciseSelect);
 
     const editFieldsContainer = document.createElement("div");
@@ -329,27 +261,6 @@ function openEditPopup(day, routines) {
 
     renderEditFields(editFieldsContainer, exercises[0], 0, day, exercises);
 
-// Modificar el evento de guardar cambios para validar antes de cerrar el popup
-saveButton.addEventListener("click", () => {
-    let valid = true;
-
-    exercises.forEach((_, index) => {
-        const seriesInput = document.getElementById(`series-${index}`);
-        const repsInput = document.getElementById(`reps-${index}`);
-        const weightInput = document.getElementById(`weight-${index}`);
-
-        if (parseFloat(seriesInput.value) <= 0 || parseFloat(repsInput.value) <= 0 || parseFloat(weightInput.value) <= 0) {
-            valid = false;
-        }
-    });
-
-    if (valid) {
-        saveChanges(day, exercises);
-        popup.classList.add("hidden");
-    } else {
-        Swal.fire("Error", "Corrige los valores en 0 o negativos antes de guardar.", "error");
-    }
-});
 
 saveButton.addEventListener("click", () => {
     saveChanges(day, exercises);
@@ -472,6 +383,31 @@ function renderEditFields(container, exercise, index, day, exercises) {
     });
 }
 
+// Modificar el evento de guardar cambios para validar antes de cerrar el popup
+saveButton.addEventListener("click", () => {
+    let valid = true;
+
+    exercises.forEach((_, index) => {
+        const seriesInput = document.getElementById(`series-${index}`);
+        const repsInput = document.getElementById(`reps-${index}`);
+        const weightInput = document.getElementById(`weight-${index}`);
+
+        if (parseFloat(seriesInput.value) <= 0 || parseFloat(repsInput.value) <= 0 || parseFloat(weightInput.value) <= 0) {
+            valid = false;
+        }
+    });
+
+    if (valid) {
+        saveChanges(day, exercises);
+        popup.classList.add("hidden");
+    } else {
+        Swal.fire("Error", "Corrige los valores en 0 o negativos antes de guardar.", "error");
+    }
+});
+
+const inputElement = document.getElementById("my-input");
+inputElement.addEventListener("input", preventNegativeValues);
+
 // 🔹 Función para guardar los cambios
 async function saveChanges(day, exercises) {
     try {
@@ -559,3 +495,75 @@ async function saveChanges(day, exercises) {
      }
     }
 }
+
+async function deleteExerciseFromRoutine(day, index, exercises) {
+    try {
+        // Elimina el ejercicio de la lista
+        exercises.splice(index, 1);
+
+        const routinesRef = collection(db, "routines");
+        const q = query(routinesRef, where("day", "==", day));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.size === 1) {
+            const routineDoc = querySnapshot.docs[0];
+
+            if (exercises.length === 0) {
+                // Si no quedan ejercicios, eliminar la rutina completa
+                await deleteDoc(routineDoc.ref);
+                Swal.fire("Éxito", "La rutina ha sido eliminada porque no tenía más ejercicios.", "success").then(() => {
+                    location.reload(); // Espera a que el usuario haga clic en OK
+                });
+            } else {
+                // Si aún hay ejercicios, actualizar Firestore
+                await updateDoc(routineDoc.ref, { exercises });
+                Swal.fire("Éxito", "El ejercicio ha sido eliminado correctamente.", "success").then(() => {
+                    location.reload(); // Espera a que el usuario haga clic en OK
+                });
+            }
+        } else {
+            Swal.fire("Error", "No se encontró la rutina para actualizar.", "error");
+        }
+    } catch (error) {
+        console.error("Error al eliminar el ejercicio:", error);
+        Swal.fire("Error", "No se pudo eliminar el ejercicio. Revisa la consola para más detalles.", "error");
+    }
+}
+
+// Función para eliminar la rutina
+async function deleteRoutine(day) {
+    const selectedUserId = localStorage.getItem("selectedUserId");
+    const routinesRef = collection(db, "routines");
+    const q = query(routinesRef, where("userId", "==", selectedUserId), where("day", "==", day));
+
+    try {
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const routineDoc = querySnapshot.docs[0];
+
+            // Eliminar la rutina directamente sin pedir confirmación nuevamente
+            await deleteDoc(routineDoc.ref);
+
+            // Notificar al usuario sobre el éxito de la operación
+            Swal.fire({
+                title: "Éxito",
+                text: `La rutina para el día ${day} ha sido eliminada.`,
+                icon: "success",
+            }).then(() => location.reload()); // Recarga la página después de eliminar la rutina
+        } else {
+            Swal.fire({
+                title: "Error",
+                text: "No se encontró la rutina para el día especificado.",
+                icon: "error",
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            title: "Error",
+            text: "Ocurrió un error al eliminar la rutina.",
+            icon: "error",
+        });
+        console.error("Error al eliminar la rutina:", error);
+        }
+    }
