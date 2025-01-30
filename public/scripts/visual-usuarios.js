@@ -4,6 +4,7 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/f
 
 const usuariosContainer = document.getElementById("usuarios-container");
 const searchInput = document.getElementById("search-input"); // Campo de búsqueda
+const clearSearchButton = document.getElementById("clear-search"); // Botón de limpiar búsqueda
 
 // Variable global para almacenar todos los usuarios
 let usuarios = [];
@@ -42,9 +43,6 @@ async function cargarUsuarios() {
                     return;
                 }
 
-                let html = "";
-
-                // Reiniciar la lista de usuarios y agregar los usuarios nuevos
                 usuarios = [];
 
                 usuariosSnapshot.forEach(doc => {
@@ -92,34 +90,6 @@ async function cargarUsuarios() {
                     mostrarUsuarios(filteredUsers);
                 });
 
-                // Función para mostrar usuarios
-                function mostrarUsuarios(users) {
-                    html = "";
-                    users.forEach(user => {
-                        html += `
-                            <div class="usuario-card">
-                                <h2>${user.nombre} ${user.apellido}</h2>
-                                <p><strong>Email:</strong> ${user.email}</p>
-                                <p><strong>Celular:</strong> ${user.celular}</p>
-                                <p><strong>Fecha de nacimiento:</strong> ${user.fechaFormateada}</p>
-                                <p><strong>Edad:</strong> ${user.edad}</p>
-                                <p><strong>Género:</strong> ${user.genero}</p>
-                                <button class="view-rutinas-btn" data-user-id="${user.userId}">Ver Rutinas</button>
-                            </div>
-                        `;
-                    });
-                    usuariosContainer.innerHTML = html;
-
-                    // Agregar eventos a los botones de "Ver Rutinas"
-                    const verRutinasButtons = document.querySelectorAll('.view-rutinas-btn');
-                    verRutinasButtons.forEach(button => {
-                        button.addEventListener('click', function() {
-                            const userId = button.dataset.userId;
-                            verRutinasUsuario(userId);
-                        });
-                    });
-                }
-
             } catch (error) {
                 console.error("Error al cargar usuarios:", error);
                 usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
@@ -130,16 +100,39 @@ async function cargarUsuarios() {
     });
 }
 
-// Seleccionamos el botón de borrar búsqueda
-const clearSearchButton = document.getElementById("clear-search");
+// Función para mostrar usuarios
+function mostrarUsuarios(users) {
+    let html = "";
+    users.forEach(user => {
+        html += `
+            <div class="usuario-card">
+                <h2>${user.nombre} ${user.apellido}</h2>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Celular:</strong> ${user.celular}</p>
+                <p><strong>Fecha de nacimiento:</strong> ${user.fechaFormateada}</p>
+                <p><strong>Edad:</strong> ${user.edad}</p>
+                <p><strong>Género:</strong> ${user.genero}</p>
+                <button class="view-rutinas-btn" data-user-id="${user.userId}">Ver Rutinas</button>
+            </div>
+        `;
+    });
+    usuariosContainer.innerHTML = html;
+
+    // Agregar eventos a los botones de "Ver Rutinas"
+    const verRutinasButtons = document.querySelectorAll('.view-rutinas-btn');
+    verRutinasButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = button.dataset.userId;
+            verRutinasUsuario(userId);
+        });
+    });
+}
 
 // Agregar el evento de clic a la "X"
 clearSearchButton.addEventListener("click", () => {
     searchInput.value = ""; // Limpiar el campo de búsqueda
     searchInput.focus(); // Poner el foco en el campo de búsqueda
-    
-    // Mostrar todos los usuarios nuevamente
-    mostrarUsuarios(usuarios);
+    mostrarUsuarios(usuarios); // Mostrar todos los usuarios nuevamente
 });
 
 // Función para ver rutinas (redirige a una nueva página con el ID del usuario)
