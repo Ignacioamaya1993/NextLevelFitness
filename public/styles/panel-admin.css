@@ -7,16 +7,6 @@ body {
     color: #333;
 }
 
-/* Header container */
-.header-container {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 20px;
-    background-color: #1d3557;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
 /* Título del panel */
 h2 {
     text-align: center;
