@@ -25,8 +25,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const exerciseTable = document.getElementById("exercise-table");
     const addExerciseBtn = document.getElementById("add-exercise-btn");
 
-    if (!currentUser || !currentUser.isAdmin) {  // Cambiado a currentUser
-        adminPanel.innerHTML = "<p>Acceso denegado. Solo administradores pueden ver esta sección.</p>";
+    const adminPanel = document.getElementById("admin-panel");
+
+    if (!currentUser || !currentUser.isAdmin) {  
+        if (adminPanel) {
+            adminPanel.innerHTML = "<p>Acceso denegado. Solo administradores pueden ver esta sección.</p>";
+        } else {
+            console.error("Elemento adminPanel no encontrado en el DOM.");
+        }
         return;
     }
 
@@ -135,11 +141,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function showExerciseDetails(nombre, video, instrucciones) {
-            const user = JSON.parse(localStorage.getItem("user"));
-            if (!user || !user.isLoggedIn) {
-                Swal.fire("Error", "Debes estar logueado como administrador para guardar rutinas.", "error");
-                return;
-            }
+        const user = JSON.parse(localStorage.getItem("user"));
+    
+        // Verificar si el usuario está autenticado y es administrador
+        if (!user || !user.isAdmin) {
+            Swal.fire("Error", "Debes estar logueado como administrador para guardar rutinas.", "error");
+            return;
+        }    
 
         let embedVideoUrl = "";
         if (video.includes("youtube.com/shorts/")) {
