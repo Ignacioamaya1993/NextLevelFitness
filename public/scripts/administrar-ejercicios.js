@@ -42,121 +42,87 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // Función para cargar categorías
-async function loadCategories(db) {
+async function loadCategories(db, categoryFilter) {
     try {
         const categoriesRef = collection(db, "categories");
-
-        // Intentar cargar desde caché primero
-        let categoriesSnapshot = await getDocs(categoriesRef, { source: "cache" });
+        const categoriesSnapshot = await getDocs(categoriesRef);
 
         if (categoriesSnapshot.empty) {
-            console.log("No hay datos en caché, obteniendo desde Firestore...");
-            categoriesSnapshot = await getDocs(categoriesRef, { source: "server" });
+            console.log("No hay categorías disponibles.");
+            return;
         }
 
-        renderCategories(categoriesSnapshot);
+        categoryFilter.innerHTML = "<option value='all'>Todas las categorías</option>";
+        categoriesSnapshot.forEach((doc) => {
+            const option = document.createElement("option");
+            option.value = doc.id;
+            option.textContent = doc.id;
+            categoryFilter.appendChild(option);
+        });
 
+        console.log("Categorías actualizadas.");
     } catch (error) {
         console.error("Error al cargar categorías:", error);
     }
 }
 
-// Función auxiliar para renderizar las categorías
-function renderCategories(snapshot) {
-    categoryFilter.innerHTML = "<option value='all'>Todas las categorías</option>";
-
-    snapshot.forEach((doc) => {
-        const option = document.createElement("option");
-        option.value = doc.id;
-        option.textContent = doc.id;
-        categoryFilter.appendChild(option);
-    });
-
-    console.log("Categorías actualizadas.");
-}
-
 // Función para cargar ejercicios
-async function loadExercises(db, category = "all", searchQuery = "") {
-    exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
+async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "") {
+    exerciseGrid.innerHTML = ""; // Limpiar el grid antes de cargar nuevos ejercicios
 
     try {
-        const exercises = []; // Array para almacenar todos los ejercicios
-        let exercisesSnapshot;
+        let exercises = []; // Array para almacenar los ejercicios
 
         if (category === "all") {
             const categoriesSnapshot = await getDocs(collection(db, "categories"));
             for (const categoryDoc of categoriesSnapshot.docs) {
-                exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "cache" });
-                if (exercisesSnapshot.empty) {
-                    exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "server" });
-                }
-                exercisesSnapshot.forEach((doc) => {
-                    const exercise = doc.data();
-                    exercises.push(exercise);
-                });
+                const exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`));
+                exercisesSnapshot.forEach((doc) => exercises.push(doc.data()));
             }
         } else {
-            exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "cache" });
-            if (exercisesSnapshot.empty) {
-                exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "server" });
-            }
-            exercisesSnapshot.forEach((doc) => {
-                const exercise = doc.data();
-                exercises.push(exercise);
-            });
+            const exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`));
+            exercisesSnapshot.forEach((doc) => exercises.push(doc.data()));
         }
 
-        // Filtrar ejercicios por búsqueda
+        // Filtrar por búsqueda
         const filteredExercises = exercises.filter((exercise) =>
             exercise.Nombre.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-        // Renderizar los ejercicios filtrados
-        filteredExercises.forEach((exercise) => {
-            const exerciseCard = document.createElement("div");
-            exerciseCard.classList.add("exercise-card");
-
-            exerciseCard.style.display = "flex";
-            exerciseCard.style.flexDirection = "column";
-            exerciseCard.style.justifyContent = "space-between";
-            exerciseCard.style.height = "100%";
-
-            const button = document.createElement("button");
-            button.textContent = "Seleccionar";
-            button.addEventListener("click", () =>
-                showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones)
-            );
-
-            exerciseCard.innerHTML = `
-                <h3>${exercise.Nombre}</h3>
-                <img src="${exercise.Imagen}" alt="${exercise.Nombre}">
-            `;
-            exerciseCard.appendChild(button);
-            exerciseGrid.appendChild(exerciseCard);
-        });
+        // Renderizar ejercicios
+        renderExercises(filteredExercises, exerciseGrid);
 
         console.log("Ejercicios cargados correctamente.");
-
     } catch (error) {
         console.error("Error al cargar ejercicios:", error);
     }
 }
 
-// Función para mostrar detalles del ejercicio
-async function showExerciseDetails(nombre, video, instrucciones) {
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    if (!user || !user.isLoggedIn) {
-        Swal.fire("Error", "Debes estar logueado para guardar rutinas.", "error");
-        return;
-    }
+// Función para renderizar ejercicios
+function renderExercises(exercises, exerciseGrid) {
+    exercises.forEach((exercise) => {
+        const exerciseCard = document.createElement("div");
+        exerciseCard.classList.add("exercise-card");
 
-    let embedVideoUrl = "";
-    if (video.includes("youtube.com/shorts/")) {
-        embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
-    } else if (video.includes("youtube.com/watch?v=")) {
-        const videoId = video.split("v=")[1]?.split("&")[0];
-        embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
-    }
+        exerciseCard.innerHTML = `
+            <h3>${exercise.Nombre}</h3>
+            <img src="${exercise.Imagen}" alt="${exercise.Nombre}">
+            <button onclick="showExerciseDetails('${exercise.Nombre}', '${exercise.Video}', '${exercise.Instrucciones}')">
+                Seleccionar
+            </button>
+        `;
+
+        exerciseGrid.appendChild(exerciseCard);
+    });
+}
+
+// Función para mostrar detalles del ejercicio
+function showExerciseDetails(nombre, video, instrucciones) {
+    let embedVideoUrl = video.includes("youtube.com/shorts/") 
+        ? video.replace("youtube.com/shorts/", "youtube.com/embed/") 
+        : video.includes("youtube.com/watch?v=") 
+            ? `https://www.youtube.com/embed/${video.split("v=")[1]?.split("&")[0]}` 
+            : video;
 
     const contentHTML = `
         <div class="exercise-popup">
