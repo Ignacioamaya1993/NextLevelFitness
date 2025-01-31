@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
         exerciseGrid = document.getElementById("exercise-grid");
         searchBar = document.getElementById("search-bar");
         const routineBuilder = document.getElementById("routine-builder");
-        const searchBar = document.getElementById("search-bar");
 
         
         routineBuilder.classList.remove("hidden");
