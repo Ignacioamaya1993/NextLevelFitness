@@ -36,18 +36,16 @@ document.addEventListener("DOMContentLoaded", () => {
             await loadExercises(db, selectedCategory, searchBar.value);
         });
 
-        let debounceTimeout;
-
         searchBar.addEventListener("input", async () => {
             const selectedCategory = categoryFilter.value;
-
+        
             // Cancelar cualquier llamada anterior que aún no se haya ejecutado
             clearTimeout(debounceTimeout);
-
+        
             // Crear un nuevo retraso de 300ms antes de realizar la búsqueda
             debounceTimeout = setTimeout(async () => {
-                await loadExercises(db, selectedCategory, searchBar.value);
-            }, 300); // 300ms es un buen tiempo para debounce
+                await loadExercises(db, exerciseGrid, selectedCategory, searchBar.value);
+            }, 300); // 300ms es un buen tiempo para debounce, ajusta si es necesario
         });
     });
 });
