@@ -36,6 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
             await loadExercises(db, selectedCategory, searchBar.value);
         });
 
+        let debounceTimeout;
+
         searchBar.addEventListener("input", async () => {
             const selectedCategory = categoryFilter.value;
         
