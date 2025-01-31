@@ -1,204 +1,246 @@
 import app from './firebaseConfig.js';
-import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-    const auth = getAuth(app);
-    const db = getFirestore(app); // Asegúrate de definir db aquí
-    
-    // Verificamos si el usuario está autenticado
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            console.log("No estás autenticado. Redirigiendo a login.");
-            alert("No estás autenticado. Redirigiendo a login.");
-            window.location.href = "login-admin.html";
-            return;
-        }
+// Inicializar Firestore
+const db = getFirestore(app);
+const categoriesCollection = collection(db, "categories"); 
+const exercisesCollection = collection(db, "exercises");
 
-        console.log("Usuario autenticado:", user.email);
+// Función para cargar categorías
+async function loadCategories() {
+  try {
+    const querySnapshot = await getDocs(categoriesCollection);
+    const categories = querySnapshot.docs.map(doc => doc.data());
+    console.log("Categorías cargadas: ", categories);
 
-        // Verificamos si el usuario tiene permisos de administrador según las reglas de Firestore
-        const userDocRef = doc(db, "usuarios", user.uid);
-        const userDoc = await getDoc(userDocRef);
+    // Limpiar el selector de categorías
+    categoryFilter.innerHTML = '';
 
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            // Verificar si el usuario tiene permisos de administrador
-            if (userData.isAdmin) { // Si el usuario tiene el campo isAdmin en Firestore
-                console.log("El usuario es administrador.");
-                // Hacer visible el panel de administración
-                const adminPanel = document.getElementById("adminPanel");
-                if (adminPanel) {
-                    adminPanel.style.display = "block"; // Mostrar panel de administración
-                }
-            } else {
-                console.log("El usuario no es administrador.");
-                Swal.fire("Error", "Solo los administradores pueden acceder a esta sección.", "error");
-                window.location.href = "panel-admin.html"; // Redirigir a otra página si no es admin
-            }
-        } else {
-            console.log("Documento de usuario no encontrado.");
-            alert("No se encontró el usuario en la base de datos.");
-        }
+    // Crear una opción por cada categoría
+    categories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category.name; // Asumiendo que 'name' es el campo que contiene el nombre de la categoría
+      option.textContent = category.name;
+      categoryFilter.appendChild(option);
+    });
 
-        // Lógica para el panel de administración de ejercicios
-        if (window.__isInitializedAdmin) return; // Evita la inicialización múltiple
-        window.__isInitializedAdmin = true;
+  } catch (error) {
+    console.error("Error al cargar categorías:", error);
+  }
+}    
 
-        const categoryFilter = document.getElementById("admin-category-filter");
-        const exerciseTable = document.getElementById("exercise-table");
-        const addExerciseBtn = document.getElementById("add-exercise-btn");
+// Función para cargar ejercicios
+async function loadExercises(category = "all") {
+  const exerciseGrid = document.getElementById("exercise-grid");
+  exerciseGrid.innerHTML = ""; // Limpiar la lista de ejercicios
 
-        // Cargar categorías y ejercicios
-        await loadCategories();
-        await loadExercises();
+  try {
+    const exercisesSnapshot = category === "all" 
+      ? await getDocs(exercisesCollection) 
+      : await getDocs(collection(db, `categories/${category}/exercises`));
 
-        // Filtrar por categoría
-        categoryFilter.addEventListener("change", async () => {
-            const selectedCategory = categoryFilter.value;
-            await loadExercises(db, exerciseTable, selectedCategory);
-        });
+    renderExercises(exercisesSnapshot, exerciseGrid);
+  } catch (error) {
+    console.error("Error al cargar ejercicios:", error);
+  }
+}
 
-        let debounceTimeout;
-        const searchBar = document.getElementById("search-bar");
-        searchBar.addEventListener("input", async () => {
-            const selectedCategory = categoryFilter.value;
-            clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(async () => {
-                await loadExercises(db, exerciseTable, selectedCategory, searchBar.value);
-            }, 300);
-        });
+function renderExercises(exercisesSnapshot, exerciseGrid) {
+  exercisesSnapshot.forEach((doc) => {
+    const exercise = doc.data();
+    const exerciseCard = document.createElement("div");
+    exerciseCard.classList.add("exercise-card");
 
-        // Botón para agregar un nuevo ejercicio
-        addExerciseBtn.addEventListener("click", () => {
-            openExerciseModal(null); // Sin datos = Nuevo ejercicio
-        });
+    exerciseCard.innerHTML = `
+      <h3>${exercise.Nombre}</h3>
+      <img src="${exercise.Imagen}" alt="${exercise.Nombre}">
+      <button class="edit-button" data-id="${doc.id}">Editar</button>
+      <button class="delete-button" data-id="${doc.id}">Eliminar</button>
+    `;
 
-        // Función auxiliar para renderizar las categorías
-        async function loadCategories() {
-            const categoriesSnapshot = await getDocs(collection(db, "categories"));
-            renderCategories(categoriesSnapshot);
-        }
+    exerciseCard.querySelector(".edit-button").addEventListener("click", () => {
+      showEditExerciseForm(exercise, doc.id);
+    });
 
-        function renderCategories(snapshot) {
-            categoryFilter.innerHTML = "<option value='all'>Todas las categorías</option>";
-            snapshot.forEach((doc) => {
-                const option = document.createElement("option");
-                option.value = doc.id;
-                option.textContent = doc.id;
-                categoryFilter.appendChild(option);
-            });
-            console.log("Categorías actualizadas.");
-        }
+    exerciseCard.querySelector(".delete-button").addEventListener("click", async () => {
+      const confirmed = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Este ejercicio será eliminado permanentemente.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      });
 
-        async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "") {
-            exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
+      if (confirmed.isConfirmed) {
+        await deleteExercise(doc.id);
+      }
+    });
 
-            try {
-                const exercises = []; // Array para almacenar todos los ejercicios
-                let exercisesSnapshot;
+    exerciseGrid.appendChild(exerciseCard);
+  });
+}
 
-                if (category === "all") {
-                    const categoriesSnapshot = await getDocs(collection(db, "categories"));
-                    for (const categoryDoc of categoriesSnapshot.docs) {
-                        exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "cache" });
-                        if (exercisesSnapshot.empty) {
-                            exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "server" });
-                        }
-                        exercisesSnapshot.forEach((doc) => {
-                            const exercise = doc.data();
-                            exercises.push(exercise);
-                        });
-                    }
-                } else {
-                    exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "cache" });
-                    if (exercisesSnapshot.empty) {
-                        exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "server" });
-                    }
-                    exercisesSnapshot.forEach((doc) => {
-                        const exercise = doc.data();
-                        exercises.push(exercise);
-                    });
-                }
+async function showAddExerciseForm() {
+  const { value: formValues } = await Swal.fire({
+    title: 'Agregar Ejercicio',
+    html: `
+      <label for="exercise-name">Nombre del ejercicio:</label>
+      <input id="exercise-name" type="text" required>
+      <label for="exercise-category">Categoría:</label>
+      <input id="exercise-category" type="text" required>
+      <label for="exercise-description">Descripción:</label>
+      <textarea id="exercise-description" required></textarea>
+      <label for="exercise-image">Imagen URL:</label>
+      <input id="exercise-image" type="url" required>
+      <label for="exercise-video">Video URL:</label>
+      <input id="exercise-video" type="url">
+    `,
+    focusConfirm: false,
+    preConfirm: async () => {
+      const name = document.getElementById("exercise-name").value;
+      const category = document.getElementById("exercise-category").value;
+      const description = document.getElementById("exercise-description").value;
+      const image = document.getElementById("exercise-image").value;
+      const video = document.getElementById("exercise-video").value;
 
-                // Filtrar ejercicios por búsqueda
-                const filteredExercises = exercises.filter((exercise) =>
-                    exercise.Nombre.toLowerCase().includes(searchQuery.toLowerCase())
-                );
+      if (!name || !category || !description || !image) {
+        Swal.showValidationMessage("Por favor completa todos los campos.");
+        return false;
+      }
 
-                // Renderizar los ejercicios filtrados
-                filteredExercises.forEach((exercise) => {
-                    const exerciseCard = document.createElement("div");
-                    exerciseCard.classList.add("exercise-card");
-                    exerciseCard.style.display = "flex";
-                    exerciseCard.style.flexDirection = "column";
-                    exerciseCard.style.justifyContent = "space-between";
-                    exerciseCard.style.height = "100%";
+      try {
+        await addExercise(name, category, description, image, video);
+        Swal.fire('Ejercicio agregado', '', 'success');
+        loadExercises(category); // Recargar ejercicios
+      } catch (error) {
+        console.error("Error al agregar ejercicio:", error);
+        Swal.fire("Error", "Hubo un problema al agregar el ejercicio.", "error");
+      }
+    }
+  });
+}
 
-                    const button = document.createElement("button");
-                    button.textContent = "Seleccionar";
-                    button.addEventListener("click", () =>
-                        showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones)
-                    );
+async function addExercise(name, category, description, image, video) {
+  const exerciseRef = collection(db, `categories/${category}/exercises`);
+  await addDoc(exerciseRef, {
+    Nombre: name,
+    Categoria: category,
+    Descripcion: description,
+    Imagen: image,
+    Video: video || ''
+  });
+}
 
-                    exerciseCard.innerHTML = `
-                        <h3>${exercise.Nombre}</h3>
-                        <img src="${exercise.Imagen}" alt="${exercise.Nombre}">
-                    `;
-                    exerciseCard.appendChild(button);
-                    exerciseGrid.appendChild(exerciseCard);
-                });
+async function showEditExerciseForm(exercise, exerciseId) {
+  const { value: formValues } = await Swal.fire({
+    title: 'Editar Ejercicio',
+    html: `
+      <label for="edit-exercise-name">Nombre del ejercicio:</label>
+      <input id="edit-exercise-name" value="${exercise.Nombre}" required>
+      <label for="edit-exercise-category">Categoría:</label>
+      <input id="edit-exercise-category" value="${exercise.Categoria}" required>
+      <label for="edit-exercise-description">Descripción:</label>
+      <textarea id="edit-exercise-description" required>${exercise.Descripcion}</textarea>
+      <label for="edit-exercise-image">Imagen URL:</label>
+      <input id="edit-exercise-image" value="${exercise.Imagen}" required>
+      <label for="edit-exercise-video">Video URL:</label>
+      <input id="edit-exercise-video" value="${exercise.Video}">
+    `,
+    focusConfirm: false,
+    preConfirm: async () => {
+      const name = document.getElementById("edit-exercise-name").value;
+      const category = document.getElementById("edit-exercise-category").value;
+      const description = document.getElementById("edit-exercise-description").value;
+      const image = document.getElementById("edit-exercise-image").value;
+      const video = document.getElementById("edit-exercise-video").value;
 
-                console.log("Ejercicios cargados correctamente.");
-            } catch (error) {
-                console.error("Error al cargar ejercicios:", error);
-            }
-        }
+      if (!name || !category || !description || !image) {
+        Swal.showValidationMessage("Por favor completa todos los campos.");
+        return false;
+      }
 
-        async function showExerciseDetails(nombre, video, instrucciones) {
-            const user = JSON.parse(localStorage.getItem("user"));
+      try {
+        await updateExercise(exerciseId, name, category, description, image, video);
+        Swal.fire('Ejercicio actualizado', '', 'success');
+        loadExercises(category); // Recargar ejercicios
+      } catch (error) {
+        console.error("Error al editar ejercicio:", error);
+        Swal.fire("Error", "Hubo un problema al editar el ejercicio.", "error");
+      }
+    }
+  });
+}
 
-            // Verificar si el usuario está autenticado y es administrador
-            if (!user || !user.isAdmin) {
-                Swal.fire("Error", "Debes estar logueado como administrador para guardar rutinas.", "error");
-                return;
-            }    
+async function updateExercise(exerciseId, name, category, description, image, video) {
+  const exerciseRef = doc(db, `categories/${category}/exercises`, exerciseId);
+  await updateDoc(exerciseRef, {
+    Nombre: name,
+    Categoria: category,
+    Descripcion: description,
+    Imagen: image,
+    Video: video || ''
+  });
+}
 
-            let embedVideoUrl = "";
-            if (video.includes("youtube.com/shorts/")) {
-                embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
-            } else if (video.includes("youtube.com/watch?v=")) {
-                const videoId = video.split("v=")[1]?.split("&")[0];
-                embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
-            }
+async function deleteExercise(exerciseId) {
+  const exerciseRef = doc(db, `categories/${categoryFilter.value}/exercises`, exerciseId);
+  try {
+    await deleteDoc(exerciseRef);
+    Swal.fire("Eliminado", "El ejercicio ha sido eliminado.", "success");
+    loadExercises(categoryFilter.value); // Recargar ejercicios
+  } catch (error) {
+    console.error("Error al eliminar ejercicio:", error);
+    Swal.fire("Error", "No se pudo eliminar el ejercicio.", "error");
+  }
+}
 
-            const contentHTML = `
-                <div class="exercise-popup">
-                    <div class="popup-header">
-                        <h3 class="exercise-title">${nombre}</h3>
-                    </div>
-                    <div class="popup-content">
-                        <div class="popup-left">
-                            <div class="video-container">
-                                <iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
-                            </div>
-                            <h4>Instrucciones</h4>
-                            <p>${instrucciones}</p>
-                        </div>
-                    </div>
-                </div>`;
+// Verificar si el usuario está autenticado
+const auth = getAuth(app);
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    console.log("Usuario autenticado: ", user.email);
+    loadCategories();  // Llamar a la función después de verificar la autenticación
+    loadExercises();   // Llamar a la función después de verificar la autenticación
+  } else {
+    console.log("Usuario no autenticado");
+  }
+});
 
-            Swal.fire({
-                title: "Detalles del ejercicio",
-                html: contentHTML,
-                showCancelButton: true,
-                confirmButtonText: "Cerrar",
-                customClass: {
-                    popup: 'custom-popup',
-                    title: 'swal2-title'
-                },
-                width: 'auto'
-            });
-        }
-    })
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = JSON.parse(localStorage.getItem("currentUser"));
+  const exerciseGrid = document.getElementById("exercise-grid");
+  const categoryFilter = document.getElementById("category-filter");
+  if (categoryFilter) {
+      categoryFilter.addEventListener("change", async () => {
+          const selectedCategory = categoryFilter.value;
+          await loadExercises(selectedCategory);
+      });
+  } else {
+      console.error("El selector de categorías no se encuentra en el DOM.");
+  }
+    const addExerciseButton = document.getElementById("add-exercise-button");
+
+  if (!user || !user.isLoggedIn) {
+    Swal.fire("Error", "Debes estar logueado para administrar ejercicios.", "error");
+    return;
+  }
+
+  // Cargar categorías
+  await loadCategories();
+
+  // Cargar ejercicios
+  await loadExercises();
+
+  // Evento de filtro por categoría
+  categoryFilter.addEventListener("change", async () => {
+    const selectedCategory = categoryFilter.value;
+    await loadExercises(selectedCategory);
+  });
+
+  // Evento para agregar ejercicio
+  addExerciseButton.addEventListener("click", () => {
+    showAddExerciseForm();
+  });
 });
