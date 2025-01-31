@@ -4,6 +4,8 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
+
+    // Verificamos si el usuario está autenticado
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             console.log("No estás autenticado. Redirigiendo a login.");
@@ -11,6 +13,33 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "login-admin.html";
             return;
         }
+
+        console.log("Usuario autenticado:", user.email);
+
+        // Obtener el documento del usuario en Firestore para verificar si es admin
+        const db = getFirestore(app);
+        const userDocRef = doc(db, "usuarios", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            
+            // Verificamos si el usuario tiene privilegios de administrador
+            if (userData.isAdmin) {
+                console.log("El usuario es administrador.");
+                // Continuar con la lógica para visualizar las rutinas o realizar otras acciones administrativas
+                // Ejemplo: Mostrar listado de rutinas o permitir eliminación de rutinas
+            } else {
+                console.log("El usuario no es administrador.");
+                Swal.fire("Error", "Solo los administradores pueden acceder a esta sección.", "error");
+                window.location.href = "panel-admin.html"; // Redirigir si no es admin
+            }
+        } else {
+            console.log("No se encontró el documento del usuario.");
+            Swal.fire("Error", "No se pudo verificar el usuario.", "error");
+        }
+    });
+});
 
         console.log("Usuario autenticado:", user.email);
 
@@ -63,8 +92,6 @@ cargarUsuario();
         } catch (error) {
             console.error("Error al obtener rutinas:", error);
         }
-    });
-});
 
 // 🔹 Obtener rutinas del usuario en Firestore
 async function getUserRoutines(userId) {
