@@ -2,6 +2,10 @@ import app, { db } from "../scripts/firebaseConfig.js";
 import { collection, getDocs, query, where, deleteDoc, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
+import app, { db } from "../scripts/firebaseConfig.js";
+import { collection, getDocs, query, where, deleteDoc, doc, getDoc, updateDoc, getFirestore } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
 
@@ -11,32 +15,37 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("No estás autenticado. Redirigiendo a login.");
             alert("No estás autenticado. Redirigiendo a login.");
             window.location.href = "login-admin.html";
-            return;
+            return;  // Esta línea está bien, dentro de la función onAuthStateChanged
         }
 
         console.log("Usuario autenticado:", user.email);
 
-        // Obtener el documento del usuario en Firestore para verificar si es admin
-        const db = getFirestore(app);
-        const userDocRef = doc(db, "usuarios", user.uid);
-        const userDoc = await getDoc(userDocRef);
+        try {
+            // Obtener el documento del usuario en Firestore para verificar si es admin
+            const db = getFirestore(app);
+            const userDocRef = doc(db, "usuarios", user.uid);
+            const userDoc = await getDoc(userDocRef);
 
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            
-            // Verificamos si el usuario tiene privilegios de administrador
-            if (userData.isAdmin) {
-                console.log("El usuario es administrador.");
-                // Continuar con la lógica para visualizar las rutinas o realizar otras acciones administrativas
-                // Ejemplo: Mostrar listado de rutinas o permitir eliminación de rutinas
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                
+                // Verificamos si el usuario tiene privilegios de administrador
+                if (userData.isAdmin) {
+                    console.log("El usuario es administrador.");
+                    // Continuar con la lógica para visualizar las rutinas o realizar otras acciones administrativas
+                    // Ejemplo: Mostrar listado de rutinas o permitir eliminación de rutinas
+                } else {
+                    console.log("El usuario no es administrador.");
+                    Swal.fire("Error", "Solo los administradores pueden acceder a esta sección.", "error");
+                    window.location.href = "panel-admin.html"; // Redirigir si no es admin
+                }
             } else {
-                console.log("El usuario no es administrador.");
-                Swal.fire("Error", "Solo los administradores pueden acceder a esta sección.", "error");
-                window.location.href = "panel-admin.html"; // Redirigir si no es admin
+                console.log("No se encontró el documento del usuario.");
+                Swal.fire("Error", "No se pudo verificar el usuario.", "error");
             }
-        } else {
-            console.log("No se encontró el documento del usuario.");
-            Swal.fire("Error", "No se pudo verificar el usuario.", "error");
+        } catch (error) {
+            console.log("Error al obtener datos del usuario:", error);
+            Swal.fire("Error", "Hubo un problema al acceder a la base de datos.", "error");
         }
     });
 });
