@@ -4,84 +4,20 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
-
-    // Verificamos si el usuario está autenticado
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             console.log("No estás autenticado. Redirigiendo a login.");
             alert("No estás autenticado. Redirigiendo a login.");
             window.location.href = "login-admin.html";
-            return;  // Esta línea está dentro de la función onAuthStateChanged
-        }
-
-        console.log("Usuario autenticado:", user.email);
-
-        try {
-            // Obtener el documento del usuario en Firestore para verificar si es admin
-            const db = getFirestore(app);
-            const userDocRef = doc(db, "usuarios", user.uid);
-            const userDoc = await getDoc(userDocRef);
-
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                
-                // Verificamos si el usuario tiene privilegios de administrador
-                if (userData.isAdmin) {
-                    console.log("El usuario es administrador.");
-                    // Continuar con la lógica para visualizar las rutinas o realizar otras acciones administrativas
-                    // Ejemplo: Mostrar listado de rutinas o permitir eliminación de rutinas
-                } else {
-                    console.log("El usuario no es administrador.");
-                    Swal.fire("Error", "Solo los administradores pueden acceder a esta sección.", "error");
-                    window.location.href = "panel-admin.html"; // Redirigir si no es admin
-                }
-            } else {
-                console.log("No se encontró el documento del usuario.");
-                Swal.fire("Error", "No se pudo verificar el usuario.", "error");
-            }
-        } catch (error) {
-            console.log("Error al obtener datos del usuario:", error);
-            Swal.fire("Error", "Hubo un problema al acceder a la base de datos.", "error");
-        }
-    });
-
-    // El resto del código se debe colocar fuera de la función de autenticación
-    const userId = localStorage.getItem("selectedUserId");
-    const routineList = document.getElementById("routine-list");
-    const tituloRutinas = document.querySelector("h1");
-
-    // Función para cargar los datos del usuario seleccionado
-    async function cargarUsuario() {
-        if (!userId) {
-            tituloRutinas.textContent = "Rutinas del Usuario Desconocido";
             return;
         }
-    
-        try {
-            const usuarioRef = doc(db, "usuarios", userId);
-            const usuarioSnap = await getDoc(usuarioRef);
-    
-            if (usuarioSnap.exists()) {
-                const usuarioData = usuarioSnap.data();
-                const nombreCompleto = `${usuarioData.nombre} ${usuarioData.apellido}`;
-                tituloRutinas.textContent = `Rutinas del Usuario ${nombreCompleto}`;
-            } else {
-                tituloRutinas.textContent = "Rutinas del Usuario No Encontrado";
-            }
-        } catch (error) {
-            console.error("Error al obtener el usuario:", error);
-            tituloRutinas.textContent = "Error al cargar usuario";
-        }
-    }
-
-    cargarUsuario(); // Llamamos a la función para cargar los datos del usuario
-});
 
         console.log("Usuario autenticado:", user.email);
 
         const userId = localStorage.getItem("selectedUserId");
         const routineList = document.getElementById("routine-list");
         const tituloRutinas = document.querySelector("h1");
+
 
     // Función para cargar los datos del usuario seleccionado
     async function cargarUsuario() {
@@ -127,6 +63,8 @@ cargarUsuario();
         } catch (error) {
             console.error("Error al obtener rutinas:", error);
         }
+    });
+});
 
 // 🔹 Obtener rutinas del usuario en Firestore
 async function getUserRoutines(userId) {
