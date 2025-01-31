@@ -36,15 +36,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         searchBar.addEventListener("input", async () => {
             const selectedCategory = categoryFilter.value;
-
+        
             // Cancelar cualquier llamada anterior que aún no se haya ejecutado
             clearTimeout(debounceTimeout);
-
+        
             // Crear un nuevo retraso de 300ms antes de realizar la búsqueda
             debounceTimeout = setTimeout(async () => {
                 await loadExercises(db, exerciseGrid, selectedCategory, searchBar.value);
             }, 300); // 300ms es un buen tiempo para debounce, ajusta si es necesario
         });
+    },
 
         async function loadCategories() {
             try {
@@ -63,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (error) {
                 console.error("Error al cargar categorías:", error);
             }
-        }
+        },
 
         // Función auxiliar para renderizar las categorías
         function renderCategories(snapshot) {
@@ -77,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             console.log("Categorías actualizadas.");
-        }
+        },
 
         async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "") {
             exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
@@ -143,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (error) {
                 console.error("Error al cargar ejercicios:", error);
             }
-        }
+        },
 
         async function showExerciseDetails(nombre, video, instrucciones) {
             const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -269,7 +270,5 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 },
             });
-        }
-
-    });
-});
+        })
+    }) 
