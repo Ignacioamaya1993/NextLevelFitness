@@ -1,6 +1,7 @@
 import app from './firebaseConfig.js';
 import { getFirestore, collection, doc, getDocs, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js"; // Agregado
 
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
