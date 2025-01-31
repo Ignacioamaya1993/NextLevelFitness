@@ -19,9 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Usuario autenticado:", user.email);
 
         // Inicialización de variables DOM
-        categoryFilter = document.getElementById("category-filter");
-        exerciseGrid = document.getElementById("exercise-grid");
-        searchBar = document.getElementById("search-bar");
+        const categoryFilter = document.getElementById("category-filter");
+        const exerciseGrid = document.getElementById("exercise-grid");
+        const searchBar = document.getElementById("search-bar");
         const routineBuilder = document.getElementById("routine-builder");
         
         routineBuilder.classList.remove("hidden");
