@@ -1,12 +1,17 @@
 import app from './firebaseConfig.js';
-import { getFirestore, collection, getDocs, addDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-// Declaramos las variables globales fuera del bloque `DOMContentLoaded`
-let categoryFilter, exerciseGrid, searchBar;
-
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const categoryFilter = document.getElementById("category-filter");
+    const exerciseGrid = document.getElementById("exercise-grid");
+    const searchBar = document.getElementById("search-bar");
+    const routineBuilder = document.getElementById("routine-builder");
+
+    routineBuilder.classList.add("hidden"); // Ocultar el constructor de rutinas hasta autenticación
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
@@ -17,37 +22,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         console.log("Usuario autenticado:", user.email);
-
-        // Inicialización de variables DOM
-        const categoryFilter = document.getElementById("category-filter");
-        const exerciseGrid = document.getElementById("exercise-grid");
-        const searchBar = document.getElementById("search-bar");
-        const routineBuilder = document.getElementById("routine-builder");
-        
         routineBuilder.classList.remove("hidden");
 
-        const db = getFirestore(app);
-
-        await loadCategories(db);
-        await loadExercises(db);
+        await loadCategories(db, categoryFilter);
+        await loadExercises(db, exerciseGrid); // Se pasa exerciseGrid como parámetro
 
         categoryFilter.addEventListener("change", async () => {
-            const selectedCategory = categoryFilter.value;
-            await loadExercises(db, exerciseGrid, selectedCategory, searchBar.value);
+            await loadExercises(db, exerciseGrid, categoryFilter.value, searchBar.value);
         });
 
         let debounceTimeout;
-
         searchBar.addEventListener("input", async () => {
-            const selectedCategory = categoryFilter.value;
-        
-            // Cancelar cualquier llamada anterior que aún no se haya ejecutado
             clearTimeout(debounceTimeout);
-        
-            // Crear un nuevo retraso de 300ms antes de realizar la búsqueda
             debounceTimeout = setTimeout(async () => {
-                await loadExercises(db, exerciseGrid, selectedCategory, searchBar.value);
-            }, 300); // 300ms es un buen tiempo para debounce, ajusta si es necesario
+                await loadExercises(db, exerciseGrid, categoryFilter.value, searchBar.value);
+            }, 300);
         });
     });
 });
