@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
             tituloRutinas.textContent = "Error al cargar usuario";
         }
     }
-
     
 // Llamar a la función para cargar el usuario al iniciar
 cargarUsuario();

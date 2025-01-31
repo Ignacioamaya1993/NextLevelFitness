@@ -1,10 +1,12 @@
 import app from './firebaseConfig.js';
-import { getFirestore, collection, doc, getDocs, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-import { query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js"; // Agregado
 
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
+    const db = getFirestore(app); // Asegúrate de definir db aquí
+    
+    // Verificamos si el usuario está autenticado
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             console.log("No estás autenticado. Redirigiendo a login.");
@@ -15,26 +17,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log("Usuario autenticado:", user.email);
 
-        // Tu lógica para el panel de administración de ejercicios
-        if (window.__isInitializedAdmin) return;
+        // Verificamos si el usuario tiene permisos de administrador según las reglas de Firestore
+        const userDocRef = doc(db, "usuarios", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            // Aquí, las reglas de Firestore ya verifican si el usuario tiene permisos, pero si usas un campo como isAdmin, lo verificamos en el frontend.
+            if (userData.isAdmin) { // Si decides mantener este campo
+                console.log("El usuario es administrador.");
+                // Hacer visible el panel de administración
+                const adminPanel = document.getElementById("adminPanel");
+                if (adminPanel) {
+                    adminPanel.style.display = "block"; // Mostrar panel de administración
+                }
+            } else {
+                console.log("El usuario no es administrador.");
+                Swal.fire("Error", "Solo los administradores pueden acceder a esta sección.", "error");
+                window.location.href = "panel-admin.html"; // Redirigir a otra página si no es admin
+            }
+        } else {
+            console.log("Documento de usuario no encontrado.");
+            alert("No se encontró el usuario en la base de datos.");
+        }
+
+        // Lógica para el panel de administración de ejercicios
+        if (window.__isInitializedAdmin) return; // Evita la inicialización múltiple
         window.__isInitializedAdmin = true;
 
-    const db = getFirestore(app);
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"));  // Renombrado aquí
-    const categoryFilter = document.getElementById("admin-category-filter");
-    const exerciseTable = document.getElementById("exercise-table");
-    const addExerciseBtn = document.getElementById("add-exercise-btn");
-
-    const adminPanel = document.getElementById("admin-panel");
-
-    if (!currentUser || !currentUser.isAdmin) {  
-        if (adminPanel) {
-            adminPanel.innerHTML = "<p>Acceso denegado. Solo administradores pueden ver esta sección.</p>";
-        } else {
-            console.error("Elemento adminPanel no encontrado en el DOM.");
-        }
-        return;
-    }
+        const categoryFilter = document.getElementById("admin-category-filter");
+        const exerciseTable = document.getElementById("exercise-table");
+        const addExerciseBtn = document.getElementById("add-exercise-btn");
 
     // Cargar categorías y ejercicios
     await loadCategories();
@@ -215,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 title: 'swal2-title'
             },
             width: 'auto'
-        });
-    }
-})
+            });
+        }
+    })
 })
