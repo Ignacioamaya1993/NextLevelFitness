@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("No estás autenticado. Redirigiendo a login.");
             alert("No estás autenticado. Redirigiendo a login.");
             window.location.href = "login-admin.html";
-            return;  // Esta línea está bien, dentro de la función onAuthStateChanged
+            return;  // Esta línea está dentro de la función onAuthStateChanged
         }
 
         console.log("Usuario autenticado:", user.email);
@@ -44,6 +44,37 @@ document.addEventListener("DOMContentLoaded", () => {
             Swal.fire("Error", "Hubo un problema al acceder a la base de datos.", "error");
         }
     });
+
+    // El resto del código se debe colocar fuera de la función de autenticación
+    const userId = localStorage.getItem("selectedUserId");
+    const routineList = document.getElementById("routine-list");
+    const tituloRutinas = document.querySelector("h1");
+
+    // Función para cargar los datos del usuario seleccionado
+    async function cargarUsuario() {
+        if (!userId) {
+            tituloRutinas.textContent = "Rutinas del Usuario Desconocido";
+            return;
+        }
+    
+        try {
+            const usuarioRef = doc(db, "usuarios", userId);
+            const usuarioSnap = await getDoc(usuarioRef);
+    
+            if (usuarioSnap.exists()) {
+                const usuarioData = usuarioSnap.data();
+                const nombreCompleto = `${usuarioData.nombre} ${usuarioData.apellido}`;
+                tituloRutinas.textContent = `Rutinas del Usuario ${nombreCompleto}`;
+            } else {
+                tituloRutinas.textContent = "Rutinas del Usuario No Encontrado";
+            }
+        } catch (error) {
+            console.error("Error al obtener el usuario:", error);
+            tituloRutinas.textContent = "Error al cargar usuario";
+        }
+    }
+
+    cargarUsuario(); // Llamamos a la función para cargar los datos del usuario
 });
 
         console.log("Usuario autenticado:", user.email);
@@ -51,7 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const userId = localStorage.getItem("selectedUserId");
         const routineList = document.getElementById("routine-list");
         const tituloRutinas = document.querySelector("h1");
-
 
     // Función para cargar los datos del usuario seleccionado
     async function cargarUsuario() {
