@@ -2,6 +2,9 @@ import app from './firebaseConfig.js';
 import { getFirestore, collection, getDocs, addDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
+// Declaramos las variables globales fuera del bloque `DOMContentLoaded`
+let categoryFilter, exerciseGrid, searchBar;
+
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
 
@@ -20,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
         exerciseGrid = document.getElementById("exercise-grid");
         searchBar = document.getElementById("search-bar");
         const routineBuilder = document.getElementById("routine-builder");
-
         
         routineBuilder.classList.remove("hidden");
 
