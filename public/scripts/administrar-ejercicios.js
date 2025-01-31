@@ -1,7 +1,6 @@
-import app, { db } from "../scripts/firebaseConfig.js";
-import { getFirestore, collection, doc, getDocs, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-import { query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import app from './firebaseConfig.js';
+import { getFirestore, collection, doc, getDocs, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
@@ -54,46 +53,26 @@ document.addEventListener("DOMContentLoaded", () => {
         openExerciseModal(null); // Sin datos = Nuevo ejercicio
     });
 
-    async function loadCategories() {
-        try {
-            const categoriesRef = collection(db, "categories");
-            let categoriesSnapshot = await getDocs(categoriesRef, { source: "cache" });
-
-            if (categoriesSnapshot.empty) {
-                console.log("No hay datos en caché, obteniendo desde Firestore...");
-                categoriesSnapshot = await getDocs(categoriesRef, { source: "server" });
-            }
-
-            renderCategories(categoriesSnapshot);
-
-            onSnapshot(categoriesRef, (snapshot) => {
-                console.log("Actualización en Firestore detectada...");
-                renderCategories(snapshot);
-            });
-
-        } catch (error) {
-            console.error("Error al cargar categorías:", error);
-        }
-    }
-
+    // Función auxiliar para renderizar las categorías
     function renderCategories(snapshot) {
         categoryFilter.innerHTML = "<option value='all'>Todas las categorías</option>";
+    
         snapshot.forEach((doc) => {
             const option = document.createElement("option");
             option.value = doc.id;
             option.textContent = doc.id;
             categoryFilter.appendChild(option);
         });
-
+    
         console.log("Categorías actualizadas.");
     }
 
     async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "") {
-        exerciseGrid.innerHTML = "";
+        exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
 
         try {
-            const exercises = [];
-            let exercisesSnapshot;
+            const exercises = []; // Array para almacenar todos los ejercicios
+            let exercisesSnapshot;// Intentar cargar desde caché primero
 
             if (category === "all") {
                 const categoriesSnapshot = await getDocs(collection(db, "categories"));
@@ -103,7 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "server" });
                     }
                     exercisesSnapshot.forEach((doc) => {
-                        exercises.push(doc.data());
+                        const exercise = doc.data();
+                        exercises.push(exercise);
                     });
                 }
             } else {
@@ -112,17 +92,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "server" });
                 }
                 exercisesSnapshot.forEach((doc) => {
-                    exercises.push(doc.data());
+                    const exercise = doc.data();
+                    exercises.push(exercise);
                 });
             }
 
+            // Filtrar ejercicios por búsqueda
             const filteredExercises = exercises.filter((exercise) =>
                 exercise.Nombre.toLowerCase().includes(searchQuery.toLowerCase())
             );
 
+            // Renderizar los ejercicios filtrados
             filteredExercises.forEach((exercise) => {
                 const exerciseCard = document.createElement("div");
                 exerciseCard.classList.add("exercise-card");
+
                 exerciseCard.style.display = "flex";
                 exerciseCard.style.flexDirection = "column";
                 exerciseCard.style.justifyContent = "space-between";
@@ -144,20 +128,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             console.log("Ejercicios cargados correctamente.");
 
-            const categoryRef = category === "all" ? collection(db, "categories") : collection(db, `categories/${category}/exercises`);
-            onSnapshot(categoryRef, (snapshot) => {
-                console.log("Actualización en Firestore detectada...");
-                loadExercises(db, exerciseGrid, category, searchQuery);
-            });
-
         } catch (error) {
             console.error("Error al cargar ejercicios:", error);
         }
     }
 
     async function showExerciseDetails(nombre, video, instrucciones) {
-        let embedVideoUrl = "";
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user || !user.isLoggedIn) {
+                Swal.fire("Error", "Debes estar logueado como administrador para guardar rutinas.", "error");
+                return;
+            }
 
+        let embedVideoUrl = "";
         if (video.includes("youtube.com/shorts/")) {
             embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
         } else if (video.includes("youtube.com/watch?v=")) {
@@ -178,8 +161,40 @@ document.addEventListener("DOMContentLoaded", () => {
                         <h4>Instrucciones</h4>
                         <p>${instrucciones}</p>
                     </div>
+                <div class="popup-right">
+                        <form id="exercise-form">
+                            <div class="form-group">
+                            <label for="series">Series: <span style="color: red;">*</span></label>
+                                <input type="number" id="series" min="1" placeholder="Ingrese las series"required>
+                            </div>
+                            <div class="form-group">
+                            <label for="repeticiones">Repeticiones: <span style="color: red;">*</span></label>
+                                <input type="number" id="repeticiones" min="1" placeholder="Ingrese las repeticiones"required>
+                            </div>
+                            <div class="form-group">
+                            <label for="peso">Peso (kg): <span style="color: red;">*</span></label>
+                                <input type="number" id="peso" min="0" step="0.1" placeholder="Ingrese el peso"required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dias">Día de la semana:</label>
+                                <select id="dias" required>
+                                    <option value="lunes">Lunes</option>
+                                    <option value="martes">Martes</option>
+                                    <option value="miércoles">Miércoles</option>
+                                    <option value="jueves">Jueves</option>
+                                    <option value="viernes">Viernes</option>
+                                    <option value="sábado">Sábado</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="adicionales">Datos Adicionales:</label>
+                                <textarea id="adicionales" rows="3" placeholder="Escribe aquí alguna aclaración..."></textarea>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>`;
+    
 
         Swal.fire({
             title: "Detalles del ejercicio",

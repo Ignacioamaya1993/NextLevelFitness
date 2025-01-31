@@ -30,27 +30,17 @@
         </div>
     </header>
 
-    <main id="admin-panel">
-        <div class="filter-container">
-            <label for="admin-category-filter">Filtrar por categoría:</label>
-            <select id="admin-category-filter">
-                <option value="all">Todas</option>
-            </select>
-            <button id="add-exercise-btn">➕ Agregar Ejercicio</button>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Imagen</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="exercise-table">
-                <!-- Aquí se cargarán los ejercicios dinámicamente -->
-            </tbody>
-        </table>
+    <main>    
+        <section class="routine-builder hidden" id="routine-builder">
+            <h2>Arma tu rutina</h2>
+            <div class="filters">
+                <select id="category-filter"></select>
+                <input type="text" id="search-bar" placeholder="Buscar ejercicio...">
+            </div>
+            <div class="exercise-grid" id="exercise-grid">
+                <!-- Aquí se cargarán dinámicamente los ejercicios -->
+            </div>
+        </section>
     </main>
 
     <!-- 🔵 FOOTER GLOBAL (Se maneja desde global.css) -->
