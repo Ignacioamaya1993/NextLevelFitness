@@ -57,12 +57,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     
             renderCategories(categoriesSnapshot);
     
-            // Escuchar cambios en tiempo real para mantener actualizado
-            onSnapshot(categoriesRef, (snapshot) => {
-                console.log("Actualización en Firestore detectada...");
-                renderCategories(snapshot);
-            });
-    
         } catch (error) {
             console.error("Error al cargar categorías:", error);
         }
@@ -132,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const button = document.createElement("button");
                 button.textContent = "Seleccionar";
                 button.addEventListener("click", () =>
-                    showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones)
+                showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones)
                 );
     
                 exerciseCard.innerHTML = `
@@ -145,13 +139,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
     
             console.log("Ejercicios cargados correctamente.");
-    
-            // Escuchar cambios en tiempo real para mantener actualizado
-            const categoryRef = category === "all" ? collection(db, "categories") : collection(db, `categories/${category}/exercises`);
-            onSnapshot(categoryRef, (snapshot) => {
-                console.log("Actualización en Firestore detectada...");
-                loadExercises(db, exerciseGrid, category, searchQuery); // Recargar los ejercicios con los nuevos datos
-            });
     
         } catch (error) {
             console.error("Error al cargar ejercicios:", error);

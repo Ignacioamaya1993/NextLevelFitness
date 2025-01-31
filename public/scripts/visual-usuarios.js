@@ -113,7 +113,7 @@ function mostrarUsuarios(users) {
                 <p><strong>Edad:</strong> ${user.edad}</p>
                 <p><strong>Género:</strong> ${user.genero}</p>
                 <button class="view-rutinas-btn" data-user-id="${user.userId}">Ver Rutinas</button>
-                button class="assign-rutina-btn" data-user-id="${user.userId}">Armar Rutina</button>
+                <button class="assign-rutina-btn" data-user-id="${user.userId}">Armar Rutina</button>
 
             </div>
         `;
