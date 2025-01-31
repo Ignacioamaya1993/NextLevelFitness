@@ -82,9 +82,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     
         try {
             const exercises = []; // Array para almacenar todos los ejercicios
-    
-            // Intentar cargar desde caché primero
-            let exercisesSnapshot;
+            let exercisesSnapshot;// Intentar cargar desde caché primero
+
             if (category === "all") {
                 const categoriesSnapshot = await getDocs(collection(db, "categories"));
                 for (const categoryDoc of categoriesSnapshot.docs) {
@@ -133,8 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <h3>${exercise.Nombre}</h3>
                     <img src="${exercise.Imagen}" alt="${exercise.Nombre}">
                 `;
-                exerciseCard.appendChild(button);
-    
+                exerciseCard.appendChild(button);    
                 exerciseGrid.appendChild(exerciseCard);
             });
     
