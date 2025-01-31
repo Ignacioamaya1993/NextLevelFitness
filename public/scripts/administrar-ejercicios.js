@@ -222,10 +222,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
     const addExerciseButton = document.getElementById("add-exercise-button");
 
-  if (!user || !user.isLoggedIn) {
-    Swal.fire("Error", "Debes estar logueado para administrar ejercicios.", "error");
-    return;
-  }
+    document.addEventListener("DOMContentLoaded", () => {
+        const auth = getAuth(app);
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                console.log("No estás autenticado. Redirigiendo a login.");
+                alert("No estás autenticado. Redirigiendo a login.");
+                window.location.href = "login-admin.html";
+                return;
+            }
+    
+            console.log("Usuario autenticado:", user.email);
 
   // Cargar categorías
   await loadCategories();
@@ -244,3 +251,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     showAddExerciseForm();
   });
 });
+})
+})
