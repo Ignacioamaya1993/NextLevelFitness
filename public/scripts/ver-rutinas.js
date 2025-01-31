@@ -16,6 +16,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const userId = localStorage.getItem("selectedUserId");
         const routineList = document.getElementById("routine-list");
+        const tituloRutinas = document.querySelector("h1");
+
+
+    // Función para cargar los datos del usuario seleccionado
+    async function cargarUsuario() {
+        if (!userId) {
+            tituloRutinas.textContent = "Rutinas del Usuario Desconocido";
+            return;
+        }
+    
+        try {
+            const usuarioRef = doc(db, "usuarios", userId);
+            const usuarioSnap = await getDoc(usuarioRef);
+    
+            if (usuarioSnap.exists()) {
+                const usuarioData = usuarioSnap.data();
+                const nombreCompleto = `${usuarioData.nombre} ${usuarioData.apellido}`;
+                tituloRutinas.textContent = `Rutinas del Usuario ${nombreCompleto}`;
+            } else {
+                tituloRutinas.textContent = "Rutinas del Usuario No Encontrado";
+            }
+        } catch (error) {
+            console.error("Error al obtener el usuario:", error);
+            tituloRutinas.textContent = "Error al cargar usuario";
+        }
+    }
+
+    
+// Llamar a la función para cargar el usuario al iniciar
+cargarUsuario();
 
         if (!userId) {
             console.log("No se ha seleccionado un usuario válido.");
