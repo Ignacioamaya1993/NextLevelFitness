@@ -2,6 +2,19 @@ import app from './firebaseConfig.js';
 import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
+
+document.addEventListener("DOMContentLoaded", () => {
+    const auth = getAuth(app);
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            console.log("No estás autenticado. Redirigiendo a login.");
+            alert("No estás autenticado. Redirigiendo a login.");
+            window.location.href = "login-admin.html";
+            return;
+        }
+
+        console.log("Usuario autenticado:", user.email);
+        
 // Inicializar Firestore
 const db = getFirestore(app);
 const categoriesCollection = collection(db, "categories"); 
@@ -221,18 +234,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("El selector de categorías no se encuentra en el DOM.");
   }
     const addExerciseButton = document.getElementById("add-exercise-button");
-
-    document.addEventListener("DOMContentLoaded", () => {
-        const auth = getAuth(app);
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                console.log("No estás autenticado. Redirigiendo a login.");
-                alert("No estás autenticado. Redirigiendo a login.");
-                window.location.href = "login-admin.html";
-                return;
-            }
-    
-            console.log("Usuario autenticado:", user.email);
 
   // Cargar categorías
   await loadCategories();
