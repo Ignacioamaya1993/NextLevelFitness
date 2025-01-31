@@ -2,10 +2,6 @@ import app, { db } from "../scripts/firebaseConfig.js";
 import { collection, getDocs, query, where, deleteDoc, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-import app, { db } from "../scripts/firebaseConfig.js";
-import { collection, getDocs, query, where, deleteDoc, doc, getDoc, updateDoc, getFirestore } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
 
