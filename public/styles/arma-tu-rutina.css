@@ -74,17 +74,17 @@ main {
 
 .exercise-grid div {
     padding: 15px;
-    background-color: #ffffff;
+    background-color: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25); /* Ajuste del sombreado */
     text-align: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s;
 }
 
 .exercise-grid div:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15); /* Sombra al hacer hover */
 }
 
 .exercise-grid div img {

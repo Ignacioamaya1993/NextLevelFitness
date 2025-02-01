@@ -1,5 +1,5 @@
 import app from './firebaseConfig.js';
-import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 300); // 300ms es un buen tiempo para debounce, ajusta si es necesario
         });
 
-        async function loadCategories() {
+        async function loadCategories(db, categoryFilter) {
             try {
                 const categoriesRef = collection(db, "categories");
 
@@ -79,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Categorías actualizadas.");
         }
 
+        // Función para cargar y mostrar los ejercicios
         async function loadExercises(db, exerciseGrid, category = "all", searchQuery = "") {
             exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
 
@@ -95,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                         exercisesSnapshot.forEach((doc) => {
                             const exercise = doc.data();
-                            exercises.push(exercise);
+                            exercises.push({ ...exercise, id: doc.id }); // Agregar el id del documento
                         });
                     }
                 } else {
@@ -105,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     exercisesSnapshot.forEach((doc) => {
                         const exercise = doc.data();
-                        exercises.push(exercise);
+                        exercises.push({ ...exercise, id: doc.id }); // Agregar el id del documento
                     });
                 }
 
@@ -124,152 +125,156 @@ document.addEventListener("DOMContentLoaded", () => {
                     exerciseCard.style.justifyContent = "space-between";
                     exerciseCard.style.height = "100%";
 
-                    const button = document.createElement("button");
-                    button.textContent = "Seleccionar";
-                    button.addEventListener("click", () =>
-                    showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones)
+                    const selectButton = document.createElement("button");
+                    selectButton.textContent = "Seleccionar";
+                    selectButton.addEventListener("click", () =>
+                        showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones, exercise.Imagen, exercise)
                     );
+
+                    // Botón para eliminar ejercicio
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Eliminar ejercicio";  // Cambiar texto del botón
+                    deleteButton.style.backgroundColor = "red";
+                    deleteButton.style.color = "white";
+                    deleteButton.style.border = "none";
+                    deleteButton.style.padding = "8px 12px";
+                    deleteButton.style.cursor = "pointer";
+                    deleteButton.style.borderRadius = "5px";
+                    deleteButton.addEventListener("click", () => {
+                        Swal.fire({
+                            title: '¿Estás seguro?',
+                            text: "Esta acción no se puede deshacer.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, eliminar',
+                            cancelButtonText: 'Cancelar'
+                        }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                try {
+                                    // Eliminamos el ejercicio de Firestore
+                                    const exerciseRef = doc(db, `categories/${exercise.Categoria}/exercises/${exercise.id}`);
+                                    await deleteDoc(exerciseRef);
+                                    Swal.fire('¡Eliminado!', 'El ejercicio ha sido eliminado.', 'success');
+                                    loadExercises(db, exerciseGrid, category, searchQuery); // Volver a cargar los ejercicios
+                                } catch (error) {
+                                    Swal.fire('Error', 'No se pudo eliminar el ejercicio.', 'error');
+                                    console.error("Error al eliminar ejercicio:", error);
+                                }
+                            }
+                        });
+                    });
 
                     exerciseCard.innerHTML = `
                         <h3>${exercise.Nombre}</h3>
-                        <img src="${exercise.Imagen}" alt="${exercise.Nombre}">
+                        <img src="${exercise.Imagen || 'default-image.jpg'}" alt="${exercise.Nombre}">
                     `;
-                    exerciseCard.appendChild(button);    
+
+                    // Añadimos ambos botones (Seleccionar y Eliminar) dentro de la misma tarjeta
+                    const buttonContainer = document.createElement("div");
+                    buttonContainer.style.display = "flex";
+                    buttonContainer.style.gap = "10px";
+
+                    buttonContainer.appendChild(selectButton);
+                    buttonContainer.appendChild(deleteButton);  // Agregar el botón de eliminar
+
+                    exerciseCard.appendChild(buttonContainer);
                     exerciseGrid.appendChild(exerciseCard);
                 });
 
                 console.log("Ejercicios cargados correctamente.");
-
             } catch (error) {
                 console.error("Error al cargar ejercicios:", error);
             }
         }
 
-        async function showExerciseDetails(nombre, video, instrucciones) {
-            const user = JSON.parse(localStorage.getItem("currentUser"));
-            if (!user || !user.isLoggedIn) {
-                Swal.fire("Error", "Debes estar logueado para guardar rutinas.", "error");
-                return;
-            }
-
-            let embedVideoUrl = "";
-            if (video.includes("youtube.com/shorts/")) {
-                embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
-            } else if (video.includes("youtube.com/watch?v=")) {
-                const videoId = video.split("v=")[1]?.split("&")[0];
-                embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
-            }
-
-            const contentHTML = `
-                <div class="exercise-popup">
-                    <div class="popup-header">
-                        <h3 class="exercise-title">${nombre}</h3>
-                    </div>
-                    <div class="popup-content">
-                        <div class="popup-left">
-                            <div class="video-container">
-                                <iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
-                            </div>
-                            <h4>Instrucciones</h4>
-                            <p>${instrucciones}</p>
-                        </div>
-                        <div class="popup-right">
-                            <form id="exercise-form">
-                                <div class="form-group">
-                                <label for="series">Series: <span style="color: red;">*</span></label>
-                                    <input type="number" id="series" min="1" placeholder="Ingrese las series"required>
-                                </div>
-                                <div class="form-group">
-                                <label for="repeticiones">Repeticiones: <span style="color: red;">*</span></label>
-                                    <input type="number" id="repeticiones" min="1" placeholder="Ingrese las repeticiones"required>
-                                </div>
-                                <div class="form-group">
-                                <label for="peso">Peso (kg): <span style="color: red;">*</span></label>
-                                    <input type="number" id="peso" min="0" step="0.1" placeholder="Ingrese el peso"required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="dias">Día de la semana:</label>
-                                    <select id="dias" required>
-                                        <option value="lunes">Lunes</option>
-                                        <option value="martes">Martes</option>
-                                        <option value="miércoles">Miércoles</option>
-                                        <option value="jueves">Jueves</option>
-                                        <option value="viernes">Viernes</option>
-                                        <option value="sábado">Sábado</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="adicionales">Datos Adicionales:</label>
-                                    <textarea id="adicionales" rows="3" placeholder="Escribe aquí alguna aclaración..."></textarea>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>`;
-
+        function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercise) {
             Swal.fire({
-                title: "Detalles del ejercicio",
-                html: contentHTML,
+                title: `Editar ejercicio: ${Nombre}`,
+                html: `
+                    <div class="edit-popup">
+                        <!-- Columna izquierda (Imágenes) -->
+                        <div class="column">
+                            <div class="input-group">
+                                <label>Imagen actual:</label>
+                                <input type="text" id="current-image" class="swal2-input" value="${Imagen || ''}" disabled>
+                            </div>
+                            <div class="input-group">
+                                <label>Nueva imagen:</label>
+                                <input type="text" id="new-image" class="swal2-input" placeholder="Nueva URL de imagen">
+                            </div>
+                        </div>
+        
+                        <!-- Columna derecha (Videos) -->
+                        <div class="column">
+                            <div class="input-group">
+                                <label>Video actual:</label>
+                                <input type="text" id="current-video" class="swal2-input" value="${Video || ''}" disabled>
+                            </div>
+                            <div class="input-group">
+                                <label>Nuevo video:</label>
+                                <input type="text" id="new-video" class="swal2-input" placeholder="Nueva URL de video">
+                            </div>
+                        </div>
+        
+                        <!-- Instrucciones -->
+                        <div class="instructions-group">
+                            <div class="input-group">
+                                <label>Instrucciones actuales:</label>
+                                <textarea id="current-instructions" class="swal2-textarea" disabled>${Instrucciones || ''}</textarea>
+                            </div>
+                            <div class="input-group">
+                                <label>Nuevas instrucciones:</label>
+                                <textarea id="new-instructions" class="swal2-textarea" placeholder="Escribe las nuevas instrucciones..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                `,
                 showCancelButton: true,
-                confirmButtonText: "Guardar",
+                confirmButtonText: "Guardar cambios",
                 cancelButtonText: "Cancelar",
                 customClass: {
-                    popup: 'custom-popup',
-                    title: 'swal2-title' // Agregar la clase personalizada
+                    popup: "swal-wide"
                 },
-                width: 'auto', // Permite que el ancho se ajuste automáticamente
-
                 preConfirm: async () => {
-                    const series = parseInt(document.getElementById('series').value, 10);
-                    const repeticiones = parseInt(document.getElementById('repeticiones').value, 10);
-                    const peso = parseFloat(document.getElementById('peso').value);
-                    const dia = document.getElementById('dias').value;
-                    const adicionales = document.getElementById('adicionales').value;
-
-                    if (!series || series <= 0 || !repeticiones || repeticiones <= 0 || !peso || peso <= 0) {
-                        Swal.showValidationMessage("Por favor, ingresa valores válidos para series, repeticiones y peso.");
-                        return;
-                    }
-
+                    const newImage = document.getElementById("new-image").value.trim() || Imagen;
+                    const newVideo = document.getElementById("new-video").value.trim() || Video;
+                    const newInstructions = document.getElementById("new-instructions").value.trim() || Instrucciones;
+        
                     try {
-                        const db = getFirestore(app);
-                        const routinesRef = collection(db, "routines");
-
-                        // Consulta Firestore para buscar una rutina con el mismo usuario y día
-                        const q = query(routinesRef, where("usuario", "==", user.email), where("dia", "==", dia));
-                        const querySnapshot = await getDocs(q);
-
-                        // Si la rutina existe, actualizamos los datos
-                        if (!querySnapshot.empty) {
-                            const routineDoc = querySnapshot.docs[0];
-                            await updateDoc(routineDoc.ref, {
-                                series,
-                                repeticiones,
-                                peso,
-                                adicionales,
-                            });
-                            console.log("Rutina actualizada correctamente.");
-                        } else {
-                            // Si no existe, creamos una nueva
-                            await addDoc(routinesRef, {
-                                usuario: user.email,
-                                dia,
-                                ejercicio: nombre,
-                                series,
-                                repeticiones,
-                                peso,
-                                adicionales,
-                                video: embedVideoUrl,
-                            });
-                            console.log("Rutina guardada correctamente.");
+                        const db = getFirestore();
+        
+                        // Si el ejercicio tiene un campo 'categoria', usamos ese valor como referencia
+                        const category = exercise.categoria;
+        
+                        if (!category) {
+                            throw new Error("La categoría del ejercicio no está definida.");
                         }
-
+        
+                        // Obtener la referencia al documento del ejercicio en la colección correspondiente
+                        const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
+        
+                        const docSnapshot = await getDoc(exerciseRef);
+        
+                        if (docSnapshot.exists()) {
+                            // El documento existe, proceder con la actualización
+                            await updateDoc(exerciseRef, {
+                                Imagen: newImage,
+                                Video: newVideo,
+                                Instrucciones: newInstructions
+                            });
+                            Swal.fire("¡Actualizado!", "El ejercicio se ha actualizado correctamente.", "success");
+                        } else {
+                            // El documento no existe, manejar el error
+                            Swal.fire("Error", "No se pudo encontrar el ejercicio para actualizar.", "error");
+                            console.error("Documento no encontrado:", exerciseRef);
+                        }
                     } catch (error) {
-                        console.error("Error al guardar rutina:", error);
+                        Swal.fire("Error", `No se pudo actualizar el ejercicio: ${error.message}`, "error");
+                        console.error("Error al actualizar ejercicio:", error);
                     }
-                },
+                }
             });
         }
-
+        
     });
 });
