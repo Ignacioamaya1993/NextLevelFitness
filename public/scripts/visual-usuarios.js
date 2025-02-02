@@ -6,8 +6,80 @@ const usuariosContainer = document.getElementById("usuarios-container");
 const searchInput = document.getElementById("search-input"); // Campo de búsqueda
 const clearSearchButton = document.getElementById("clear-search"); // Botón de limpiar búsqueda
 
-// Variable global para almacenar todos los usuarios
 let usuarios = [];
+
+async function cargarUsuarios() {
+    const auth = getAuth(app);
+    // Verificar si el usuario está autenticado
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            // Si no hay usuario autenticado, redirigir al login
+            window.location.href = "login-admin.html";
+            return;
+        }
+
+        // Usuario autenticado
+        console.log("Usuario autenticado:", user.email);
+
+        try {
+            const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
+
+            if (usuariosSnapshot.empty) {
+                usuariosContainer.innerHTML = "<p>No hay usuarios registrados.</p>";
+                return;
+            }
+
+            usuarios = [];
+
+            usuariosSnapshot.forEach(doc => {
+                const userData = doc.data();
+                const userId = doc.id;
+                const nombre = userData.nombre || "Sin nombre";
+                const apellido = userData.apellido || "Sin apellido";
+                const email = userData.email || "No disponible";
+                const celular = userData.celular || "No disponible";
+                const fechaNacimiento = userData.fechaNacimiento || "No disponible";
+                const genero = userData.genero || "No disponible";
+
+                let edad = "No disponible";
+                if (fechaNacimiento !== "No disponible") {
+                    edad = calcularEdad(fechaNacimiento);
+                }
+
+                let fechaFormateada = "No disponible";
+                if (fechaNacimiento !== "No disponible") {
+                    fechaFormateada = formatearFecha(fechaNacimiento);
+                }
+
+                usuarios.push({
+                    userId,
+                    nombre,
+                    apellido,
+                    email,
+                    celular,
+                    fechaFormateada,
+                    edad,
+                    genero
+                });
+            });
+
+            mostrarUsuarios(usuarios);
+
+            searchInput.addEventListener("input", () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredUsers = usuarios.filter(user =>
+                    user.nombre.toLowerCase().includes(searchTerm) ||
+                    user.apellido.toLowerCase().includes(searchTerm)
+                );
+                mostrarUsuarios(filteredUsers);
+            });
+
+        } catch (error) {
+            console.error("Error al cargar usuarios:", error);
+            usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
+        }
+    });
+}
 
 // Función para calcular la edad basada en la fecha de nacimiento
 function calcularEdad(fechaNacimiento) {
@@ -28,78 +100,6 @@ function formatearFecha(fecha) {
     return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
 }
 
-// Función para cargar usuarios
-async function cargarUsuarios() {
-    const auth = getAuth(app);
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            console.log("Usuario autenticado:", user.email);
-
-            try {
-                const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
-                
-                if (usuariosSnapshot.empty) {
-                    usuariosContainer.innerHTML = "<p>No hay usuarios registrados.</p>";
-                    return;
-                }
-
-                usuarios = [];
-
-                usuariosSnapshot.forEach(doc => {
-                    const userData = doc.data();
-                    const userId = doc.id;
-                    const nombre = userData.nombre || "Sin nombre";
-                    const apellido = userData.apellido || "Sin apellido";
-                    const email = userData.email || "No disponible";
-                    const celular = userData.celular || "No disponible";
-                    const fechaNacimiento = userData.fechaNacimiento || "No disponible";
-                    const genero = userData.genero || "No disponible";
-                    
-                    let edad = "No disponible";
-                    if (fechaNacimiento !== "No disponible") {
-                        edad = calcularEdad(fechaNacimiento);
-                    }
-
-                    let fechaFormateada = "No disponible";
-                    if (fechaNacimiento !== "No disponible") {
-                        fechaFormateada = formatearFecha(fechaNacimiento);
-                    }
-
-                    usuarios.push({
-                        userId,
-                        nombre,
-                        apellido,
-                        email,
-                        celular,
-                        fechaFormateada,
-                        edad,
-                        genero
-                    });
-                });
-
-                // Mostrar todos los usuarios inicialmente
-                mostrarUsuarios(usuarios);
-
-                // Filtrar usuarios mientras se escribe en el campo de búsqueda
-                searchInput.addEventListener("input", () => {
-                    const searchTerm = searchInput.value.toLowerCase();
-                    const filteredUsers = usuarios.filter(user => 
-                        user.nombre.toLowerCase().includes(searchTerm) || 
-                        user.apellido.toLowerCase().includes(searchTerm)
-                    );
-                    mostrarUsuarios(filteredUsers);
-                });
-
-            } catch (error) {
-                console.error("Error al cargar usuarios:", error);
-                usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
-            }
-        } else {
-            usuariosContainer.innerHTML = `<p style="color:red;">Por favor, inicia sesión para ver los usuarios.</p>`;
-        }
-    });
-}
-
 // Función para mostrar usuarios
 function mostrarUsuarios(users) {
     let html = "";
@@ -114,22 +114,18 @@ function mostrarUsuarios(users) {
                 <p><strong>Género:</strong> ${user.genero}</p>
                 <button class="view-rutinas-btn" data-user-id="${user.userId}">Ver Rutinas</button>
                 <button class="assign-rutina-btn" data-user-id="${user.userId}">Armar Rutina</button>
-
             </div>
         `;
     });
     usuariosContainer.innerHTML = html;
 
-    // Agregar eventos a los botones de "Ver Rutinas"
-    const verRutinasButtons = document.querySelectorAll('.view-rutinas-btn');
-    verRutinasButtons.forEach(button => {
+    document.querySelectorAll('.view-rutinas-btn').forEach(button => {
         button.addEventListener('click', function() {
             const userId = button.dataset.userId;
             verRutinasUsuario(userId);
         });
     });
 
-    // Agregar eventos a los botones "Armar Rutina"
     document.querySelectorAll('.assign-rutina-btn').forEach(button => {
         button.addEventListener('click', function() {
             const userId = button.dataset.userId;
@@ -140,20 +136,20 @@ function mostrarUsuarios(users) {
 
 // Agregar el evento de clic a la "X"
 clearSearchButton.addEventListener("click", () => {
-    searchInput.value = ""; // Limpiar el campo de búsqueda
-    searchInput.focus(); // Poner el foco en el campo de búsqueda
-    mostrarUsuarios(usuarios); // Mostrar todos los usuarios nuevamente
+    searchInput.value = ""; 
+    searchInput.focus();
+    mostrarUsuarios(usuarios);
 });
 
 // Función para ver rutinas (redirige a una nueva página con el ID del usuario)
 function verRutinasUsuario(userId) {
-    localStorage.setItem("selectedUserId", userId); // Guarda el ID del usuario
+    localStorage.setItem("selectedUserId", userId);
     window.location.href = "ver-rutinas.html";
 }
 
 // Función para redirigir a la página de asignar rutinas
 function asignarRutinaUsuario(userId) {
-    localStorage.setItem("selectedUserId", userId); // Guarda el ID del usuario
+    localStorage.setItem("selectedUserId", userId);
     window.location.href = "asignar-rutinas.html";
 }
 

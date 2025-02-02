@@ -10,17 +10,161 @@ body {
 .routine-builder {
     max-width: 100%;
     margin: 20px auto;
+    margin-top: 20px;
     padding: 20px;
     background-color: #fff;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
 
+/* Estilos para el contenedor de la paginación */
+#pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Estilo para cada botón de la paginación */
+#pagination-container button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Estilo para el botón activo */
+#pagination-container button.active {
+    background-color: #45a049;
+}
+
+/* Efecto al pasar el mouse por encima de los botones */
+#pagination-container button:hover {
+    background-color: #3e8e41;
+    transform: scale(1.1);
+}
+
+/* Estilo para los botones de "Anterior" y "Siguiente" */
+#pagination-container button.prev,
+#pagination-container button.next {
+    background-color: #008CBA;
+}
+
+/* Efecto al pasar el mouse por encima de los botones "Anterior" y "Siguiente" */
+#pagination-container button.prev:hover,
+#pagination-container button.next:hover {
+    background-color: #007B8A;
+}
+
 /* Filtros */
 .filters {
     display: flex;
     gap: 10px;
-    margin-bottom: 15px;
+    align-items: center;
+}
+
+.narrow {
+    width: 200px; /* Reducir el ancho de los campos */
+}
+
+.add-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.add-button i {
+    margin-right: 5px;
+}
+
+/* Contenedor principal del modal */
+.swal2-popup {
+    width: 30%;
+    border-radius: 12px;
+}
+
+/* Título del modal */
+.swal2-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Inputs, selects y textarea */
+.swal2-input, .swal2-select, .swal2-textarea {
+    width: 90%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: 0.3s;
+    margin-bottom: 15px; /* Separación entre los campos */
+}
+
+/* Efecto al hacer foco en los inputs */
+.swal2-input:focus, .swal2-select:focus, .swal2-textarea:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Estilo del select */
+.swal2-select {
+    cursor: pointer;
+    background: #fff;
+}
+
+/* Área de texto */
+.swal2-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Contenedor de la categoría */
+#category-container {
+    display: flex;
+    gap: 10px;
+    flex-direction: row; /* Para mantener los elementos en línea por defecto */
+}
+
+/* Si la categoría seleccionada es 'Otra', se cambia a columna */
+#category-container.expand {
+    flex-direction: column;
+}
+
+/* Selector de categoría */
+#category-select {
+    flex: 1;
+}
+
+/* Input para nueva categoría */
+#new-exercise-category {
+    flex: 1;
+    display: none;
+    margin-top: 10px; 
+    padding: 10px; 
+    border-radius: 8px; 
+    border: 1px solid #ccc; 
+    font-size: 14px; 
+    transition: 0.3s; 
+}
+
+/* Botón de confirmación */
+.swal2-confirm {
+    background-color: #007BFF !important;
+    font-size: 16px !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
 }
 
 #category-filter, #search-bar {
@@ -34,7 +178,8 @@ body {
 /* Grid de ejercicios */
 .exercise-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    margin-top: 20px; 
+    grid-template-columns: repeat(6, 1fr);  /* 3 columnas */
     gap: 15px;
 }
 
@@ -59,11 +204,11 @@ body {
     border-radius: 5px;
 }
 
-/* Contenedor de botones (Seleccionar y Eliminar) */
-.exercise-card .button-container {
+.buttonContainer { /* Sin el prefijo .exercise-card */
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
 }
 
 /* Estilos para el botón de "Seleccionar" */
@@ -83,7 +228,7 @@ body {
 
 /* Estilos para el botón de "Eliminar" */
 .exercise-card button.delete-btn {
-    background-color: rgb(146, 23, 23);
+    background-color: rgb(214, 16, 16);
     color: white;
     border: none;
     padding: 8px 12px;

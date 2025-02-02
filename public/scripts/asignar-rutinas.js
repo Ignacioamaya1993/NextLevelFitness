@@ -1,16 +1,50 @@
-import app from './firebaseConfig.js';
-import { getFirestore, collection, doc, getDocs, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import app, { db } from "../scripts/firebaseConfig.js";
+import { getFirestore, collection, doc, getDocs, getDoc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { query, where } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-document.addEventListener("DOMContentLoaded", async () => {
-    // Asegúrate de que este código solo se ejecute una vez
-    if (window.__isInitialized) return;
-    window.__isInitialized = true;
+document.addEventListener("DOMContentLoaded", () => {
+    const auth = getAuth(app);
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "login-admin.html";
+            return;
+        }
 
-    const db = getFirestore(app);
+        console.log("Usuario autenticado:", user.email);
 
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    const restrictedMessage = document.getElementById("restricted-message");
+        const userId = localStorage.getItem("selectedUserId");
+
+    // Función para cargar los datos del usuario seleccionado
+    async function cargarUsuario() {
+        try {
+            // Reemplazar 'userId' con el ID del usuario que deseas cargar (por ejemplo, el ID obtenido desde la sesión de login)
+            const usuarioRef = doc(db, "usuarios", userId);
+            const usuarioSnap = await getDoc(usuarioRef);
+
+            if (usuarioSnap.exists()) {
+                const usuarioData = usuarioSnap.data();
+                const nombreCompleto = `${usuarioData.nombre} ${usuarioData.apellido}`;
+                
+                // Actualizar el título en el HTML con el nombre completo del usuario
+                const tituloRutinas = document.getElementById("titulo-rutinas");
+                tituloRutinas.textContent = `Asignar rutina para ${nombreCompleto}`;
+            } else {
+                // Si el usuario no existe, mostrar un mensaje adecuado
+                const tituloRutinas = document.getElementById("titulo-rutinas");
+                tituloRutinas.textContent = "Rutinas del Usuario No Encontrado";
+            }
+        } catch (error) {
+            console.error("Error al obtener el usuario:", error);
+            // Si hay un error, mostrar un mensaje adecuado
+            const tituloRutinas = document.getElementById("titulo-rutinas");
+            tituloRutinas.textContent = "Error al cargar usuario";
+        }
+    }
+
+    // Llamar a la función para cargar el usuario al iniciar
+    cargarUsuario();
+
     const routineBuilder = document.getElementById("routine-builder");
     const categoryFilter = document.getElementById("category-filter");
     const exerciseGrid = document.getElementById("exercise-grid");
@@ -19,33 +53,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     let currentPage = 1; // Página actual
     const itemsPerPage = 18; // Número de items por página
 
-    if (user && user.isLoggedIn) {
-        restrictedMessage.classList.add("hidden");
-        routineBuilder.classList.remove("hidden");
+    routineBuilder.classList.remove("hidden");
 
-        await loadCategories(db, categoryFilter);
-        await loadExercises(db, exerciseGrid);
-        
-        categoryFilter.addEventListener("change", async () => {
-            const selectedCategory = categoryFilter.value || "all"; // Si es vacío, usar "all"
-            await loadExercises(db, exerciseGrid, 1, selectedCategory, searchBar.value);
-        });
-        
+    await loadCategories(db, categoryFilter);
+    await loadExercises(db, exerciseGrid, currentPage);
 
-        let debounceTimeout;
+    categoryFilter.addEventListener("change", async () => {
+        const selectedCategory = categoryFilter.value;
+        await loadExercises(db, exerciseGrid, currentPage, selectedCategory, searchBar.value);
+    });        
 
-        searchBar.addEventListener("input", async () => {
-            const selectedCategory = categoryFilter.value;
-        
-            // Cancelar cualquier llamada anterior que aún no se haya ejecutado
-            clearTimeout(debounceTimeout);
-        
-            // Crear un nuevo retraso de 300ms antes de realizar la búsqueda
-            debounceTimeout = setTimeout(async () => {
-                await loadExercises(db, exerciseGrid, currentPage, selectedCategory, searchBar.value);
-            }, 300); // 300ms es un buen tiempo para debounce, ajusta si es necesario
-        });
-    }
+    let debounceTimeout;
+
+    searchBar.addEventListener("input", async () => {
+        const selectedCategory = categoryFilter.value;
+
+        // Cancelar cualquier llamada anterior que aún no se haya ejecutado
+        clearTimeout(debounceTimeout);
+
+        // Crear un nuevo retraso de 300ms antes de realizar la búsqueda
+        debounceTimeout = setTimeout(async () => {
+            await loadExercises(db, exerciseGrid, currentPage, selectedCategory, searchBar.value);
+        }, 300); // 300ms es un buen tiempo para debounce, ajusta si es necesario
+    });
 
     async function loadCategories() {
         try {
@@ -219,11 +249,6 @@ function renderPagination(totalItems, currentPage) {
 
 
     async function showExerciseDetails(nombre, video, instrucciones) {
-        const user = JSON.parse(localStorage.getItem("currentUser"));
-        if (!user || !user.isLoggedIn) {
-            Swal.fire("Error", "Debes estar logueado para guardar rutinas.", "error");
-            return;
-        }
     
         let embedVideoUrl = "";
         if (video.includes("youtube.com/shorts/")) {
@@ -367,3 +392,4 @@ function renderPagination(totalItems, currentPage) {
         });
     }
 });
+})

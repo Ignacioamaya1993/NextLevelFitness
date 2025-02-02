@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administrar Ejercicios</title>
+    <title>Asignar Rutinas - Next Level Fitness</title>
     <link rel="stylesheet" href="../styles/global.css">
-    <link rel="stylesheet" href="../styles/administrar-ejercicios.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../styles/asignar-rutinas.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -29,27 +29,20 @@
     </header>
 
     <main>
-        <section class="routine-builder" id="routine-builder">
-            <h2>Administrar Ejercicios</h2>
+        <section class="routine-builder hidden" id="routine-builder">
+            <h2 id="titulo-rutinas">Asignar rutina para [Nombre] [Apellido]</h2>
             <div class="filters">
-                <select id="category-filter" class="narrow"></select>
-                <input type="text" id="search-bar" placeholder="Buscar ejercicio..." class="narrow">
-                <button id="add-exercise-btn" class="add-button"><i class="fas fa-plus"></i> Agregar nuevo ejercicio</button>
-            </div>            
+                <select id="category-filter"></select>
+                <input type="text" id="search-bar" placeholder="Buscar ejercicio...">
+            </div>
             <div class="exercise-grid" id="exercise-grid">
                 <!-- Aquí se cargarán dinámicamente los ejercicios -->
             </div>
         </section>
     </main>
 
-    <!-- Aquí se cargará el formulario de creación de nuevo ejercicio -->
-    <div id="create-exercise-popup" class="hidden">
-        <!-- El formulario se manejará dinámicamente desde JS -->
-    </div>
-
     <div id="pagination-container"></div>
 
-    <!-- 🔵 FOOTER GLOBAL -->
     <footer>
         <div class="footer-container">
             <div class="footer-info">
@@ -73,9 +66,9 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script type="module" src="../scripts/firebaseConfig.js"></script>
-    <script type="module" src="../scripts/administrar-ejercicios.js"></script>
+    <script type="module" src="../scripts/asignar-rutinas.js"></script> 
+    <script type="module" src="../scripts/auth.js"></script> 
 
 </body>
 </html>

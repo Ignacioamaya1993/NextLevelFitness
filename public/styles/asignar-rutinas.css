@@ -3,46 +3,6 @@ main {
     padding: 20px;
 }
 
-/* Sección de acceso restringido */
-.access-restricted {
-    text-align: center;
-    padding: 50px;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.access-restricted:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.access-restricted h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #1f2937;
-}
-
-.access-restricted .cta-button {
-    margin: 10px;
-    background-color: #457b9d;
-    color: #ffffff;
-    text-decoration: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: inline-block;
-}
-
-.access-restricted .cta-button:hover {
-    background-color: #1d3557;
-    transform: scale(1.1);
-}
-
 .routine-builder {
     display: flex;
     flex-direction: column;
