@@ -15,107 +15,126 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const selectedUserId = localStorage.getItem("selectedUserId");
 
-        // Verificar si se ha obtenido el userId correctamente
-        if (selectedUserId) {
-            console.log("User seleccionado:", selectedUserId);
-        } else {
+        if (!selectedUserId) {
             console.error("No se ha encontrado el userId en localStorage.");
+            return;
         }
 
-    // Función para cargar los datos del usuario seleccionado
-    async function cargarUsuario() {
-        try {
-            // Reemplazar 'userId' con el ID del usuario que deseas cargar (por ejemplo, el ID obtenido desde la sesión de login)
-            const usuarioRef = doc(db, "usuarios", selectedUserId);
-            const usuarioSnap = await getDoc(usuarioRef);
+        console.log("Usuario seleccionado:", selectedUserId);
 
-            if (usuarioSnap.exists()) {
-                const usuarioData = usuarioSnap.data();
-                const nombreCompleto = `${usuarioData.nombre} ${usuarioData.apellido}`;
-                
-                // Actualizar el título en el HTML con el nombre completo del usuario
+        // Función para cargar los datos del usuario seleccionado
+        async function cargarUsuario() {
+            try {
+                const usuarioRef = doc(db, "usuarios", selectedUserId);
+                const usuarioSnap = await getDoc(usuarioRef);
+
+                if (usuarioSnap.exists()) {
+                    const usuarioData = usuarioSnap.data();
+                    const nombreCompleto = `${usuarioData.nombre} ${usuarioData.apellido}`;
+                    const tituloRutinas = document.getElementById("titulo-rutinas");
+                    tituloRutinas.textContent = `Asignar rutina para ${nombreCompleto}`;
+                } else {
+                    const tituloRutinas = document.getElementById("titulo-rutinas");
+                    tituloRutinas.textContent = "Rutinas del Usuario No Encontrado";
+                }
+            } catch (error) {
+                console.error("Error al obtener el usuario:", error);
                 const tituloRutinas = document.getElementById("titulo-rutinas");
-                tituloRutinas.textContent = `Asignar rutina para ${nombreCompleto}`;
-            } else {
-                // Si el usuario no existe, mostrar un mensaje adecuado
-                const tituloRutinas = document.getElementById("titulo-rutinas");
-                tituloRutinas.textContent = "Rutinas del Usuario No Encontrado";
+                tituloRutinas.textContent = "Error al cargar usuario";
             }
-        } catch (error) {
-            console.error("Error al obtener el usuario:", error);
-            // Si hay un error, mostrar un mensaje adecuado
-            const tituloRutinas = document.getElementById("titulo-rutinas");
-            tituloRutinas.textContent = "Error al cargar usuario";
         }
-    }
 
-    // Llamar a la función para cargar el usuario al iniciar
-    cargarUsuario();
+        cargarUsuario();
 
-    const routineBuilder = document.getElementById("routine-builder");
-    const categoryFilter = document.getElementById("category-filter");
-    const exerciseGrid = document.getElementById("exercise-grid");
-    const searchBar = document.getElementById("search-bar");
+        async function guardarRutina(selectedExerciseName) {  // Asegurar que recibe el ejercicio seleccionado
+            const series = document.getElementById("series").value;
+            const repeticiones = document.getElementById("repeticiones").value;
+            const peso = document.getElementById("peso").value;
+            const dia = document.getElementById("dias").value;
+        
+            if (!series || !repeticiones || !peso || !dia || !selectedExerciseName) {
+                alert("Por favor, complete todos los campos.");
+                return;
+            }
+        
+            console.log("Guardando rutina para usuario:", selectedUserId); 
+        
+            try {
+                const ejerciciosRef = collection(db, "usuarios", selectedUserId, "rutinas");  // Guardar en el usuario correcto
+                await addDoc(ejerciciosRef, {
+                    ejercicio: selectedExerciseName,
+                    series: series,
+                    repeticiones: repeticiones,
+                    peso: peso,
+                    dia: dia,
+                    fecha: new Date()
+                });
+        
+                console.log("Rutina guardada correctamente para", selectedUserId);
+            } catch (error) {
+                console.error("Error al guardar la rutina:", error);
+            }
+        }        
 
-    let currentPage = 1; // Página actual
-    const itemsPerPage = 18; // Número de items por página
+        // Cargar categorías y ejercicios
+        const routineBuilder = document.getElementById("routine-builder");
+        const categoryFilter = document.getElementById("category-filter");
+        const exerciseGrid = document.getElementById("exercise-grid");
+        const searchBar = document.getElementById("search-bar");
 
-    routineBuilder.classList.remove("hidden");
+        let currentPage = 1;
+        const itemsPerPage = 18;
 
-    await loadCategories(db, categoryFilter);
-    await loadExercises(db, exerciseGrid, currentPage);
+        routineBuilder.classList.remove("hidden");
 
-    categoryFilter.addEventListener("change", async () => {
-        const selectedCategory = categoryFilter.value;
-        await loadExercises(db, exerciseGrid, currentPage, selectedCategory, searchBar.value);
-    });        
+        await loadCategories(db, categoryFilter);
+        await loadExercises(db, exerciseGrid, currentPage);
 
-    let debounceTimeout;
-
-    searchBar.addEventListener("input", async () => {
-        const selectedCategory = categoryFilter.value;
-
-        // Cancelar cualquier llamada anterior que aún no se haya ejecutado
-        clearTimeout(debounceTimeout);
-
-        // Crear un nuevo retraso de 300ms antes de realizar la búsqueda
-        debounceTimeout = setTimeout(async () => {
+        categoryFilter.addEventListener("change", async () => {
+            const selectedCategory = categoryFilter.value;
             await loadExercises(db, exerciseGrid, currentPage, selectedCategory, searchBar.value);
-        }, 300); // 300ms es un buen tiempo para debounce, ajusta si es necesario
-    });
-
-    async function loadCategories() {
-        try {
-            const categoriesRef = collection(db, "categories");
-    
-            // Intentar cargar desde caché primero
-            let categoriesSnapshot = await getDocs(categoriesRef, { source: "cache" });
-    
-            if (categoriesSnapshot.empty) {
-                console.log("No hay datos en caché, obteniendo desde Firestore...");
-                categoriesSnapshot = await getDocs(categoriesRef, { source: "server" });
-            }
-    
-            renderCategories(categoriesSnapshot);
-    
-        } catch (error) {
-            console.error("Error al cargar categorías:", error);
-        }
-    }
-    
-    // Función auxiliar para renderizar las categorías
-    function renderCategories(snapshot) {
-        categoryFilter.innerHTML = "<option value='all'>Todas las categorías</option>";
-    
-        snapshot.forEach((doc) => {
-            const option = document.createElement("option");
-            option.value = doc.id;
-            option.textContent = doc.id;
-            categoryFilter.appendChild(option);
         });
-    
-        console.log("Categorías actualizadas.");
-    }
+
+        let debounceTimeout;
+
+        searchBar.addEventListener("input", async () => {
+            const selectedCategory = categoryFilter.value;
+
+            clearTimeout(debounceTimeout);
+
+            debounceTimeout = setTimeout(async () => {
+                await loadExercises(db, exerciseGrid, currentPage, selectedCategory, searchBar.value);
+            }, 300);
+        });
+
+        async function loadCategories() {
+            try {
+                const categoriesRef = collection(db, "categories");
+                let categoriesSnapshot = await getDocs(categoriesRef, { source: "cache" });
+
+                if (categoriesSnapshot.empty) {
+                    console.log("No hay datos en caché, obteniendo desde Firestore...");
+                    categoriesSnapshot = await getDocs(categoriesRef, { source: "server" });
+                }
+
+                renderCategories(categoriesSnapshot);
+            } catch (error) {
+                console.error("Error al cargar categorías:", error);
+            }
+        }
+
+        function renderCategories(snapshot) {
+            categoryFilter.innerHTML = "<option value='all'>Todas las categorías</option>";
+
+            snapshot.forEach((doc) => {
+                const option = document.createElement("option");
+                option.value = doc.id;
+                option.textContent = doc.id;
+                categoryFilter.appendChild(option);
+            });
+
+            console.log("Categorías actualizadas.");
+        }
     
 // Función para cargar y mostrar los ejercicios con paginación
 async function loadExercises(db, exerciseGrid, page = 1, category = "all", searchQuery = "") {
@@ -245,148 +264,148 @@ function renderPagination(totalItems, currentPage) {
 }
 
 
-    async function showExerciseDetails(nombre, video, instrucciones) {
-    
-        let embedVideoUrl = "";
-        if (video.includes("youtube.com/shorts/")) {
-            embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
-        } else if (video.includes("youtube.com/watch?v=")) {
-            const videoId = video.split("v=")[1]?.split("&")[0];
-            embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
-        }
-    
-        const contentHTML = `
-            <div class="exercise-popup">
-                <div class="popup-header">
-                    <h3 class="exercise-title">${nombre}</h3>
-                </div>
-                <div class="popup-content">
-                    <div class="popup-left">
-                        <div class="video-container">
-                            <iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
-                        </div>
-                        <h4>Instrucciones</h4>
-                        <p>${instrucciones}</p>
-                    </div>
-                    <div class="popup-right">
-                        <form id="exercise-form">
-                            <div class="form-group">
-                            <label for="series">Series: <span style="color: red;">*</span></label>
-                                <input type="number" id="series" min="1" placeholder="Ingrese las series"required>
-                            </div>
-                            <div class="form-group">
-                            <label for="repeticiones">Repeticiones: <span style="color: red;">*</span></label>
-                                <input type="number" id="repeticiones" min="1" placeholder="Ingrese las repeticiones"required>
-                            </div>
-                            <div class="form-group">
-                            <label for="peso">Peso (kg): <span style="color: red;">*</span></label>
-                                <input type="number" id="peso" min="0" step="0.1" placeholder="Ingrese el peso"required>
-                            </div>
-                            <div class="form-group">
-                                <label for="dias">Día de la semana:</label>
-                                <select id="dias" required>
-                                    <option value="lunes">Lunes</option>
-                                    <option value="martes">Martes</option>
-                                    <option value="miércoles">Miércoles</option>
-                                    <option value="jueves">Jueves</option>
-                                    <option value="viernes">Viernes</option>
-                                    <option value="sábado">Sábado</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="adicionales">Datos Adicionales:</label>
-                                <textarea id="adicionales" rows="3" placeholder="Escribe aquí alguna aclaración..."></textarea>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>`;
-    
-        Swal.fire({
-            title: "Detalles del ejercicio",
-            html: contentHTML,
-            showCancelButton: true,
-            confirmButtonText: "Guardar",
-            cancelButtonText: "Cancelar",
-            customClass: {
-                popup: 'custom-popup',
-                title: 'swal2-title' // Agregar la clase personalizada
-            },
-            width: 'auto', // Permite que el ancho se ajuste automáticamente
+async function showExerciseDetails(nombre, video, instrucciones) {
+    let embedVideoUrl = "";
+    if (video.includes("youtube.com/shorts/")) {
+        embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
+    } else if (video.includes("youtube.com/watch?v=")) {
+        const videoId = video.split("v=")[1]?.split("&")[0];
+        embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
+    }
 
-            preConfirm: async () => {
-                const series = parseInt(document.getElementById('series').value, 10);
-                const repeticiones = parseInt(document.getElementById('repeticiones').value, 10);
-                const peso = parseFloat(document.getElementById('peso').value);
-                const dia = document.getElementById('dias').value;
-                const adicionales = document.getElementById('adicionales').value;
+    const contentHTML = `
+        <div class="exercise-popup">
+            <div class="popup-header">
+                <h3 class="exercise-title">${nombre}</h3>
+            </div>
+            <div class="popup-content">
+                <div class="popup-left">
+                    <div class="video-container">
+                        <iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <h4>Instrucciones</h4>
+                    <p>${instrucciones}</p>
+                </div>
+                <div class="popup-right">
+                    <form id="exercise-form">
+                        <div class="form-group">
+                            <label for="series">Series: <span style="color: red;">*</span></label>
+                            <input type="number" id="series" min="1" placeholder="Ingrese las series" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="repeticiones">Repeticiones: <span style="color: red;">*</span></label>
+                            <input type="number" id="repeticiones" min="1" placeholder="Ingrese las repeticiones" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="peso">Peso (kg): <span style="color: red;">*</span></label>
+                            <input type="number" id="peso" min="0" step="0.1" placeholder="Ingrese el peso" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dias">Día de la semana:</label>
+                            <select id="dias" required>
+                                <option value="lunes">Lunes</option>
+                                <option value="martes">Martes</option>
+                                <option value="miércoles">Miércoles</option>
+                                <option value="jueves">Jueves</option>
+                                <option value="viernes">Viernes</option>
+                                <option value="sábado">Sábado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="adicionales">Datos Adicionales:</label>
+                            <textarea id="adicionales" rows="3" placeholder="Escribe aquí alguna aclaración..."></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>`;
+
+    Swal.fire({
+        title: "Detalles del ejercicio",
+        html: contentHTML,
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        customClass: {
+            popup: 'custom-popup',
+            title: 'swal2-title'
+        },
+        width: 'auto',
+        preConfirm: async () => {
+            const selectedExerciseName = nombre;  // Obtener el nombre del ejercicio seleccionado
+            guardarRutina(selectedExerciseName);  // Pasarlo como parámetro
+            const series = parseInt(document.getElementById('series').value, 10);
+            const repeticiones = parseInt(document.getElementById('repeticiones').value, 10);
+            const peso = parseFloat(document.getElementById('peso').value);
+            const dia = document.getElementById('dias').value;
+            const adicionales = document.getElementById('adicionales').value;
+        
+            if (!series || series <= 0 || !repeticiones || repeticiones <= 0 || !peso || peso <= 0) {
+                Swal.showValidationMessage("Por favor, ingresa valores válidos para series, repeticiones y peso.");
+                return;
+            }
+
+            try {
+                const db = getFirestore(app);
+                const routinesRef = collection(db, "routines");
             
-                if (!series || series <= 0 || !repeticiones || repeticiones <= 0 || !peso || peso <= 0) {
-                    Swal.showValidationMessage("Por favor, ingresa valores válidos para series, repeticiones y peso.");
-                    return;
+                const q = query(routinesRef, 
+                    where("userId", "==", selectedUserId), 
+                    where("day", "==", dia)
+                );                
+                
+                const querySnapshot = await getDocs(q);
+                
+                let existingRoutineDoc = null;
+                if (!querySnapshot.empty) {
+                    existingRoutineDoc = querySnapshot.docs[0];
                 }
 
-                try {
-                    const db = getFirestore(app);
-                    const routinesRef = collection(db, "routines");
-                
-                    // Consulta Firestore para buscar una rutina con el mismo usuario y día
-                    const q = query(routinesRef, where("userId", "==", user.uid), where("day", "==", dia));
-                    const querySnapshot = await getDocs(q);
-                
-                    let existingRoutineDoc = null;
-                
-                    if (!querySnapshot.empty) {
-                        existingRoutineDoc = querySnapshot.docs[0]; // Debería haber solo uno
-                    }
+                const exerciseId = crypto.randomUUID();
 
-                    // Generar un ID único para el ejercicio
-                    const exerciseId = crypto.randomUUID();
-    
-                    if (existingRoutineDoc) {
-                        const routineData = existingRoutineDoc.data();
-                        const updatedExercises = [...routineData.exercises, {
-                            id: exerciseId, // ID único del ejercicio
+                if (existingRoutineDoc) {
+                    const routineData = existingRoutineDoc.data();
+                    const updatedExercises = [...routineData.exercises, {
+                        id: exerciseId,
+                        name: nombre,
+                        series,
+                        repetitions: repeticiones,
+                        weight: peso,
+                        video,
+                        instructions: instrucciones,
+                        additionalData: adicionales,
+                    }];
+
+                    await updateDoc(doc(db, "routines", existingRoutineDoc.id), {
+                        exercises: updatedExercises,
+                    });
+
+                    Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
+                } else {
+                    await addDoc(routinesRef, {
+                        userId: selectedUserId,
+                        day: dia,
+                        exercises: [{
+                            id: exerciseId,
                             name: nombre,
-                            series: parseInt(series, 10),
-                            repetitions: parseInt(repeticiones, 10),
-                            weight: parseFloat(peso),
-                            video: video,
+                            series,
+                            repetitions: repeticiones,
+                            weight: peso,
+                            video,
                             instructions: instrucciones,
                             additionalData: adicionales,
-                        }];
-    
-                        // Actualizar el documento existente
-                        await updateDoc(doc(db, "routines", existingRoutineDoc.id), {
-                            exercises: updatedExercises,
-                        });
-    
-                        Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
-                    } else {
-                        // Crear una nueva rutina si no existe
-                        await addDoc(routinesRef, {
-                            userId: user.uid,
-                            day: dia,
-                            exercises: [{
-                                id: exerciseId, // ID único del ejercicio
-                                name: nombre,
-                                series: parseInt(series, 10),
-                                repetitions: parseInt(repeticiones, 10),
-                                weight: parseFloat(peso),
-                                video: video,
-                                instructions: instrucciones,
-                                additionalData: adicionales,
-                            }],
-                        });
-    
-                        Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
-                    }
-                } catch (error) {
-                    console.error("Error al guardar el ejercicio:", error);
-                    Swal.fire("Error", "No se pudo guardar el ejercicio.", "error");
+                        }],
+                    });
+
+                    Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
                 }
+            } catch (error) {
+                console.error("Error al guardar el ejercicio:", error);
+                Swal.fire("Error", "No se pudo guardar el ejercicio.", "error");
             }
-        });
-    }
-});
+        }
+    });
+}
+
+})
 })

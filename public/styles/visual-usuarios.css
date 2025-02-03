@@ -167,3 +167,80 @@ body {
 .ordenar-btn:hover {
     background: #e68900;
 }
+
+/* Estilos específicos para la ventana emergente de traspasar rutina */
+.swal2-popup {
+    border-radius: 10px;
+    padding: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.swal2-title {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.swal2-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin: 10px 0;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.swal2-input:focus {
+    border-color: #00bcd4;
+    outline: none;
+}
+
+.swal2-confirm, .swal2-cancel {
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.swal2-confirm {
+    background: #4caf50;
+    color: white;
+}
+
+.swal2-confirm:hover {
+    background: #388e3c;
+}
+
+.swal2-cancel {
+    background: #ff3b3b;
+    color: white;
+}
+
+.swal2-cancel:hover {
+    background: #d32f2f;
+}
+
+/* Diseño adaptado para pantallas móviles */
+@media (max-width: 768px) {
+    .swal2-popup {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .swal2-title {
+        font-size: 20px;
+    }
+
+    .swal2-input {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .swal2-confirm, .swal2-cancel {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
