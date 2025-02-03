@@ -300,49 +300,38 @@ body {
     font-size: 14px !important;
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
-    .exercise-grid {
-        grid-template-columns: repeat(4, 1fr); /* 4 columnas en pantallas medianas */
-    }
-}
-
-@media (max-width: 992px) {
-    .exercise-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 columnas en pantallas más pequeñas */
-    }
-    .filters {
-        flex-wrap: wrap;
-    }
-    .filters .narrow {
-        width: 100%;
-    }
-}
-
-@media (max-width: 768px) {
-    .exercise-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 columnas en tablets */
-    }
-    .filters {
-        flex-direction: column;
-    }
-    .routine-builder {
-        padding: 15px;
-    }
-}
-
+/* Responsive para pantallas pequeñas */
 @media (max-width: 576px) {
-    .exercise-grid {
-        grid-template-columns: repeat(1, 1fr); /* 1 columna en móviles */
-    }
     .swal2-popup {
-        width: 90%;
+        width: 90%; /* Reducir tamaño en pantallas pequeñas */
+        padding: 10px; /* Ajustar el padding */
     }
+
+    /* Ajustar columnas dentro del popup */
     .edit-popup {
         flex-direction: column;
         align-items: stretch;
     }
+
     .column {
-        width: 100%;
+        width: 100%; /* Las columnas deben tomar todo el ancho disponible */
+    }
+
+    /* Ajustar inputs y textarea dentro del popup */
+    .edit-popup input,
+    .edit-popup textarea {
+        width: 100%; /* Los campos ocupan todo el espacio */
+        padding: 10px;
+    }
+
+    /* Instrucciones de mayor altura en móviles */
+    .edit-popup textarea {
+        height: 150px; /* Aumentar la altura del textarea */
+    }
+
+    /* Ajustar tamaño del botón de confirmación */
+    .swal2-confirm {
+        padding: 10px 16px !important;
+        font-size: 14px !important;
     }
 }
