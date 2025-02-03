@@ -299,3 +299,72 @@ body {
     padding: 10px 18px !important;
     font-size: 14px !important;
 }
+
+/* Media Query para dispositivos móviles */
+@media (max-width: 768px) {
+    .exercise-popup {
+        display: flex;
+        flex-direction: column; /* Cambiar a diseño vertical */
+        gap: 15px; /* Reducir el espacio entre elementos */
+        max-width: 100%; /* Asegurar que ocupe todo el ancho */
+        max-height: 90vh !important; /* Más espacio para el contenido */
+        overflow-y: auto; /* Permite desplazamiento si es necesario */
+    }
+
+    .popup-header {
+        text-align: center; /* Mantener el título centrado */
+        padding: 10px 0; /* Reducir el espacio interno */
+    }
+
+    .exercise-title {
+        font-size: 1.5rem; /* Ajustar el tamaño del título para móvil */
+    }
+
+    .popup-content {
+        display: flex;
+        flex-direction: column; /* Asegurar contenido apilado */
+        gap: 15px;
+    }
+
+    .popup-left, .popup-right {
+        padding: 8px;
+        width: 100%; /* Asegurarse de que ocupen todo el ancho */
+    }
+
+    .video-container iframe {
+        width: 100%; /* Video ocupa todo el ancho disponible */
+        height: 200px; /* Ajustar la altura del video */
+    }
+
+    .instrucciones {
+        font-size: 1rem; /* Ajustar tamaño de texto */
+        padding: 10px 0; /* Espaciado entre instrucciones */
+    }
+
+    .exercise-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%; /* Asegurar que el formulario ocupe todo el ancho */
+    }
+
+    .form-group {
+        width: 100%; /* Asegurar que los formularios ocupen todo el ancho */
+    }
+
+    .popup-right {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-popup {
+        width: 100% !important; /* Asegurarse que el popup ocupe todo el ancho */
+        max-width: 100% !important;
+        height: auto !important; /* Ajustar la altura para que se adapte al contenido */
+        max-height: none !important;
+        padding: 20px; /* Añadir algo de espacio interno */
+        overflow-y: auto; /* Habilitar desplazamiento si es necesario */
+    }
+}
