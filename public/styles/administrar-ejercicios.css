@@ -204,7 +204,7 @@ body {
     border-radius: 5px;
 }
 
-.buttonContainer { /* Sin el prefijo .exercise-card */
+.buttonContainer { 
     display: flex;
     justify-content: center;
     gap: 15px;
@@ -300,38 +300,41 @@ body {
     font-size: 14px !important;
 }
 
-/* Responsive para pantallas pequeñas */
-@media (max-width: 576px) {
-    .swal2-popup {
-        width: 90%; /* Reducir tamaño en pantallas pequeñas */
-        padding: 10px; /* Ajustar el padding */
+/* Media Query para dispositivos móviles */
+@media (max-width: 768px) {
+    .swal-wide {
+        width: 90vw !important; /* Ocupa el 90% del ancho de la pantalla */
+        max-width: 100%; 
+        min-width: auto; /* Elimina la restricción mínima */
+        padding: 15px !important;
+        overflow-y: auto; /* Permite desplazamiento si el contenido es grande */
+    }
+    .edit-popup {
+        flex-direction: column; /* Apilar los elementos */
+        align-items: center;
     }
 
-    /* Ajustar columnas dentro del popup */
-    .edit-popup {
-        flex-direction: column;
-        align-items: stretch;
+    .edit-popup input,
+    .edit-popup textarea {
+        width: 100%; /* Ocupar el ancho completo */
     }
 
     .column {
-        width: 100%; /* Las columnas deben tomar todo el ancho disponible */
+        width: 100%; /* Las columnas ocuparán todo el ancho */
     }
 
-    /* Ajustar inputs y textarea dentro del popup */
-    .edit-popup input,
-    .edit-popup textarea {
-        width: 100%; /* Los campos ocupan todo el espacio */
-        padding: 10px;
+    .exercise-grid {
+        grid-template-columns: 1fr; /* Solo una columna en móviles */
     }
 
-    /* Instrucciones de mayor altura en móviles */
-    .edit-popup textarea {
-        height: 150px; /* Aumentar la altura del textarea */
+    #pagination-container {
+        flex-wrap: wrap; /* Permite que los botones se acomoden mejor */
+        gap: 5px; /* Reduce el espacio entre botones */
     }
 
-    /* Ajustar tamaño del botón de confirmación */
-    .swal2-confirm {
-        padding: 10px 16px !important;
-        font-size: 14px !important;
+    #pagination-container button {
+        padding: 8px 10px; /* Reduce el tamaño de los botones */
+        font-size: 14px; /* Texto más pequeño */
     }
+
 }
