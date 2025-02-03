@@ -13,13 +13,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log("Usuario autenticado:", user.email);
 
-        const userId = localStorage.getItem("selectedUserId");
+        const selectedUserId = localStorage.getItem("selectedUserId");
+
+        // Verificar si se ha obtenido el userId correctamente
+        if (selectedUserId) {
+            console.log("User seleccionado:", selectedUserId);
+        } else {
+            console.error("No se ha encontrado el userId en localStorage.");
+        }
 
     // Función para cargar los datos del usuario seleccionado
     async function cargarUsuario() {
         try {
             // Reemplazar 'userId' con el ID del usuario que deseas cargar (por ejemplo, el ID obtenido desde la sesión de login)
-            const usuarioRef = doc(db, "usuarios", userId);
+            const usuarioRef = doc(db, "usuarios", selectedUserId);
             const usuarioSnap = await getDoc(usuarioRef);
 
             if (usuarioSnap.exists()) {
@@ -110,8 +117,8 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Categorías actualizadas.");
     }
     
-
- async function loadExercises(db, exerciseGrid, page = 1, category = "all", searchQuery = "") {
+// Función para cargar y mostrar los ejercicios con paginación
+async function loadExercises(db, exerciseGrid, page = 1, category = "all", searchQuery = "") {
     let latestSearchId = 0; // Variable global para rastrear la búsqueda más reciente
     const searchId = ++latestSearchId; // Incrementa el ID de búsqueda
 
@@ -124,34 +131,24 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!category || category === "all") { // Verificar si category está vacío o es "all"
             const categoriesSnapshot = await getDocs(collection(db, "categories"));
             for (const categoryDoc of categoriesSnapshot.docs) {
-                const categoryId = categoryDoc.id; // Obtener el ID correctamente
-                exercisesSnapshot = await getDocs(collection(db, `categories/${categoryId}/exercises`), { source: "cache" });
-
+                exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "cache" });
                 if (exercisesSnapshot.empty) {
-                    exercisesSnapshot = await getDocs(collection(db, `categories/${categoryId}/exercises`), { source: "server" });
+                    exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "server" });
                 }
-
                 exercisesSnapshot.forEach((doc) => {
                     const exercise = doc.data();
                     exercises.push({ ...exercise, id: doc.id }); // Agregar el id del documento
                 });
             }
         } else {
-            // Verificar si el valor de category es válido
-            if (category.trim() !== "") { 
-                exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "cache" });
-
-                if (exercisesSnapshot.empty) {
-                    exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "server" });
-                }
-
-                exercisesSnapshot.forEach((doc) => {
-                    const exercise = doc.data();
-                    exercises.push({ ...exercise, id: doc.id }); // Agregar el id del documento
-                });
-            } else {
-                console.warn("Categoría inválida:", category);
+            exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "cache" });
+            if (exercisesSnapshot.empty) {
+                exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "server" });
             }
+            exercisesSnapshot.forEach((doc) => {
+                const exercise = doc.data();
+                exercises.push({ ...exercise, id: doc.id }); // Agregar el id del documento
+            });
         }
 
         // Verifica si esta es la búsqueda más reciente antes de actualizar la UI
@@ -190,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <h3>${exercise.Nombre}</h3>
                     <img src="${exercise.Imagen}" alt="${exercise.Nombre}">
                 `;
-                exerciseCard.appendChild(button);    
+                exerciseCard.appendChild(button);
                 exerciseGrid.appendChild(exerciseCard);
             });
 
@@ -202,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
         console.error("Error al cargar ejercicios:", error);
     }
-}    
+}
 
 // Función para renderizar la paginación
 function renderPagination(totalItems, currentPage) {

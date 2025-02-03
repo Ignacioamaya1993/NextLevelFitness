@@ -29,8 +29,6 @@ service cloud.firestore {
     match /routines/{routineId} {
       // Permitir lectura si el usuario es el propietario de la rutina o un administrador
       allow read: if request.auth != null || isAdmin(request.auth.token.email);
-
-      // Permitir creación, actualización y eliminación solo al dueño de la rutina o un administrador
       allow create, update, delete: if request.auth != null || isAdmin(request.auth.token.email);
     }
   }

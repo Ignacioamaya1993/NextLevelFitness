@@ -1,6 +1,9 @@
 import app, { db } from "../scripts/firebaseConfig.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, getDocs, doc, query, where, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        
+    // Llamar a la función para cargar el usuario al iniciar
+    cargarUsuarios();
 
 const usuariosContainer = document.getElementById("usuarios-container");
 const searchInput = document.getElementById("search-input"); // Campo de búsqueda
@@ -114,6 +117,7 @@ function mostrarUsuarios(users) {
                 <p><strong>Género:</strong> ${user.genero}</p>
                 <button class="view-rutinas-btn" data-user-id="${user.userId}">Ver Rutinas</button>
                 <button class="assign-rutina-btn" data-user-id="${user.userId}">Armar Rutina</button>
+                <button class="transfer-rutina-btn" data-user-id="${user.userId}">Traspasar Rutina</button>
             </div>
         `;
     });
@@ -130,6 +134,13 @@ function mostrarUsuarios(users) {
         button.addEventListener('click', function() {
             const userId = button.dataset.userId;
             asignarRutinaUsuario(userId);
+        });
+    });
+
+    document.querySelectorAll('.transfer-rutina-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = button.dataset.userId;
+            traspasarRutinaUsuario(userId);
         });
     });
 }
@@ -153,5 +164,97 @@ function asignarRutinaUsuario(userId) {
     window.location.href = "asignar-rutinas.html";
 }
 
-// Cargar usuarios al cargar la página
-cargarUsuarios();
+async function traspasarRutinaUsuario(userId) {
+    Swal.fire({
+        title: "Traspasar Rutina",
+        html: `
+            <label for="user-select">Seleccione un usuario:</label>
+            <select id="user-select" class="swal2-input">
+                <option value="" disabled selected>Seleccione un usuario</option>
+            </select>
+            <br>
+            <label for="email-field">Email del usuario seleccionado:</label>
+            <input type="text" id="email-field" class="swal2-input" readonly>
+        `,
+        showCancelButton: true,
+        confirmButtonText: "Traspasar",
+        cancelButtonText: "Cancelar",
+        didOpen: async () => {
+            const userSelect = document.getElementById("user-select");
+            const emailField = document.getElementById("email-field");
+
+            try {
+                const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
+                let optionsHTML = "";
+
+                usuariosSnapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const uid = doc.id;
+                    const nombre = userData.nombre || "Sin nombre";
+                    const apellido = userData.apellido || "Sin apellido";
+                    const email = userData.email || "No disponible";
+
+                    if (uid !== userId) { // No permitir transferirse a sí mismo
+                        optionsHTML += `<option value="${uid}" data-email="${email}">${nombre} ${apellido}</option>`;
+                    }
+                });
+
+                userSelect.innerHTML += optionsHTML;
+
+                userSelect.addEventListener("change", function() {
+                    const selectedOption = userSelect.options[userSelect.selectedIndex];
+                    emailField.value = selectedOption.dataset.email || "No disponible";
+                });
+
+            } catch (error) {
+                console.error("Error al cargar usuarios:", error);
+                Swal.showValidationMessage("Error al obtener los usuarios.");
+            }
+        },
+        preConfirm: () => {
+            const selectedUserId = document.getElementById("user-select").value;
+            if (!selectedUserId) {
+                Swal.showValidationMessage("Debe seleccionar un usuario.");
+                return false;
+            }
+            return selectedUserId;
+        }
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            const newUserId = result.value;
+            try {
+                // Eliminar todas las rutinas del usuario destino (newUserId)
+                const userRutinasDestinoSnapshot = await getDocs(query(collection(db, "routines"), where("userId", "==", newUserId)));
+
+                // Eliminar rutinas del usuario destino
+                for (let rutinaDoc of userRutinasDestinoSnapshot.docs) {
+                    await deleteDoc(doc(db, "routines", rutinaDoc.id));
+                }
+
+                // Obtener las rutinas del usuario origen
+                const userRutinas = await getDocs(query(collection(db, "routines"), where("userId", "==", userId)));
+
+                if (userRutinas.size === 0) {
+                    Swal.fire("Error", "El usuario no tiene rutinas para traspasar.", "error");
+                    return;
+                }
+
+                // Copiar las rutinas del usuario origen al usuario destino
+                for (let rutinaDoc of userRutinas.docs) {
+                    const rutinaData = rutinaDoc.data();
+                    // Asegúrate de actualizar el `userId` del documento con el nuevo usuario
+                    await setDoc(doc(db, "routines", rutinaDoc.id), {
+                        ...rutinaData,
+                        userId: newUserId // Reemplaza el userId con el nuevo
+                    });
+                }
+
+                Swal.fire("Éxito", "La rutina fue traspasada correctamente.", "success");
+
+            } catch (error) {
+                console.error("Error al traspasar rutina:", error);
+                Swal.fire("Error", "Hubo un problema al traspasar la rutina.", "error");
+            }
+        }
+    });
+}

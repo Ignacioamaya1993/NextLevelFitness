@@ -98,6 +98,7 @@ body {
     transition: 0.3s;
 }
 
+/* Botón para ver rutinas */
 .view-rutinas-btn {
     background: #00bcd4;
     color: white;
@@ -107,6 +108,7 @@ body {
     background: #008c9e;
 }
 
+/* Botón para asignar rutina */
 .assign-rutina-btn {
     background: #ff9800;
     color: white;
@@ -114,6 +116,16 @@ body {
 
 .assign-rutina-btn:hover {
     background: #e68900;
+}
+
+/* Botón para traspasar rutina (nuevo) */
+.traspasar-rutina-btn {
+    background: #4caf50;  /* Verde */
+    color: white;
+}
+
+.traspasar-rutina-btn:hover {
+    background: #388e3c; /* Verde más oscuro */
 }
 
 /* Paginador */
