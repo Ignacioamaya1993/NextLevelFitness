@@ -16,8 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const userId = localStorage.getItem("selectedUserId");
         const routineList = document.getElementById("routine-list");
-        const tituloRutinas = document.querySelector("h1");
-
+        const tituloRutinas = document.getElementById("titulo-rutinas");
 
     // Función para cargar los datos del usuario seleccionado
     async function cargarUsuario() {
@@ -33,15 +32,17 @@ document.addEventListener("DOMContentLoaded", () => {
             if (usuarioSnap.exists()) {
                 const usuarioData = usuarioSnap.data();
                 const nombreCompleto = `${usuarioData.nombre} ${usuarioData.apellido}`;
-                tituloRutinas.textContent = `Rutinas del Usuario ${nombreCompleto}`;
-            } else {
-                tituloRutinas.textContent = "Rutinas del Usuario No Encontrado";
-            }
-        } catch (error) {
-            console.error("Error al obtener el usuario:", error);
-            tituloRutinas.textContent = "Error al cargar usuario";
+
+             // Actualizar solo el contenido del span
+            document.getElementById("user-name").textContent = nombreCompleto;
+        } else {
+            document.getElementById("user-name").textContent = "No Encontrado";
         }
+    } catch (error) {
+        console.error("Error al obtener el usuario:", error);
+        document.getElementById("user-name").textContent = "Error al cargar usuario";
     }
+}
     
 // Llamar a la función para cargar el usuario al iniciar
 cargarUsuario();
@@ -229,14 +230,17 @@ function displayUserRoutines(routines) {
         downloadRoutinesAsPDF(groupedRoutines); // Pasar las rutinas agrupadas como parámetro
          });
 
-    // Función que genera y descarga el PDF
-    function downloadRoutinesAsPDF(groupedRoutines) {
-        const { jsPDF } = window.jspdf; // Usar jsPDF
-
-        const doc = new jsPDF();
-        let yPosition = 10;
-        doc.setFontSize(16);
-        doc.text("Rutinas de Ejercicio", 10, yPosition);
+         function downloadRoutinesAsPDF(groupedRoutines) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let yPosition = 10;
+            doc.setFontSize(16);
+        
+            const userNameElement = document.getElementById("user-name");
+            const userName = userNameElement ? userNameElement.textContent.trim() : "Usuario desconocido";
+        
+            doc.setFontSize(16);
+            doc.text(`Rutinas de Ejercicios de ${userName}`, 10, yPosition);        
 
         // Para cada día de la rutina
         for (const day in groupedRoutines) {
@@ -265,9 +269,11 @@ function displayUserRoutines(routines) {
                 yPosition = 10;
             }
         }
-
+        // Nombre del archivo con el formato "Rutina de [Usuario].pdf"
+        const fileName = `Rutina de ${userName.replace(/\s+/g, " ")}.pdf`;
+            
         // Descargar el archivo PDF
-        doc.save("rutinas.pdf");
+        doc.save(fileName);
     }
 }
 
