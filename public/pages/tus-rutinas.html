@@ -42,15 +42,18 @@
 
         <section class="routine-viewer hidden" id="routine-viewer">
             <h2>Tus Rutinas</h2>
-            <p id="no-routines-message" class="hidden">No tienes rutinas creadas. Ve a "Arma tus Rutinas" para crear una.</p>
+            <p id="no-routines-message" class="hidden">
+                No tienes rutinas creadas. Ve a "Arma tus Rutinas" para crear una.
+            </p>
             <div id="routine-list">
                 <!-- Las rutinas creadas se mostrarán aquí -->
             </div>
-        </section>
-
-        <button id="download-pdf" style="display: none;">
-            <img src="../assets/images/logos/pdf.png" alt="pdf Icon" width="40" height="40">
-        </button>
+        
+            <!-- Botón de descarga dentro del contenedor -->
+            <button id="download-pdf" style="display: none;">
+                <img src="../assets/images/logos/pdf.png" alt="pdf Icon">
+            </button>
+        </section>            
 
             <!-- Popup para editar rutina -->
             <div id="edit-popup" class="popup hidden" aria-hidden="true" role="dialog">
