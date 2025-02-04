@@ -141,7 +141,7 @@ main {
 /* Botón de descarga PDF */
 #download-pdf {
     position: absolute;
-    top: 10px;
+    top: -15px;
     right: 20px;
     background: #f8f8f8;
     border: 2px solid #388E3C;
