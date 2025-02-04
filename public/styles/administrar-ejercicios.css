@@ -307,16 +307,55 @@ body {
         max-width: 100%;
         min-width: auto;
         padding: 15px !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
     .edit-popup {
         flex-direction: column;
         align-items: stretch;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .edit-popup input,
     .edit-popup textarea {
         width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .edit-popup label {
+        font-weight: bold;
+        margin-top: 10px;
+        display: block;
+        color: #333;
+    }
+
+    .edit-popup button {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .edit-popup .save-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+    .edit-popup .cancel-btn {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        margin-top: 10px;
     }
 
     .column {
@@ -337,18 +376,30 @@ body {
         font-size: 14px;
     }
 
-    .add-button {
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    .routine-builder {
-        padding: 15px;
-    }
-
     .filters {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .filters select,
+    .filters input {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .add-button {
+        flex: 0 1 auto;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 12px;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
