@@ -189,11 +189,6 @@ function displayUserRoutines(routines) {
 
         routineList.appendChild(routineCard);
     });
-        // Llamar a la función de descarga solo después de que las rutinas estén disponibles
-        const downloadButton = document.getElementById("download-pdf");
-        downloadButton.addEventListener("click", () => {
-            downloadRoutinesAsPDF(groupedRoutines); // Pasar las rutinas agrupadas como parámetro
-        });
 
         // Asignar los event listeners después de que el contenido se haya cargado
         addEventListenersToButtons();
@@ -227,6 +222,12 @@ function displayUserRoutines(routines) {
             });
         })
     );
+
+        // Llamar a la función de descarga solo después de que las rutinas estén disponibles
+        const downloadButton = document.getElementById("download-pdf");
+        downloadButton.addEventListener("click", () => {
+        downloadRoutinesAsPDF(groupedRoutines); // Pasar las rutinas agrupadas como parámetro
+         });
 
     // Función que genera y descarga el PDF
     function downloadRoutinesAsPDF(groupedRoutines) {
