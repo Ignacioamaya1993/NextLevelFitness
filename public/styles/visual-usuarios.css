@@ -48,6 +48,29 @@ body {
     background: #d32f2f;
 }
 
+#download-excel {
+    position: absolute;
+    top: 200px; /* Ajusta según sea necesario */
+    right: 20px; /* Ajusta según sea necesario */
+    background: #4CAF50; /* Fondo verde (similar a Excel) */
+    border: 2px solid #388E3C; /* Borde más oscuro para contraste */
+    border-radius: 7px; /* Bordes redondeados */
+    padding: 6px; /* Espaciado interno */
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para resaltar */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#download-excel:hover {
+    transform: scale(1.1); /* Efecto de agrandamiento al pasar el mouse */
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+#download-excel img {
+    width: 35px;
+    height: 35px;
+}
+
 /* Contenedor de usuarios */
 .usuarios-container {
     display: grid;
@@ -105,12 +128,12 @@ body {
 }
 
 .view-rutinas-btn:hover {
-    background: #008c9e;
+    background: #e68900;
 }
 
 /* Botón para asignar rutina */
 .assign-rutina-btn {
-    background: #ff9800;
+    background: #00bcd4;
     color: white;
 }
 
@@ -118,14 +141,36 @@ body {
     background: #e68900;
 }
 
-/* Botón para traspasar rutina (nuevo) */
-.traspasar-rutina-btn {
-    background: #4caf50;  /* Verde */
+/* Botón para traspasar rutina*/
+.transfer-rutina-btn {
+    background: #00bcd4;  /* Verde */
     color: white;
 }
 
-.traspasar-rutina-btn:hover {
-    background: #388e3c; /* Verde más oscuro */
+.transfer-rutina-btn:hover {
+    background: #e68900; /* Verde más oscuro */
+}
+
+/* Botón para aprobar usuario */
+.aprobar-btn {
+    background: #00bcd4;  /* Verde claro */
+    color: white;
+}
+
+.aprobar-btn:hover {
+    background: #e68900; /* Verde más oscuro */
+}
+
+/* Botón aprobado (deshabilitado) */
+.aprobar-btn[disabled] {
+    background: #e0d0d0; /* Gris claro */
+    color: #757575; /* Gris oscuro para el texto */
+    cursor: not-allowed; /* Cambiar el cursor para indicar que está deshabilitado */
+}
+
+/* Estilo para el botón aprobado */
+.aprobar-btn[disabled]:hover {
+    background: #9e9e9e; /* Gris claro sin cambio de color al hacer hover */
 }
 
 /* Paginador */

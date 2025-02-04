@@ -93,7 +93,10 @@ registroForm.addEventListener("submit", async (event) => {
             genero,
             celular,
             email,
+            aprobado: false // Usuario pendiente de aprobación
         };    
+        
+        await setDoc(doc(db, "usuarios", user.uid), nuevoUsuario);
 
         await setDoc(doc(db, "usuarios", user.uid), nuevoUsuario); // Usar el UID como ID del documento
         console.log("Usuario guardado en Firestore correctamente.");

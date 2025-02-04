@@ -1,15 +1,26 @@
 import app, { db } from "../scripts/firebaseConfig.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs, doc, query, where, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-        
-    // Llamar a la función para cargar el usuario al iniciar
-    cargarUsuarios();
+import { collection, getDocs, doc, updateDoc, query, where, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+// Llamar a la función para cargar el usuario al iniciar
+cargarUsuarios();
 
 const usuariosContainer = document.getElementById("usuarios-container");
 const searchInput = document.getElementById("search-input"); // Campo de búsqueda
 const clearSearchButton = document.getElementById("clear-search"); // Botón de limpiar búsqueda
 
 let usuarios = [];
+
+// Función para obtener usuarios desde Firestore
+async function obtenerUsuarios() {
+    const usuariosRef = collection(db, "usuarios");
+    const snapshot = await getDocs(usuariosRef);
+    const usuarios = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+    mostrarUsuarios(usuarios);
+}
 
 async function cargarUsuarios() {
     const auth = getAuth(app);
@@ -62,7 +73,8 @@ async function cargarUsuarios() {
                     celular,
                     fechaFormateada,
                     edad,
-                    genero
+                    genero,
+                    aprobado: userData.aprobado || false // Asegurar que 'aprobado' tenga un valor por defecto
                 });
             });
 
@@ -115,12 +127,86 @@ function mostrarUsuarios(users) {
                 <p><strong>Fecha de nacimiento:</strong> ${user.fechaFormateada}</p>
                 <p><strong>Edad:</strong> ${user.edad}</p>
                 <p><strong>Género:</strong> ${user.genero}</p>
+                <p><strong>Estado:</strong> ${user.aprobado ? "Aprobado" : "Pendiente"}</p>
                 <button class="view-rutinas-btn" data-user-id="${user.userId}">Ver Rutinas</button>
                 <button class="assign-rutina-btn" data-user-id="${user.userId}">Armar Rutina</button>
                 <button class="transfer-rutina-btn" data-user-id="${user.userId}">Traspasar Rutina</button>
+                <button class="aprobar-btn" data-id="${user.userId}" ${user.aprobado ? "disabled" : ""}>
+                ${user.aprobado ? "Aprobado" : "Aprobar"}
+                </button>
             </div>
         `;
     });
+
+    // Asignar el HTML al contenedor
+    usuariosContainer.innerHTML = html;
+
+    // Llamar a la función para agregar los eventos de aprobación después de asignar el HTML
+    agregarEventosAprobacion();
+
+    // Agregar eventos a otros botones
+    document.querySelectorAll('.view-rutinas-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = button.dataset.userId;
+            verRutinasUsuario(userId);
+        });
+    });
+
+    document.querySelectorAll('.assign-rutina-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = button.dataset.userId;
+            asignarRutinaUsuario(userId);
+        });
+    });
+
+    document.querySelectorAll('.transfer-rutina-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = button.dataset.userId;
+            traspasarRutinaUsuario(userId);
+        });
+    });
+}
+
+// Función para descargar los usuarios en formato Excel
+function descargarExcel() {
+    const usuariosParaExportar = usuarios.map(user => ({
+        NombreCompleto: `${user.nombre} ${user.apellido}`,
+        celular: user.celular
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(usuariosParaExportar);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Usuarios");
+    // Descargar el archivo Excel
+    XLSX.writeFile(wb, "usuarios.xlsx");  // Cambié 'writeFile' a 'XLSX.writeFile'
+}
+
+// Agregar el evento de clic al botón de descarga
+document.getElementById("download-excel").addEventListener("click", descargarExcel);
+
+// Agregar eventos a los botones de aprobación
+function agregarEventosAprobacion() {
+    const botones = document.querySelectorAll(".aprobar-btn");
+    botones.forEach(boton => {
+        boton.addEventListener("click", () => {
+            const id = boton.dataset.id;
+            if (id) aprobarUsuario(id);
+        });
+    });
+}
+
+// Función para aprobar un usuario
+async function aprobarUsuario(id) {
+    try {
+        const usuarioRef = doc(db, "usuarios", id);
+        await updateDoc(usuarioRef, { aprobado: true });
+
+        obtenerUsuarios(); // Recargar la lista después de aprobar
+    } catch (error) {
+        console.error("Error al aprobar usuario:", error);
+    }
+}
+
     usuariosContainer.innerHTML = html;
 
     document.querySelectorAll('.view-rutinas-btn').forEach(button => {
@@ -143,7 +229,9 @@ function mostrarUsuarios(users) {
             traspasarRutinaUsuario(userId);
         });
     });
-}
+
+// Cargar usuarios al iniciar
+obtenerUsuarios();
 
 // Agregar el evento de clic a la "X"
 clearSearchButton.addEventListener("click", () => {

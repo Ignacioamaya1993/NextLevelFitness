@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const routineViewer = document.getElementById("routine-viewer");
     const noRoutinesMessage = document.getElementById("no-routines-message");
     const overlay = document.getElementById("overlay");
+    const downloadButton = document.getElementById("download-pdf"); // Obtener el botón de descarga
+
 
     overlay.addEventListener("click", (e) => {
         e.stopPropagation(); // Evitar que el clic pase al fondo
@@ -15,6 +17,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (user && user.isLoggedIn) {
         restrictedMessage.classList.add("hidden");
         routineViewer.classList.remove("hidden");
+
+        // Mostrar el botón de descarga si el usuario está logueado
+        downloadButton.style.display = "block";
 
         try {
             const routines = await getUserRoutines(user.uid);
@@ -30,6 +35,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
         restrictedMessage.classList.remove("hidden");
         routineViewer.classList.add("hidden");
+        // Ocultar el botón de descarga si el usuario no está logueado
+        downloadButton.style.display = "none";
     }
 });
 
@@ -103,6 +110,7 @@ function displayUserRoutines(routines) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = "";
 
+    // Agrupar las rutinas por día
     const groupedRoutines = groupRoutinesByDay(routines);
     let today = new Date().toLocaleDateString("es-ES", { weekday: "long" }).toLowerCase();
 
@@ -156,46 +164,99 @@ function displayUserRoutines(routines) {
             })
             .join("");
 
-            routineCard.innerHTML = `
+        routineCard.innerHTML = `
             <h3>${day === today ? `Esta es tu rutina para hoy (${today})` : `Rutina para el día ${day}`}</h3>
             <ul class="exercise-list">
                 ${exercisesList}
             </ul>
             <button class="edit-button" data-day="${day}">Editar</button>
             <button class="delete-button" data-day="${day}">Eliminar</button>
-        `;       
+        `;
 
         routineList.appendChild(routineCard);
     });
 
-    const editButtons = routineList.querySelectorAll(".edit-button");
-    const deleteButtons = routineList.querySelectorAll(".delete-button");
+    // Llamar a la función de descarga solo después de que las rutinas estén disponibles
+    const downloadButton = document.getElementById("download-pdf");
+    downloadButton.addEventListener("click", () => {
+        downloadRoutinesAsPDF(groupedRoutines); // Pasar las rutinas agrupadas como parámetro
+    });
 
-    editButtons.forEach((button) =>
-        button.addEventListener("click", (e) => {
-            const day = e.target.dataset.day;
-            openEditPopup(day, routines);
-        })
-    );
+    // Asignar los event listeners después de que el contenido se haya cargado
+    addEventListenersToButtons();
 
-    deleteButtons.forEach((button) =>
-        button.addEventListener("click", (e) => {
-            const day = e.target.dataset.day;
-            Swal.fire({
-                title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
-                text: "Esta acción no se puede deshacer.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Sí, eliminar",
-                cancelButtonText: "Cancelar"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Llamar a la función para eliminar la rutina solo después de confirmar
-                    deleteRoutine(day);
-                }
+    // Función que agrega los event listeners
+    function addEventListenersToButtons() {
+        const editButtons = routineList.querySelectorAll(".edit-button");
+        const deleteButtons = routineList.querySelectorAll(".delete-button");
+
+        editButtons.forEach((button) =>
+            button.addEventListener("click", (e) => {
+                const day = e.target.dataset.day;
+                openEditPopup(day, routines);
+            })
+        );
+
+        deleteButtons.forEach((button) =>
+            button.addEventListener("click", (e) => {
+                const day = e.target.dataset.day;
+                Swal.fire({
+                    title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
+                    text: "Esta acción no se puede deshacer.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, eliminar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Llamar a la función para eliminar la rutina solo después de confirmar
+                        deleteRoutine(day);
+                    }
+                });
+            })
+        );
+    }
+
+    // Función que genera y descarga el PDF
+    function downloadRoutinesAsPDF(groupedRoutines) {
+        const { jsPDF } = window.jspdf; // Usar jsPDF
+
+        const doc = new jsPDF();
+        let yPosition = 10;
+        doc.setFontSize(16);
+        doc.text("Rutinas de Ejercicio", 10, yPosition);
+
+        // Para cada día de la rutina
+        for (const day in groupedRoutines) {
+            const exercises = groupedRoutines[day];
+
+            // Título del día
+            yPosition += 10;
+            doc.setFontSize(12);
+            doc.text(`Rutina para el día ${day}`, 10, yPosition);
+
+            // Agregar los ejercicios
+            exercises.forEach(exercise => {
+                yPosition += 8;
+                doc.setFontSize(10);
+                const name = exercise.name || "Ejercicio sin nombre";
+                const series = exercise.series || 0;
+                const reps = exercise.repetitions || 0;
+                const weight = exercise.weight || 0;
+                const additionalData = exercise.additionalData || "Sin información adicional";
+                doc.text(`${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}`, 10, yPosition);
             });
-        })
-    );
+
+            // Si el contenido se está saliendo de la página, añadir una nueva página
+            if (yPosition > 270) {
+                doc.addPage();
+                yPosition = 10;
+            }
+        }
+
+        // Descargar el archivo PDF
+        doc.save("rutinas.pdf");
+    }
 }
 
 function openEditPopup(day, routines) {

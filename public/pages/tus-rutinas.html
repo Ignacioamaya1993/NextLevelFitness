@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../styles/tus-rutinas.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
 </head>
 <body>
     <header>
@@ -46,6 +47,10 @@
                 <!-- Las rutinas creadas se mostrarán aquí -->
             </div>
         </section>
+
+        <button id="download-pdf" style="display: none;">
+            <img src="../assets/images/logos/pdf.png" alt="pdf Icon" width="40" height="40">
+        </button>
 
             <!-- Popup para editar rutina -->
             <div id="edit-popup" class="popup hidden" aria-hidden="true" role="dialog">
@@ -100,5 +105,7 @@
     <script type="module" src="../scripts/tus-rutinas.js"></script>
     <script type="module" src="../scripts/auth.js"></script>
     <script type="module" src="../scripts/firebaseConfig.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </body>
 </html>

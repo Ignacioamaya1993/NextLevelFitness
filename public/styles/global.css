@@ -147,13 +147,24 @@ footer {
     display: flex;
     justify-content: center; /* Centramos los iconos */
     gap: 15px;
+    width: 50%;
 }
 
 .footer-design {
-    text-align: right;
-    flex: 1;
-    font-size: 0.8rem;
-    color: #bdc3c7;
+    display: flex;
+    align-items: center; /* Alinea el logo y el texto verticalmente */
+    justify-content: center; /* Centra el contenido */
+    gap: 10px; /* Espacio entre el logo y el texto */
+    position: relative;
+}
+
+.footer-design::after {
+    content: ""; /* Necesario para que el pseudo-elemento funcione */
+    background: url("../assets/images/logos/logoia.png") no-repeat center;
+    background-size: contain; /* Ajusta la imagen al tamaño del contenedor */
+    width: 150px; /* Tamaño del logo */
+    height: 60px;
+    display: inline-block;
 }
 
 /* Enlaces y efectos */

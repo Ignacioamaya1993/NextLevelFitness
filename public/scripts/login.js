@@ -1,12 +1,14 @@
-import app from "../scripts/firebaseConfig.js"; 
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import app from "../scripts/firebaseConfig.js";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const auth = getAuth(app);
+const db = getFirestore(app);
+
 const loginForm = document.getElementById("loginForm");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 
-// Función para restablecer validaciones personalizadas
 function resetCustomValidity(input) {
     input.setCustomValidity(""); 
     input.reportValidity(); 
@@ -40,36 +42,48 @@ loginForm.addEventListener("submit", async (event) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        if (user.emailVerified) {
-            console.log("Correo verificado: Continuando con la autenticación.");
-            const currentUser = {
-                isLoggedIn: true,
-                email: user.email,
-                uid: user.uid,
-            };
-            localStorage.setItem("currentUser", JSON.stringify(currentUser));
-            window.location.href = "tus-rutinas.html";
-        } else {
-            console.log("Correo no verificado, deteniendo el flujo");
+        if (!user.emailVerified) {
             await auth.signOut();
-
             Swal.fire({
                 icon: "warning",
                 title: "Correo no verificado",
                 text: "Por favor, verifica tu correo antes de iniciar sesión.",
                 confirmButtonColor: "#6f42c1",
             });
+            return;
         }
+
+        // Verificar si el usuario está aprobado en Firestore
+        const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+
+        if (!userDoc.exists() || !userDoc.data().aprobado) {
+            await auth.signOut();
+            Swal.fire({
+                icon: "warning",
+                title: "Acceso denegado",
+                text: "Tu cuenta aún no ha sido aprobada por el administrador.",
+                confirmButtonColor: "#6f42c1",
+            });
+            return;
+        }
+
+        // Usuario aprobado, guardar en localStorage y redirigir
+        const currentUser = {
+            isLoggedIn: true,
+            email: user.email,
+            uid: user.uid,
+        };
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        window.location.href = "tus-rutinas.html";
+
     } catch (error) {
         console.error("Error al iniciar sesión:", error);
-        console.error("Código de error:", error.code); // Muestra el código de error
-        console.error("Mensaje de error:", error.message); // Muestra el mensaje de error
 
         let errorMessage = "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
 
         switch (error.code) {
             case "auth/invalid-credential":
-                errorMessage = "Las credenciales proporcionadas son incorrectas. Por favor, verifica tu correo y contraseña e intenta nuevamente";
+                errorMessage = "Las credenciales proporcionadas son incorrectas.";
                 break;
             case "auth/user-not-found":
                 errorMessage = `No existe una cuenta registrada con el correo: ${email}`;

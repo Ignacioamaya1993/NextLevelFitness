@@ -357,6 +357,29 @@ main {
     transform: translateY(-2px);
 }
 
+#download-pdf {
+    position: absolute;
+    top: 200px; /* Ajusta según sea necesario */
+    right: 20px; /* Ajusta según sea necesario */
+    background: #f8f8f8; /* Fondo verde (similar a Excel) */
+    border: 2px solid #388E3C; /* Borde más oscuro para contraste */
+    border-radius: 7px; /* Bordes redondeados */
+    padding: 6px; /* Espaciado interno */
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para resaltar */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#download-pdf:hover {
+    transform: scale(1.1); /* Efecto de agrandamiento al pasar el mouse */
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+#download-pdf img {
+    width: 45px;
+    height: 45px;
+}
+
 /* Animación del popup */
 @keyframes popup-show {
     from {
@@ -565,5 +588,19 @@ main {
 @media screen and (max-width: 480px) {
     #routine-list {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Media query para pantallas pequeñas (móviles) */
+@media (max-width: 600px) {
+    #download-pdf {
+        top: 150px; /* Ajusta la posición para móviles si es necesario */
+        right: 10px; /* Ajusta para pantallas más pequeñas */
+        padding: 4px; /* Menos espacio en móviles */
+    }
+
+    #download-pdf img {
+        width: 35px;  /* Tamaño del icono más pequeño */
+        height: 35px; /* Tamaño del icono más pequeño */
     }
 }
