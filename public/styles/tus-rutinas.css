@@ -592,7 +592,7 @@ main {
     #routine-list {
         grid-template-columns: 1fr;
     }
-    
+
     #download-pdf {
         top: 15px; /* Ajuste menor */
         right: 15px;
@@ -616,7 +616,7 @@ main {
     /* Estilos del botón de descarga PDF */
 #download-pdf {
     position: absolute;
-    top: 20px;
+    top: -20px;
     right: 20px;
     background: #f8f8f8;
     border: 2px solid #388E3C;
