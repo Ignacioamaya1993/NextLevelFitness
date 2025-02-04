@@ -544,10 +544,24 @@ main {
     #routine-list {
         grid-template-columns: repeat(2, minmax(220px, 1fr));
     }
+
+    /* Botón de descarga PDF */
+#download-pdf {
+    position: absolute;
+    top: 183px;
+}
+
 }
 
 @media screen and (max-width: 480px) {
     #routine-list {
         grid-template-columns: 1fr;
     }
+
+        /* Botón de descarga PDF */
+#download-pdf {
+    position: absolute;
+    top: 183px;
+}
+
 }
