@@ -1,5 +1,5 @@
 import { db } from './firebaseConfig.js'; // Importa solo db
-import { collection, getDocs, query, where, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, getDocs, query, where, updateDoc, deleteDoc, getFirestore, doc, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -474,6 +474,22 @@ saveButton.addEventListener("click", () => {
 
 const inputElement = document.getElementById("my-input");
 inputElement.addEventListener("input", preventNegativeValues);
+
+async function guardarHistorialPeso(userId, ejercicioID, nuevoPeso) {
+    try {
+        const historialRef = collection(db, `usuarios/${userId}/historialPesos`);
+
+        await addDoc(historialRef, {
+            ejercicioID: ejercicioID,
+            peso: nuevoPeso,
+            fecha: Timestamp.now()
+        });
+
+        console.log(`Historial guardado: Usuario ${userId}, Ejercicio ${ejercicioID}, Peso ${nuevoPeso} kg.`);
+    } catch (error) {
+        console.error("Error al guardar el historial de peso:", error);
+    }
+}
 
 async function saveChanges(day, exercises) {
     try {
