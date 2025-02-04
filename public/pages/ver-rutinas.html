@@ -35,9 +35,13 @@
 
     <!-- 📌 SECCIÓN PRINCIPAL -->
     <main>
-        <h1>Rutinas del usuario [Nombre] [Apellido]</h1>
+        <h1>Rutinas del Usuario <span id="user-name"></h1>
         <div id="routine-list"></div> 
         <!-- Aquí se generarán las rutinas dinámicamente -->
+
+        <button id="download-pdf" style="display: none;">
+            <img src="../assets/images/logos/pdf.png" alt="pdf Icon">
+        </button>
 
     <!-- Popup para editar rutina -->
     <div id="edit-popup" class="popup hidden" aria-hidden="true" role="dialog">
@@ -92,6 +96,7 @@
 
     <script type="module" src="../scripts/firebaseConfig.js"></script>
     <script type="module" src="../scripts/ver-rutinas.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>

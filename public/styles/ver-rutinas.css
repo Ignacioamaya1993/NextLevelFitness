@@ -113,6 +113,31 @@ main {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
+/* Botón de descarga PDF */
+#download-pdf {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #f8f8f8;
+    border: 2px solid #388E3C;
+    border-radius: 7px;
+    padding: 5px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: none; /* Se mantiene oculto por defecto */
+}
+
+#download-pdf:hover {
+    transform: scale(1.1);
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+#download-pdf img {
+    width: 45px;
+    height: 45px;
+}
+
 /* Estilo para las viñetas modernas */
 .exercise-list {
     list-style-type: none; /* Elimina las viñetas tradicionales */

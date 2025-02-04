@@ -189,7 +189,17 @@ function displayUserRoutines(routines) {
 
         routineList.appendChild(routineCard);
     });
+        // Llamar a la función de descarga solo después de que las rutinas estén disponibles
+        const downloadButton = document.getElementById("download-pdf");
+        downloadButton.addEventListener("click", () => {
+            downloadRoutinesAsPDF(groupedRoutines); // Pasar las rutinas agrupadas como parámetro
+        });
 
+        // Asignar los event listeners después de que el contenido se haya cargado
+        addEventListenersToButtons();
+
+    // Función que agrega los event listeners
+    function addEventListenersToButtons() {
     const editButtons = routineList.querySelectorAll(".edit-button");
     const deleteButtons = routineList.querySelectorAll(".delete-button");
 
@@ -217,6 +227,48 @@ function displayUserRoutines(routines) {
             });
         })
     );
+
+    // Función que genera y descarga el PDF
+    function downloadRoutinesAsPDF(groupedRoutines) {
+        const { jsPDF } = window.jspdf; // Usar jsPDF
+
+        const doc = new jsPDF();
+        let yPosition = 10;
+        doc.setFontSize(16);
+        doc.text("Rutinas de Ejercicio", 10, yPosition);
+
+        // Para cada día de la rutina
+        for (const day in groupedRoutines) {
+            const exercises = groupedRoutines[day];
+
+            // Título del día
+            yPosition += 10;
+            doc.setFontSize(12);
+            doc.text(`Rutina para el día ${day}`, 10, yPosition);
+
+            // Agregar los ejercicios
+            exercises.forEach(exercise => {
+                yPosition += 8;
+                doc.setFontSize(10);
+                const name = exercise.name || "Ejercicio sin nombre";
+                const series = exercise.series || 0;
+                const reps = exercise.repetitions || 0;
+                const weight = exercise.weight || 0;
+                const additionalData = exercise.additionalData || "Sin información adicional";
+                doc.text(`${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}`, 10, yPosition);
+            });
+
+            // Si el contenido se está saliendo de la página, añadir una nueva página
+            if (yPosition > 270) {
+                doc.addPage();
+                yPosition = 10;
+            }
+        }
+
+        // Descargar el archivo PDF
+        doc.save("rutinas.pdf");
+    }
+}
 
 // 🔹 Abrir el popup de edición
 function openEditPopup(day, routines) {
