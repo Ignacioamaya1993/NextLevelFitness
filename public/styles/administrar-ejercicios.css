@@ -302,61 +302,78 @@ body {
 
 /* Media Query para dispositivos móviles */
 @media (max-width: 768px) {
+/* Media Query para dispositivos móviles */
+@media (max-width: 768px) {
     .swal2-popup {
-        width: 90%;
+        display: flex;
+        flex-direction: column; /* Diseño vertical */
+        gap: 15px; /* Espacio entre elementos */
         max-width: 100%;
-        min-width: auto;
-        padding: 15px !important;
+        max-height: 90vh !important;
+        overflow-y: auto;
+        padding: 20px !important;
         border-radius: 12px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
-    .edit-popup {
+    .popup-header {
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    .exercise-title {
+        font-size: 1.5rem;
+    }
+
+    .popup-content {
+        display: flex;
         flex-direction: column;
-        align-items: stretch;
-        background: #f8f9fa;
+        gap: 15px;
+    }
+
+    .popup-left, .popup-right {
+        padding: 8px;
+        width: 100%;
+    }
+
+    .video-container iframe {
+        width: 100%;
+        height: 200px;
+    }
+
+    .instrucciones {
+        font-size: 1rem;
+        padding: 10px 0;
+    }
+
+    .exercise-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+
+    .popup-right {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-popup {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
         padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
     }
+}
 
-    .edit-popup input,
-    .edit-popup textarea {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 14px;
-    }
-
-    .edit-popup label {
-        font-weight: bold;
-        margin-top: 10px;
-        display: block;
-        color: #333;
-    }
-
-    .edit-popup button {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .edit-popup .save-btn {
-        background-color: #007bff;
-        color: white;
-        border: none;
-    }
-
-    .edit-popup .cancel-btn {
-        background-color: #6c757d;
-        color: white;
-        border: none;
-        margin-top: 10px;
-    }
 
     .column {
         width: 100%;
