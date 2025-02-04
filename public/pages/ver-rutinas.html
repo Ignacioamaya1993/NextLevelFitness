@@ -36,8 +36,12 @@
     <!-- 📌 SECCIÓN PRINCIPAL -->
     <main>
         <h1>Rutinas del Usuario <span id="user-name"></h1>
-        <div id="routine-list"></div> 
-        <!-- Aquí se generarán las rutinas dinámicamente -->
+            <div id="routine-container">
+                <div id="routine-list"></div>
+                <button id="download-pdf">
+                    <img src="../assets/images/logos/pdf.png" alt="pdf Icon">
+                </button>
+            </div>            
 
     <!-- Popup para editar rutina -->
     <div id="edit-popup" class="popup hidden" aria-hidden="true" role="dialog">
@@ -65,10 +69,6 @@
     </div>
 
 </main>
-
-<button id="download-pdf" style="display: none;">
-    <img src="../assets/images/logos/pdf.png" alt="pdf Icon">
-</button>
 
     <!-- 🔵 FOOTER GLOBAL (Se maneja desde global.css) -->
     <footer>
