@@ -1,5 +1,5 @@
 import app from './firebaseConfig.js';
-import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc, deleteDoc, setDoc, query, orderBy, startAfter, limit } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log("Usuario autenticado:", user.email);
 
+        const db = getFirestore(app);
         const routineBuilder = document.getElementById("routine-builder");
         const categoryFilter = document.getElementById("category-filter");
         const exerciseGrid = document.getElementById("exercise-grid");
@@ -19,32 +20,26 @@ document.addEventListener("DOMContentLoaded", () => {
         const addExerciseBtn = document.getElementById("add-exercise-btn");
 
         let currentPage = 1; // Página actual
-        const itemsPerPage = 20; // Número de items por página
+        const itemsPerPage = 18; // Número de items por página
 
         routineBuilder.classList.remove("hidden");
-
-        const db = getFirestore(app);
 
         await loadCategories(db, categoryFilter);
         await loadExercises(db, exerciseGrid, currentPage);
 
         categoryFilter.addEventListener("change", async () => {
             const selectedCategory = categoryFilter.value;
-            await loadExercises(db, exerciseGrid, currentPage, selectedCategory, searchBar.value);
+            await loadExercisesPaginated(selectedCategory, searchBar.value, true);
         });
 
         let debounceTimeout;
 
-        searchBar.addEventListener("input", async () => {
-            const selectedCategory = categoryFilter.value;
-
-            // Cancelar cualquier llamada anterior que aún no se haya ejecutado
+        searchBar.addEventListener("input", () => {
             clearTimeout(debounceTimeout);
-
-            // Crear un nuevo retraso de 300ms antes de realizar la búsqueda
             debounceTimeout = setTimeout(async () => {
-                await loadExercises(db, exerciseGrid, currentPage, selectedCategory, searchBar.value);
-            }, 300); // 300ms es un buen tiempo para debounce, ajusta si es necesario
+                const selectedCategory = categoryFilter.value;
+                await loadExercises (selectedCategory, searchBar.value, true);
+            }, 300);
         });
 
         // Botón para agregar nuevo ejercicio
@@ -85,100 +80,52 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 // Función para cargar y mostrar los ejercicios con paginación
-async function loadExercises(db, exerciseGrid, page = 1, category = "all", searchQuery = "") {
+async function loadExercises(db, exerciseGrid, page = 1, category = "all", searchQuery = "", lastVisible = null) {
     let latestSearchId = 0; // Variable global para rastrear la búsqueda más reciente
     const searchId = ++latestSearchId; // Incrementa el ID de búsqueda
 
     exerciseGrid.innerHTML = ""; // Limpiar ejercicios existentes
 
     try {
-        const exercises = []; // Array para almacenar todos los ejercicios
-        let exercisesSnapshot;
-
-        if (!category || category === "all") { // Verificar si category está vacío o es "all"
-            const categoriesSnapshot = await getDocs(collection(db, "categories"));
-            for (const categoryDoc of categoriesSnapshot.docs) {
-                exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "cache" });
-                if (exercisesSnapshot.empty) {
-                    exercisesSnapshot = await getDocs(collection(db, `categories/${categoryDoc.id}/exercises`), { source: "server" });
-                }
-                exercisesSnapshot.forEach((doc) => {
-                    const exercise = doc.data();
-                    exercises.push({ ...exercise, id: doc.id }); // Agregar el id del documento
-                });
-            }
+        let queryRef;
+        if (category === "all") {
+            queryRef = collection(db, "exercises"); // Si "all", buscamos en la colección principal de ejercicios
         } else {
-            exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "cache" });
-            if (exercisesSnapshot.empty) {
-                exercisesSnapshot = await getDocs(collection(db, `categories/${category}/exercises`), { source: "server" });
-            }
-            exercisesSnapshot.forEach((doc) => {
-                const exercise = doc.data();
-                exercises.push({ ...exercise, id: doc.id }); // Agregar el id del documento
-            });
+            queryRef = collection(db, `categories/${category}/exercises`); // Si hay categoría, buscamos ahí
         }
 
-        // Verifica si esta es la búsqueda más reciente antes de actualizar la UI
+        let queryConstraints = [orderBy("Nombre"), limit(itemsPerPage)]; 
+
+        // Aplicar startAfter si no es la primera página
+        if (lastVisible) {
+            queryConstraints.push(startAfter(lastVisible));
+        }
+
+        const exercisesSnapshot = await getDocs(query(queryRef, ...queryConstraints));
+
+        // Si esta es la búsqueda más reciente, actualizamos la UI
         if (searchId === latestSearchId) {
             exerciseGrid.innerHTML = ""; // Limpia antes de agregar nuevos elementos
 
-            // Filtrar ejercicios por búsqueda
+            const exercises = [];
+            exercisesSnapshot.forEach((doc) => {
+                exercises.push({ ...doc.data(), id: doc.id });
+            });
+
+            // Último documento visible para paginación posterior
+            lastVisible = exercisesSnapshot.docs[exercisesSnapshot.docs.length - 1] || null;
+
+            // Filtrar por búsqueda
             const filteredExercises = exercises.filter((exercise) =>
                 exercise.Nombre.toLowerCase().includes(searchQuery.toLowerCase())
             );
 
-            // Ordenar ejercicios alfabéticamente por nombre
-            filteredExercises.sort((a, b) => a.Nombre.localeCompare(b.Nombre));
-
-            // Paginación: mostrar solo los ejercicios de la página actual
-            const startIndex = (page - 1) * itemsPerPage;
-            const paginatedExercises = filteredExercises.slice(startIndex, startIndex + itemsPerPage);
-
-            // Renderizar los ejercicios filtrados y ordenados
-            paginatedExercises.forEach((exercise) => {
+            // Renderizar ejercicios en la UI
+            filteredExercises.forEach((exercise) => {
                 const exerciseCard = document.createElement("div");
                 exerciseCard.classList.add("exercise-card");
 
-                exerciseCard.style.display = "flex";
-                exerciseCard.style.flexDirection = "column";
-                exerciseCard.style.justifyContent = "space-between";
-                exerciseCard.style.height = "100%";
-
-                const selectButton = document.createElement("button");
-                selectButton.textContent = "Seleccionar";
-                selectButton.addEventListener("click", () =>
-                    showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones, exercise.Imagen, exercise)
-                );
-
-                // Botón para eliminar ejercicio
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Eliminar ejercicio";  // Cambiar texto del botón
-                deleteButton.classList.add("delete-btn"); // Agregar la clase delete-btn
-                deleteButton.addEventListener("click", () => {
-                    Swal.fire({
-                        title: '¿Estás seguro?',
-                        text: "Esta acción no se puede deshacer.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar'
-                    }).then(async (result) => {
-                        if (result.isConfirmed) {
-                            try {
-                                // Eliminamos el ejercicio de Firestore
-                                const exerciseRef = doc(db, `categories/${exercise.Categoria}/exercises/${exercise.id}`);
-                                await deleteDoc(exerciseRef);
-                                Swal.fire('¡Eliminado!', 'El ejercicio ha sido eliminado.', 'success');
-                                loadExercises(db, exerciseGrid, page); // Volver a cargar los ejercicios
-                            } catch (error) {
-                                Swal.fire('Error', 'No se pudo eliminar el ejercicio.', 'error');
-                                console.error("Error al eliminar ejercicio:", error);
-                            }
-                        }
-                    });
-                });
-
-                exerciseCard.innerHTML = ` 
+                exerciseCard.innerHTML = `
                     <h3>${exercise.Nombre}</h3>
                     <img src="${exercise.Imagen || 'default-image.jpg'}" alt="${exercise.Nombre}">
                 `;
@@ -186,15 +133,47 @@ async function loadExercises(db, exerciseGrid, page = 1, category = "all", searc
                 const buttonContainer = document.createElement("div");
                 buttonContainer.classList.add("buttonContainer");
 
-                buttonContainer.appendChild(selectButton);
-                buttonContainer.appendChild(deleteButton);  
+                // Botón de selección
+                const selectButton = document.createElement("button");
+                selectButton.textContent = "Seleccionar";
+                selectButton.addEventListener("click", () =>
+                    showExerciseDetails(exercise.Nombre, exercise.Video, exercise.Instrucciones, exercise.Imagen, exercise)
+                );
 
+                // Botón de eliminación
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Eliminar ejercicio";
+                deleteButton.classList.add("delete-btn");
+                deleteButton.addEventListener("click", async () => {
+                    const confirmDelete = await Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "Esta acción no se puede deshacer.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    });
+
+                    if (confirmDelete.isConfirmed) {
+                        try {
+                            await deleteDoc(doc(db, `categories/${exercise.Categoria}/exercises/${exercise.id}`));
+                            Swal.fire('¡Eliminado!', 'El ejercicio ha sido eliminado.', 'success');
+                            loadExercises(db, exerciseGrid, page, category, searchQuery, lastVisible); // Recargar lista
+                        } catch (error) {
+                            Swal.fire('Error', 'No se pudo eliminar el ejercicio.', 'error');
+                            console.error("Error al eliminar ejercicio:", error);
+                        }
+                    }
+                });
+
+                buttonContainer.appendChild(selectButton);
+                buttonContainer.appendChild(deleteButton);
                 exerciseCard.appendChild(buttonContainer);
                 exerciseGrid.appendChild(exerciseCard);
             });
 
             // Mostrar la paginación
-            renderPagination(filteredExercises.length, page);
+            renderPagination(filteredExercises.length, page, lastVisible);
 
             console.log("Ejercicios cargados correctamente.");
         }
@@ -202,6 +181,12 @@ async function loadExercises(db, exerciseGrid, page = 1, category = "all", searc
         console.error("Error al cargar ejercicios:", error);
     }
 }
+
+window.addEventListener("scroll", () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        loadExercises(db, exerciseGrid, currentPage + 1, categoryFilter.value, searchBar.value, lastVisible);
+    }
+});
 
 // Función para renderizar la paginación
 function renderPagination(totalItems, currentPage) {
