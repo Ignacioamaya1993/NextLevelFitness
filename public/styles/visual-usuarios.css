@@ -4,7 +4,8 @@
     justify-content: center;
     align-items: center;
     margin: 20px auto;
-    width: 100%;
+    margin-left: 10px;
+    width: 70%;
     max-width: 400px;
     background: white;
     padding: 8px;
@@ -266,21 +267,6 @@
 
 /* Diseño adaptado para pantallas móviles */
 @media (max-width: 768px) {
-
-    /* 1920x1080 - 3 filas de 8 ejercicios (Total: 24 por página) */
-@media (min-width: 1900px) {
-    .usuarios-container {
-        grid-template-columns: repeat(6, 1fr); /* 8 ejercicios por fila */
-    }
-}
-
-/* Para pantallas medianas (tablets, laptops más pequeñas) */
-@media (max-width: 1200px) {
-    .usuarios-container {
-        grid-template-columns: repeat(4, 1fr); /* Ajuste dinámico */
-    }
-}
-
     .swal2-popup {
         width: 90%;
         padding: 15px;
@@ -302,5 +288,12 @@
 
     #download-excel {
         top: 295px; /* Ajusta según sea necesario */
+    }
+}
+
+/* 1920x1080 - 3 filas de 8 ejercicios (Total: 24 por página) */
+@media (min-width: 1900px) {
+    .usuarios-container {
+        grid-template-columns: repeat(6, 1fr); /* 8 ejercicios por fila */
     }
 }
