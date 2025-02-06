@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const addExerciseBtn = document.getElementById("add-exercise-btn");
 
         let currentPage = 1; // Página actual
-        const itemsPerPage = 20; // Número de items por página
+        const itemsPerPage = 24; // Número de items por página
 
         routineBuilder.classList.remove("hidden");
 
