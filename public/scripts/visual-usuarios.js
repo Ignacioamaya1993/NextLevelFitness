@@ -1,6 +1,6 @@
 import app, { db } from "../scripts/firebaseConfig.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs, doc, updateDoc, query, where, setDoc, deleteDoc, orderBy, limit, startAfter } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, getDocs, doc, updateDoc, getDoc, query, where, setDoc, deleteDoc, orderBy, limit, startAfter } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 // Llamar a la función para cargar el usuario al iniciar
 cargarUsuarios();
@@ -12,7 +12,8 @@ let ultimoDocumento = null; // Para almacenar el último documento de la página
 
 let usuarios = [];
 let paginaActual = 1;
-let usuariosPorPagina = 24; // Cuántos usuarios se mostrarán por página
+let usuariosPorPagina = 12; // Cuántos usuarios se mostrarán por página
+let searchTerm = ""; // Variable para almacenar el término de búsqueda
 
 async function obtenerUsuarios() {
     const usuariosRef = collection(db, "usuarios");
@@ -40,13 +41,55 @@ async function obtenerUsuarios() {
             orderBy("nombre"),
             limit(usuariosPorPagina)
         );
-    }    
+    }
 
-    // Actualizar el último documento para la siguiente página
-    ultimoDocumento = snapshot.docs[snapshot.docs.length - 1];
+    // Obtener los documentos y actualizar la lista de usuarios
+    try {
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+            ultimoDocumento = snapshot.docs[snapshot.docs.length - 1]; // Actualizar el último documento
+            snapshot.forEach(doc => {
+                const userData = doc.data();
+                const userId = doc.id;
+                const nombre = userData.nombre || "Sin nombre";
+                const apellido = userData.apellido || "Sin apellido";
+                const email = userData.email || "No disponible";
+                const celular = userData.celular || "No disponible";
+                const fechaNacimiento = userData.fechaNacimiento || "No disponible";
+                const genero = userData.genero || "No disponible";
 
-    mostrarUsuarios(usuarios);
-    mostrarPaginacion();
+                let edad = "No disponible";
+                if (fechaNacimiento !== "No disponible") {
+                    edad = calcularEdad(fechaNacimiento);
+                }
+
+                let fechaFormateada = "No disponible";
+                if (fechaNacimiento !== "No disponible") {
+                    fechaFormateada = formatearFecha(fechaNacimiento);
+                }
+
+                usuarios.push({
+                    userId,
+                    nombre,
+                    apellido,
+                    email,
+                    celular,
+                    fechaFormateada,
+                    edad,
+                    genero,
+                    aprobado: userData.aprobado || false // Asegurar que 'aprobado' tenga un valor por defecto
+                });
+            });
+
+            mostrarUsuarios(usuarios);
+            mostrarPaginacion();
+        } else {
+            usuariosContainer.innerHTML = "<p>No hay usuarios registrados.</p>";
+        }
+    } catch (error) {
+        console.error("Error al obtener usuarios:", error);
+        usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
+    }
 }
 
 function mostrarPaginacion() {
@@ -107,13 +150,45 @@ async function cargarUsuarios() {
         console.log("Usuario autenticado:", user.email);
 
         try {
-            const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
+            let usuariosSnapshot;
+
+            // Si se está realizando una búsqueda, aplicar el filtro
+            if (searchInput.value.trim() !== "") {
+                const searchTerm = searchInput.value.toLowerCase();
+                usuariosSnapshot = await getDocs(query(
+                    collection(db, "usuarios"),
+                    where("nombre", ">=", searchTerm),
+                    where("nombre", "<=", searchTerm + "\uf8ff"), // Para obtener coincidencias de inicio
+                    orderBy("nombre"),
+                    limit(usuariosPorPagina)
+                ));
+            } else {
+                // Si no hay búsqueda, obtener los usuarios con paginación
+                let q;
+                if (ultimoDocumento) {
+                    q = query(
+                        collection(db, "usuarios"),
+                        orderBy("nombre"),
+                        limit(usuariosPorPagina),
+                        startAfter(ultimoDocumento)
+                    );
+                } else {
+                    q = query(
+                        collection(db, "usuarios"),
+                        orderBy("nombre"),
+                        limit(usuariosPorPagina)
+                    );
+                }
+
+                usuariosSnapshot = await getDocs(q);
+            }
 
             if (usuariosSnapshot.empty) {
                 usuariosContainer.innerHTML = "<p>No hay usuarios registrados.</p>";
                 return;
             }
 
+            // Limpiar los usuarios previos
             usuarios = [];
 
             usuariosSnapshot.forEach(doc => {
@@ -152,19 +227,6 @@ async function cargarUsuarios() {
             mostrarUsuarios(usuarios);
             mostrarPaginacion();
 
-            searchInput.addEventListener("input", () => {
-                const searchTerm = searchInput.value.toLowerCase();
-                const filteredUsers = usuarios.filter(user =>
-                    user.nombre.toLowerCase().includes(searchTerm) ||
-                    user.apellido.toLowerCase().includes(searchTerm)
-                );
-                // Resetear paginación y cargar resultados filtrados
-                ultimoDocumento = null; // Reiniciar el último documento
-                paginaActual = 1; // Volver a la primera página
-                mostrarUsuarios(filteredUsers);
-                mostrarPaginacion();
-            });
-
         } catch (error) {
             console.error("Error al cargar usuarios:", error);
             usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
@@ -198,18 +260,17 @@ function mostrarUsuarios(users) {
         html += `
             <div class="usuario-card">
                 <h2>${user.nombre} ${user.apellido}</h2>
-                <p><strong>Email:</strong></p>
-                <p>${user.email}</p>
+                <p><strong>Email:</strong> ${user.email}</p>
                 <p><strong>Celular:</strong> ${user.celular}</p>
                 <p><strong>Fecha de nacimiento:</strong> ${user.fechaFormateada}</p>
                 <p><strong>Edad:</strong> ${user.edad}</p>
                 <p><strong>Género:</strong> ${user.genero}</p>
-                <p><strong>Estado:</strong> ${user.aprobado ? "Aprobado" : "Pendiente"}</p>
+                <p><strong>Estado:</strong> ${user.aprobado ? "Aprobado" : "Inhabilitado"}</p>
                 <button class="view-rutinas-btn" data-user-id="${user.userId}">Ver Rutinas</button>
                 <button class="assign-rutina-btn" data-user-id="${user.userId}">Armar Rutina</button>
                 <button class="transfer-rutina-btn" data-user-id="${user.userId}">Traspasar Rutina</button>
-                <button class="aprobar-btn" data-id="${user.userId}" ${user.aprobado ? "disabled" : ""}>
-                ${user.aprobado ? "Aprobado" : "Aprobar"}
+                <button class="aprobar-btn" data-id="${user.userId}">
+                ${user.aprobado ? "Inhabilitar" : "Aprobar"}
                 </button>
             </div>
         `;
@@ -218,8 +279,13 @@ function mostrarUsuarios(users) {
     // Asignar el HTML al contenedor
     usuariosContainer.innerHTML = html;
 
-    // Llamar a la función para agregar los eventos de aprobación después de asignar el HTML
-    agregarEventosAprobacion();
+    // Agregar eventos a los botones de aprobar/inabilitar
+    document.querySelectorAll('.aprobar-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = button.dataset.id;
+            cambiarEstadoUsuario(userId, button); // Cambiar estado dependiendo del usuario
+        });
+    });
 
     // Agregar eventos a otros botones
     document.querySelectorAll('.view-rutinas-btn').forEach(button => {
@@ -244,6 +310,48 @@ function mostrarUsuarios(users) {
     });
 }
 
+searchInput.addEventListener("input", async () => {
+    searchTerm = searchInput.value.trim();
+    usuarios = [];
+    ultimoDocumento = null;
+    await obtenerUsuarios();
+});
+
+clearSearchButton.addEventListener("click", () => {
+    searchInput.value = "";
+    searchTerm = "";
+    usuarios = [];
+    ultimoDocumento = null;
+    obtenerUsuarios();
+});
+
+async function cambiarEstadoUsuario(userId, button) {
+    const usuarioRef = doc(db, "usuarios", userId);
+
+    try {
+        // Obtener el documento del usuario
+        const usuarioSnapshot = await getDoc(usuarioRef);
+        if (usuarioSnapshot.exists()) {
+            const usuarioData = usuarioSnapshot.data();
+            const nuevoEstado = !usuarioData.aprobado; // Cambiar el estado
+
+            // Actualizar el estado en Firestore
+            await updateDoc(usuarioRef, {
+                aprobado: nuevoEstado
+            });
+
+            // Actualizar la interfaz sin recargar la página
+            button.textContent = nuevoEstado ? "Inhabilitar" : "Aprobar";
+            button.parentElement.querySelector("p strong").textContent = nuevoEstado ? "Aprobado" : "Inhabilitado";
+
+            // Recargar los usuarios con el nuevo estado
+            cargarUsuarios(); // Recargar usuarios con el nuevo estado actualizado
+        }
+    } catch (error) {
+        console.error("Error al cambiar el estado del usuario:", error);
+    }
+}
+
 // Función para descargar los usuarios en formato Excel
 function descargarExcel() {
     const usuariosParaExportar = usuarios.map(user => ({
@@ -255,67 +363,11 @@ function descargarExcel() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Usuarios");
     // Descargar el archivo Excel
-    XLSX.writeFile(wb, "usuarios.xlsx");  // Cambié 'writeFile' a 'XLSX.writeFile'
+    XLSX.writeFile(wb, "Usuarios.xlsx");  // Cambié 'writeFile' a 'XLSX.writeFile'
 }
 
 // Agregar el evento de clic al botón de descarga
 document.getElementById("download-excel").addEventListener("click", descargarExcel);
-
-// Agregar eventos a los botones de aprobación
-function agregarEventosAprobacion() {
-    const botones = document.querySelectorAll(".aprobar-btn");
-    botones.forEach(boton => {
-        boton.addEventListener("click", () => {
-            const id = boton.dataset.id;
-            if (id) aprobarUsuario(id);
-        });
-    });
-}
-
-// Función para aprobar un usuario
-async function aprobarUsuario(id) {
-    try {
-        const usuarioRef = doc(db, "usuarios", id);
-        await updateDoc(usuarioRef, { aprobado: true });
-
-        obtenerUsuarios(); // Recargar la lista después de aprobar
-    } catch (error) {
-        console.error("Error al aprobar usuario:", error);
-    }
-}
-
-    usuariosContainer.innerHTML = html;
-
-    document.querySelectorAll('.view-rutinas-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const userId = button.dataset.userId;
-            verRutinasUsuario(userId);
-        });
-    });
-
-    document.querySelectorAll('.assign-rutina-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const userId = button.dataset.userId;
-            asignarRutinaUsuario(userId);
-        });
-    });
-
-    document.querySelectorAll('.transfer-rutina-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const userId = button.dataset.userId;
-            traspasarRutinaUsuario(userId);
-        });
-    });
-
-// Cargar usuarios al iniciar
-obtenerUsuarios();
-
-// Agregar el evento de clic a la "X"
-clearSearchButton.addEventListener("click", () => {
-    searchInput.value = ""; 
-    searchInput.focus();
-    mostrarUsuarios(usuarios);
-});
 
 // Función para ver rutinas (redirige a una nueva página con el ID del usuario)
 function verRutinasUsuario(userId) {

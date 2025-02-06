@@ -362,20 +362,6 @@ main {
 }
 
 /* Media Query para dispositivos móviles */
-/* 1920x1080 - 3 filas de 8 ejercicios (Total: 24 por página) */
-@media (min-width: 1900px) {
-    .exercise-grid {
-        grid-template-columns: repeat(8, 1fr); /* 8 ejercicios por fila */
-    }
-}
-
-/* Para pantallas medianas (tablets, laptops más pequeñas) */
-@media (max-width: 1200px) {
-    .exercise-grid {
-        grid-template-columns: repeat(4, 1fr); /* Ajuste dinámico */
-    }
-}
-
 @media (max-width: 768px) {
     .exercise-popup {
         display: flex;
