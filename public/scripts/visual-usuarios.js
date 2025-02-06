@@ -12,7 +12,7 @@ let ultimoDocumento = null; // Para almacenar el último documento de la página
 
 let usuarios = [];
 let paginaActual = 1;
-let usuariosPorPagina = 15; // Cuántos usuarios se mostrarán por página
+let usuariosPorPagina = 24; // Cuántos usuarios se mostrarán por página
 
 async function obtenerUsuarios() {
     const usuariosRef = collection(db, "usuarios");
