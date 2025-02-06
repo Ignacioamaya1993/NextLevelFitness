@@ -297,8 +297,35 @@ body {
 }
 
 /* Media Query para dispositivos móviles */
-@media (max-width: 768px) {
-/* Media Query para dispositivos móviles */
+/* Grid de ejercicios por defecto */
+.exercise-grid {
+    display: grid;
+    margin-top: 20px;
+    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Base flexible */
+}
+
+/* 1920x1080 - 3 filas de 8 ejercicios (Total: 24 por página) */
+@media (min-width: 1900px) {
+    .exercise-grid {
+        grid-template-columns: repeat(8, 1fr); /* 8 ejercicios por fila */
+    }
+}
+
+/* 1366x768 - 3 filas de 6 ejercicios (Total: 18 por página) */
+@media (max-width: 1366px) and (min-height: 768px) {
+    .exercise-grid {
+        grid-template-columns: repeat(6, 1fr); /* 6 ejercicios por fila */
+    }
+}
+
+/* Para pantallas medianas (tablets, laptops más pequeñas) */
+@media (max-width: 1200px) {
+    .exercise-grid {
+        grid-template-columns: repeat(4, 1fr); /* Ajuste dinámico */
+    }
+}
+
 @media (max-width: 768px) {
     .swal2-popup {
         display: flex;
@@ -368,8 +395,6 @@ body {
         padding: 20px;
         overflow-y: auto;
     }
-}
-
 
     .column {
         width: 100%;
