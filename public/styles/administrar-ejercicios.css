@@ -304,13 +304,6 @@ body {
     }
 }
 
-/* 1366x768 - 3 filas de 6 ejercicios (Total: 18 por página) */
-@media (max-width: 1366px) and (min-height: 768px) {
-    .exercise-grid {
-        grid-template-columns: repeat(6, 1fr); /* 6 ejercicios por fila */
-    }
-}
-
 /* Para pantallas medianas (tablets, laptops más pequeñas) */
 @media (max-width: 1200px) {
     .exercise-grid {

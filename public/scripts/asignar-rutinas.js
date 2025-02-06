@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const searchBar = document.getElementById("search-bar");
 
         let currentPage = 1;
-        const itemsPerPage = 18;
+        const itemsPerPage = 24;
 
         routineBuilder.classList.remove("hidden");
 

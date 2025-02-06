@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchBar = document.getElementById("search-bar");
 
     let currentPage = 1; // Página actual
-    const itemsPerPage = 18; // Número de items por página
+    const itemsPerPage = 24; // Número de items por página
 
     if (user && user.isLoggedIn) {
         restrictedMessage.classList.add("hidden");
