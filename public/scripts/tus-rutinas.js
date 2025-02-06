@@ -1,5 +1,5 @@
 import { db } from './firebaseConfig.js'; // Importa solo db
-import { collection, getDocs, query, where, updateDoc, deleteDoc, getFirestore, doc, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, getDocs, query, where, updateDoc, deleteDoc, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const user = JSON.parse(localStorage.getItem("currentUser"));

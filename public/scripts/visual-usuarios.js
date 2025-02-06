@@ -1,6 +1,6 @@
 import app, { db } from "../scripts/firebaseConfig.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs, doc, updateDoc, query, where, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, getDocs, doc, updateDoc, query, where, setDoc, deleteDoc, orderBy, limit, startAfter } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 // Llamar a la función para cargar el usuario al iniciar
 cargarUsuarios();
@@ -8,18 +8,89 @@ cargarUsuarios();
 const usuariosContainer = document.getElementById("usuarios-container");
 const searchInput = document.getElementById("search-input"); // Campo de búsqueda
 const clearSearchButton = document.getElementById("clear-search"); // Botón de limpiar búsqueda
+let ultimoDocumento = null; // Para almacenar el último documento de la página actual
 
 let usuarios = [];
+let paginaActual = 1;
+let usuariosPorPagina = 15; // Cuántos usuarios se mostrarán por página
 
-// Función para obtener usuarios desde Firestore
 async function obtenerUsuarios() {
     const usuariosRef = collection(db, "usuarios");
-    const snapshot = await getDocs(usuariosRef);
-    const usuarios = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-    }));
+
+    // Realizamos la consulta con límites (paginación)
+    let q;
+    if (searchTerm) {
+        q = query(
+            usuariosRef,
+            where("nombre", ">=", searchTerm),
+            where("nombre", "<=", searchTerm + "\uf8ff"), // Para obtener coincidencias de inicio
+            orderBy("nombre"),
+            limit(usuariosPorPagina)
+        );
+    } else if (ultimoDocumento) {
+        q = query(
+            usuariosRef,
+            orderBy("nombre"),
+            limit(usuariosPorPagina),
+            startAfter(ultimoDocumento)
+        );
+    } else {
+        q = query(
+            usuariosRef,
+            orderBy("nombre"),
+            limit(usuariosPorPagina)
+        );
+    }    
+
+    // Actualizar el último documento para la siguiente página
+    ultimoDocumento = snapshot.docs[snapshot.docs.length - 1];
+
     mostrarUsuarios(usuarios);
+    mostrarPaginacion();
+}
+
+function mostrarPaginacion() {
+    const paginacionContainer = document.getElementById("pagination-container");
+
+    // Limpiar la paginación existente
+    paginacionContainer.innerHTML = "";
+
+    // Calcular el número total de páginas
+    const totalItems = usuarios.length; // Total de usuarios
+    const totalPages = Math.ceil(totalItems / usuariosPorPagina);
+
+    // Botón de página anterior
+    if (paginaActual > 1) {
+        const prevButton = document.createElement("button");
+        prevButton.textContent = "Anterior";
+        prevButton.classList.add("prev");
+        prevButton.addEventListener("click", () => cambiarPagina(paginaActual - 1));
+        paginacionContainer.appendChild(prevButton);
+    }
+
+    // Botones de páginas numeradas
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement("button");
+        pageButton.textContent = i;
+        pageButton.addEventListener("click", () => cambiarPagina(i));
+        if (i === paginaActual) pageButton.classList.add("active");
+        paginacionContainer.appendChild(pageButton);
+    }
+
+    // Botón de página siguiente
+    if (paginaActual < totalPages) {
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "Siguiente";
+        nextButton.classList.add("next");
+        nextButton.addEventListener("click", () => cambiarPagina(paginaActual + 1));
+        paginacionContainer.appendChild(nextButton);
+    }
+}
+
+function cambiarPagina(pagina) {
+    if (pagina < 1) return; // No permitir páginas negativas
+    paginaActual = pagina;
+    obtenerUsuarios(); // Recargar usuarios para la página seleccionada
 }
 
 async function cargarUsuarios() {
@@ -79,6 +150,7 @@ async function cargarUsuarios() {
             });
 
             mostrarUsuarios(usuarios);
+            mostrarPaginacion();
 
             searchInput.addEventListener("input", () => {
                 const searchTerm = searchInput.value.toLowerCase();
@@ -86,7 +158,11 @@ async function cargarUsuarios() {
                     user.nombre.toLowerCase().includes(searchTerm) ||
                     user.apellido.toLowerCase().includes(searchTerm)
                 );
+                // Resetear paginación y cargar resultados filtrados
+                ultimoDocumento = null; // Reiniciar el último documento
+                paginaActual = 1; // Volver a la primera página
                 mostrarUsuarios(filteredUsers);
+                mostrarPaginacion();
             });
 
         } catch (error) {
@@ -122,7 +198,8 @@ function mostrarUsuarios(users) {
         html += `
             <div class="usuario-card">
                 <h2>${user.nombre} ${user.apellido}</h2>
-                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Email:</strong></p>
+                <p>${user.email}</p>
                 <p><strong>Celular:</strong> ${user.celular}</p>
                 <p><strong>Fecha de nacimiento:</strong> ${user.fechaFormateada}</p>
                 <p><strong>Edad:</strong> ${user.edad}</p>

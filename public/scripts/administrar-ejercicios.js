@@ -166,10 +166,15 @@ async function loadExercises(db, exerciseGrid, page = 1, category = "all", searc
                         if (result.isConfirmed) {
                             try {
                                 // Eliminamos el ejercicio de Firestore
-                                const exerciseRef = doc(db, `categories/${exercise.Categoria}/exercises/${exercise.id}`);
+                                const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
+                                console.log(`Ruta del ejercicio: categories/${category}/exercises/${exercise.id}`);
+                                console.log('Categoría:', exercise.Categoria);
+                                console.log('ID del ejercicio:', exercise.id); 
                                 await deleteDoc(exerciseRef);
                                 Swal.fire('¡Eliminado!', 'El ejercicio ha sido eliminado.', 'success');
-                                loadExercises(db, exerciseGrid, page); // Volver a cargar los ejercicios
+                                
+                                // Recargar ejercicios con los parámetros actuales
+                                loadExercises(db, exerciseGrid, page, category, searchQuery);
                             } catch (error) {
                                 Swal.fire('Error', 'No se pudo eliminar el ejercicio.', 'error');
                                 console.error("Error al eliminar ejercicio:", error);
