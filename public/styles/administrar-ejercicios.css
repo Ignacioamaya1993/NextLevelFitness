@@ -297,18 +297,10 @@ body {
 }
 
 /* Media Query para dispositivos móviles */
-/* Grid de ejercicios por defecto */
-.exercise-grid {
-    display: grid;
-    margin-top: 20px;
-    gap: 15px;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Base flexible */
-}
-
 /* 1920x1080 - 3 filas de 8 ejercicios (Total: 24 por página) */
 @media (min-width: 1900px) {
     .exercise-grid {
-        grid-template-columns: repeat(8, 1fr); /* 8 ejercicios por fila */
+        grid-template-columns: repeat(10, 1fr); /* 8 ejercicios por fila */
     }
 }
 
