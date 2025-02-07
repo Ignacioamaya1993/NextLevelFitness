@@ -21,14 +21,13 @@ html, body {
 header {
     background-color: #34495e; /* Mantener el fondo oscuro */
     padding: 10px 0; /* Espaciado vertical del encabezado */
-    max-height: 120px;
 }
 
 /* Contenedor principal del header */
 .header-container {
     display: flex;
-    align-items: center; 
-    justify-content: center;
+    align-items: center; /* Alinea verticalmente los elementos */
+    justify-content: center; /* Centra todos los elementos horizontalmente */
     padding: 10px 0;
 }
 
@@ -38,7 +37,7 @@ header {
     align-items: center; /* Alinea el logo verticalmente */
     padding: 10px; /* Elimina el padding adicional */
     margin-right: 50px; /* Empuja el logo a la izquierda */
-    margin-top: -20px;
+
 }
 
 .logo img {
@@ -52,7 +51,9 @@ header {
     align-items: center;
     list-style: none;
     gap: 20px; /* Espaciado entre los elementos */
-    margin-top: -30px;}
+    margin: 0;
+    padding: 0;
+}
 
 .nav-menu li {
     display: inline-block;
@@ -77,6 +78,44 @@ header {
     color: #34495e; /* Azul gris oscuro */
     background-color: #ecf0f1; /* Blanco suave para contraste */
     border-radius: 5px;
+}
+
+/* Contenido principal */
+main {
+    flex: 1; /* Hace que el contenido principal ocupe el espacio restante */
+    padding: 20px;
+}
+
+.hero {
+    text-align: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #a8dadc, #457b9d); /* Degradado moderno en tonos azules */
+    color: #f1faee; /* Blanco puro para el texto */
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin: 20px 0;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #457b9d; /* Azul medio para el botón */
+    color: #f1faee;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #1d3557; /* Azul más oscuro para hover */
 }
 
 /* Footer */
@@ -160,7 +199,6 @@ footer {
 
     .logo {
         margin-bottom: 10px; /* Espacio entre logo y menú */
-        margin-left: 18%;
     }
 
     .nav-menu {
