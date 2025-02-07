@@ -57,7 +57,7 @@
 
 /* Tarjetas de usuario */
 .usuario-card {
-    width: 25%;  /* Ancho fijo */
+    width: 300px;  /* Ancho fijo */
     height: 95%; /* Alto fijo */
     background: white;
     margin-top: 15px;
