@@ -161,6 +161,7 @@ footer {
 
     .logo {
         margin-bottom: 10px; /* Espacio entre logo y menú */
+        margin-left: 18%;
     }
 
     .nav-menu {
