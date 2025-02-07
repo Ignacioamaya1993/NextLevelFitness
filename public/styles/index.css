@@ -237,4 +237,26 @@ main {
     .about-container p {
         font-size: 1rem;
     }
+
+    .about {
+        padding: 40px 20px;
+        max-height: none; /* Permite que la altura se ajuste en pantallas pequeñas */
+    }
+    
+    /* Ajustes de imagen */
+    .about {
+        background-size: cover;
+        background-position: center;
+    }
+    
+    /* Ajustes para las tarjetas */
+    .cards-container {
+        grid-template-columns: 1fr; /* Las tarjetas ocuparán toda la fila */
+    }
+
+    /* Ajustes del botón CTA */
+    .cta-button {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+    }
 }
