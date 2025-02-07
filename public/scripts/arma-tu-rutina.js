@@ -217,7 +217,6 @@ function renderPagination(totalItems, currentPage) {
     }
 }
 
-
     async function showExerciseDetails(nombre, video, instrucciones) {
         const user = JSON.parse(localStorage.getItem("currentUser"));
         if (!user || !user.isLoggedIn) {

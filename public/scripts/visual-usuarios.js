@@ -1,102 +1,57 @@
 import app, { db } from "../scripts/firebaseConfig.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { collection, getDocs, doc, updateDoc, getDoc, query, where, setDoc, deleteDoc, orderBy, limit, startAfter } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, onSnapshot, getDocs, doc, updateDoc, getDoc, query, where, setDoc, deleteDoc, orderBy, limit, startAfter } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 // Llamar a la función para cargar el usuario al iniciar
 cargarUsuarios();
 
 const usuariosContainer = document.getElementById("usuarios-container");
 const searchInput = document.getElementById("search-input"); // Campo de búsqueda
-const clearSearchButton = document.getElementById("clear-search"); // Botón de limpiar búsqueda
 let ultimoDocumento = null; // Para almacenar el último documento de la página actual
 
 let usuarios = [];
 let paginaActual = 1;
 let usuariosPorPagina = 12; // Cuántos usuarios se mostrarán por página
-let searchTerm = ""; // Variable para almacenar el término de búsqueda
 
-async function obtenerUsuarios() {
-    const usuariosRef = collection(db, "usuarios");
+let debounceTimeout;
 
-    // Realizamos la consulta con límites (paginación)
-    let q;
-    if (searchTerm) {
-        q = query(
-            usuariosRef,
-            where("nombre", ">=", searchTerm),
-            where("nombre", "<=", searchTerm + "\uf8ff"), // Para obtener coincidencias de inicio
-            orderBy("nombre"),
-            limit(usuariosPorPagina)
-        );
-    } else if (ultimoDocumento) {
-        q = query(
-            usuariosRef,
-            orderBy("nombre"),
-            limit(usuariosPorPagina),
-            startAfter(ultimoDocumento)
-        );
-    } else {
-        q = query(
-            usuariosRef,
-            orderBy("nombre"),
-            limit(usuariosPorPagina)
-        );
-    }
-
-    // Obtener los documentos y actualizar la lista de usuarios
-    try {
-        const snapshot = await getDocs(q);
-        if (!snapshot.empty) {
-            ultimoDocumento = snapshot.docs[snapshot.docs.length - 1]; // Actualizar el último documento
-            snapshot.forEach(doc => {
-                const userData = doc.data();
-                const userId = doc.id;
-                const nombre = userData.nombre || "Sin nombre";
-                const apellido = userData.apellido || "Sin apellido";
-                const email = userData.email || "No disponible";
-                const celular = userData.celular || "No disponible";
-                const fechaNacimiento = userData.fechaNacimiento || "No disponible";
-                const genero = userData.genero || "No disponible";
-
-                let edad = "No disponible";
-                if (fechaNacimiento !== "No disponible") {
-                    edad = calcularEdad(fechaNacimiento);
-                }
-
-                let fechaFormateada = "No disponible";
-                if (fechaNacimiento !== "No disponible") {
-                    fechaFormateada = formatearFecha(fechaNacimiento);
-                }
-
-                usuarios.push({
-                    userId,
-                    nombre,
-                    apellido,
-                    email,
-                    celular,
-                    fechaFormateada,
-                    edad,
-                    genero,
-                    aprobado: userData.aprobado || false // Asegurar que 'aprobado' tenga un valor por defecto
-                });
-            });
-
-            mostrarUsuarios(usuarios);
-            mostrarPaginacion();
-        } else {
-            usuariosContainer.innerHTML = "<p>No hay usuarios registrados.</p>";
-        }
-    } catch (error) {
-        console.error("Error al obtener usuarios:", error);
-        usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
-    }
-}
+searchInput.addEventListener("input", () => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(async () => {
+        paginaActual = 1;
+        ultimoDocumento = null;
+        await cargarUsuarios(searchInput.value.trim());
+    }, 300);
+});
 
 function mostrarPaginacion() {
     const paginacionContainer = document.getElementById("pagination-container");
 
     // Limpiar la paginación existente
-    paginacionContainer.innerHTML = "";
+    paginacionContainer.innerHTML = "";async function cambiarEstadoUsuario(userId, button) {
+    const usuarioRef = doc(db, "usuarios", userId);
+
+    try {
+        const usuarioSnapshot = await getDoc(usuarioRef);
+        if (usuarioSnapshot.exists()) {
+            const usuarioData = usuarioSnapshot.data();
+            const nuevoEstado = !usuarioData.aprobado;
+
+            await updateDoc(usuarioRef, { aprobado: nuevoEstado });
+
+            // Actualizar la interfaz sin recargar la página
+            button.textContent = nuevoEstado ? "Inhabilitar" : "Aprobar";
+            button.parentElement.querySelector("p strong").textContent = nuevoEstado ? "Aprobado" : "Inhabilitado";
+
+            // Esperar 500 ms antes de recargar la lista de usuarios
+            setTimeout(() => {
+                cargarUsuarios();
+            }, 500);
+        }
+    } catch (error) {
+        console.error("Error al cambiar el estado del usuario:", error);
+    }
+}
 
     // Calcular el número total de páginas
     const totalItems = usuarios.length; // Total de usuarios
@@ -136,101 +91,76 @@ function cambiarPagina(pagina) {
     obtenerUsuarios(); // Recargar usuarios para la página seleccionada
 }
 
-async function cargarUsuarios() {
+async function cargarUsuarios(filtro = "") {
     const auth = getAuth(app);
-    // Verificar si el usuario está autenticado
+    console.log("Usuario autenticado, verificando...");
+    
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            // Si no hay usuario autenticado, redirigir al login
             window.location.href = "login-admin.html";
             return;
         }
 
-        // Usuario autenticado
-        console.log("Usuario autenticado:", user.email);
+        console.log("Usuario autenticado:", user);
 
-        try {
-            let usuariosSnapshot;
+        const filtroLower = filtro.toLowerCase(); // Esto se define fuera del bloque if
+        console.log("Filtro en minúsculas:", filtroLower);
 
-            // Si se está realizando una búsqueda, aplicar el filtro
-            if (searchInput.value.trim() !== "") {
-                const searchTerm = searchInput.value.toLowerCase();
-                usuariosSnapshot = await getDocs(query(
-                    collection(db, "usuarios"),
-                    where("nombre", ">=", searchTerm),
-                    where("nombre", "<=", searchTerm + "\uf8ff"), // Para obtener coincidencias de inicio
-                    orderBy("nombre"),
-                    limit(usuariosPorPagina)
-                ));
-            } else {
-                // Si no hay búsqueda, obtener los usuarios con paginación
-                let q;
-                if (ultimoDocumento) {
-                    q = query(
-                        collection(db, "usuarios"),
-                        orderBy("nombre"),
-                        limit(usuariosPorPagina),
-                        startAfter(ultimoDocumento)
-                    );
-                } else {
-                    q = query(
-                        collection(db, "usuarios"),
-                        orderBy("nombre"),
-                        limit(usuariosPorPagina)
-                    );
-                }
+        let q;
+        if (filtro) {
+            console.log("Filtro activado, creando consulta con filtro...");
+            q = query(
+                collection(db, "usuarios"),
+                where("nombre", ">=", filtroLower),
+                where("nombre", "<=", filtroLower + "\uf8ff"),
+                orderBy("nombre"),
+                limit(usuariosPorPagina)
+            );
+            console.log("Consulta con filtro:", q);
+        } else {
+            console.log("Sin filtro, creando consulta sin filtro...");
+            q = query(
+                collection(db, "usuarios"),
+                orderBy("nombre"),
+                limit(usuariosPorPagina),
+                ...(ultimoDocumento ? [startAfter(ultimoDocumento)] : [])
+            );
+            console.log("Consulta sin filtro:", q);
+        }
 
-                usuariosSnapshot = await getDocs(q);
-            }
+                // Usar onSnapshot para actualizaciones en tiempo real
+            console.log("Iniciando onSnapshot...");
+            onSnapshot(q, {source: "server"}, (usuariosSnapshot) => {
+            console.log("Usuarios snapshot recibido:", usuariosSnapshot);
 
             if (usuariosSnapshot.empty) {
+                console.log("No hay usuarios registrados.");
                 usuariosContainer.innerHTML = "<p>No hay usuarios registrados.</p>";
                 return;
             }
 
-            // Limpiar los usuarios previos
             usuarios = [];
-
             usuariosSnapshot.forEach(doc => {
+                console.log("Documento:", doc.id, doc.data());
                 const userData = doc.data();
-                const userId = doc.id;
-                const nombre = userData.nombre || "Sin nombre";
-                const apellido = userData.apellido || "Sin apellido";
-                const email = userData.email || "No disponible";
-                const celular = userData.celular || "No disponible";
-                const fechaNacimiento = userData.fechaNacimiento || "No disponible";
-                const genero = userData.genero || "No disponible";
-
-                let edad = "No disponible";
-                if (fechaNacimiento !== "No disponible") {
-                    edad = calcularEdad(fechaNacimiento);
-                }
-
-                let fechaFormateada = "No disponible";
-                if (fechaNacimiento !== "No disponible") {
-                    fechaFormateada = formatearFecha(fechaNacimiento);
-                }
-
                 usuarios.push({
-                    userId,
-                    nombre,
-                    apellido,
-                    email,
-                    celular,
-                    fechaFormateada,
-                    edad,
-                    genero,
-                    aprobado: userData.aprobado || false // Asegurar que 'aprobado' tenga un valor por defecto
+                    userId: doc.id,
+                    nombre: userData.nombre || "Sin nombre",
+                    apellido: userData.apellido || "Sin apellido",
+                    email: userData.email || "No disponible",
+                    celular: userData.celular || "No disponible",
+                    fechaFormateada: userData.fechaNacimiento ? formatearFecha(userData.fechaNacimiento) : "No disponible",
+                    edad: userData.fechaNacimiento ? calcularEdad(userData.fechaNacimiento) : "No disponible",
+                    genero: userData.genero || "No disponible",
+                    aprobado: userData.aprobado || false
                 });
             });
 
+            console.log("Usuarios filtrados:", usuarios);
+
             mostrarUsuarios(usuarios);
             mostrarPaginacion();
-
-        } catch (error) {
-            console.error("Error al cargar usuarios:", error);
-            usuariosContainer.innerHTML = `<p style="color:red;">Error al obtener los usuarios.</p>`;
-        }
+        });
     });
 }
 
@@ -310,42 +240,23 @@ function mostrarUsuarios(users) {
     });
 }
 
-searchInput.addEventListener("input", async () => {
-    searchTerm = searchInput.value.trim();
-    usuarios = [];
-    ultimoDocumento = null;
-    await obtenerUsuarios();
-});
-
-clearSearchButton.addEventListener("click", () => {
-    searchInput.value = "";
-    searchTerm = "";
-    usuarios = [];
-    ultimoDocumento = null;
-    obtenerUsuarios();
-});
-
 async function cambiarEstadoUsuario(userId, button) {
     const usuarioRef = doc(db, "usuarios", userId);
 
     try {
-        // Obtener el documento del usuario
         const usuarioSnapshot = await getDoc(usuarioRef);
         if (usuarioSnapshot.exists()) {
             const usuarioData = usuarioSnapshot.data();
-            const nuevoEstado = !usuarioData.aprobado; // Cambiar el estado
+            const nuevoEstado = !usuarioData.aprobado;
 
-            // Actualizar el estado en Firestore
-            await updateDoc(usuarioRef, {
-                aprobado: nuevoEstado
-            });
+            await updateDoc(usuarioRef, { aprobado: nuevoEstado });
 
-            // Actualizar la interfaz sin recargar la página
+            // Actualizar solo la UI sin recargar todos los usuarios
             button.textContent = nuevoEstado ? "Inhabilitar" : "Aprobar";
-            button.parentElement.querySelector("p strong").textContent = nuevoEstado ? "Aprobado" : "Inhabilitado";
-
-            // Recargar los usuarios con el nuevo estado
-            cargarUsuarios(); // Recargar usuarios con el nuevo estado actualizado
+            const estadoText = button.parentElement.querySelector("p strong");
+            if (estadoText) {
+                estadoText.textContent = nuevoEstado ? "Aprobado" : "Inhabilitado";
+            }
         }
     } catch (error) {
         console.error("Error al cambiar el estado del usuario:", error);
