@@ -1,51 +1,208 @@
-/* Estilos para la página principal */
-.hero {
+main {
+    justify-content: center; /* Centra horizontalmente */
+    height: 100vh; /* Asegura que el main ocupe toda la altura de la ventana */
+    width: 100%;
+}
+
+/* Estilos para la sección "Sobre nosotros" */
+.about {
+    max-width: 1210px;
+    margin-top: 3%;
+    margin-left: 4%;
+    max-height: 430px;
+    background-image: url('../assets/images/banner/banner\ about.webp');
+    color: #ffffff;
+    padding: 60px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     position: relative;
+    z-index: 1;
+}
+
+.about-container {
+    max-width: 1500px;
+    margin: 0 auto;
     text-align: center;
-    background-image: url('../assets/images/banner/banner.webp'); /* Ruta de tu imagen */
-    background-size: cover;
-    background-position: center;
-    border-radius: 15px; /* Bordes redondeados */
-    padding: 60px 20px; /* Ajusta el espaciado */
-    color: #ffffff; /* Color del texto */
-    max-width: 1200px; /* Ancho máximo */
-    margin: 0 auto; /* Centrado horizontal */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar */
+    padding: 40px 20px;
 }
 
-.hero-content {
-    background-color: rgba(0, 0, 0, 0); /* Fondo semitransparente para destacar el texto */
-    padding: 20px;
-    border-radius: 10px; /* Bordes redondeados del contenido */
-    display: inline-block; /* Ajusta el ancho del contenido al texto */
-}
-
-.hero h1 {
+.about-container h2 {
     font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px black; /* Agrega borde negro suave alrededor del texto */
+}
+
+.about-container p {
+    font-size: 1.3rem;
+    line-height: 1.8;
+    margin-bottom: 40px;
+    color: #f4f4f4;
+    text-shadow: 1px 1px 2px black; /* Agrega borde negro suave alrededor del texto */
+}
+
+.cta-button {
+    font-size: 1.1rem;
+    padding: 12px 30px;
+    background-color: #ffffff;
+    color: #ff5733;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s, transform 0.3s, color 0.3s;
+    border: 2px solid #ff5733;
+}
+
+.cta-button:hover {
+    background-color: #ff5733;
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+/* Sección de información de entrenamiento */
+.training-info {
+    padding: 40px 20px;
+    background-color: #f4f4f4;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 1200px;
+    margin-left: 4%;
+    margin-top: 3%;
+    margin-bottom: 50px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Título de la sección */
+.training-info h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* Contenedor de tarjetas */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    justify-items: center;
+}
+
+/* Estilos para las tarjetas */
+.card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card h3 {
+    font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 15px;
+    color: #ff5733;
 }
 
-.hero p {
-    font-size: 1.2rem;
-    margin-bottom: 25px;
+.card p {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
 }
 
+/* Efecto hover en las tarjetas */
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
 
-.hero .cta-button {
+/* Contenedor de llamada a la acción */
+.cta-container {
+    margin-top: 40px;
+}
+
+.cta-container h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.cta-container p {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.cta-button {
     font-size: 1rem;
     padding: 12px 25px;
-    background-color: #ff5733; /* Color llamativo para el botón */
-    color: #ffffff; /* Texto en blanco */
+    background-color: #ff5733;
+    color: #ffffff;
     text-decoration: none;
     border-radius: 5px;
     font-weight: bold;
     transition: background-color 0.3s, transform 0.2s;
 }
 
-.hero .cta-button:hover {
-    background-color: #c70039; /* Color diferente al pasar el ratón */
-    transform: scale(1.05); /* Pequeño efecto de agrandamiento */
+.cta-button:hover {
+    background-color: #c70039;
+    transform: scale(1.05);
+}
+
+/* Estilos para la audiencia objetivo */
+.target-audience {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #f9f9f9;
+}
+
+.target-audience h3 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.target-audience ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.target-audience li {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+/* Estilos para la llamada a la acción */
+.cta-container {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #ff5733;
+    border-radius: 10px;
+    margin-bottom: -30px;
+    color: white;
+}
+
+.cta-container h3 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.cta-container p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+.cta-button {
+    background-color: #ffffff;
+    color: #ff5733;
+}
+
+.cta-button:hover {
+    background-color: #ff704d;
+    color: #ffffff;
 }
 
 @media (max-width: 776px) {
@@ -53,6 +210,31 @@
         font-size: 2rem;
     }
     .hero p {
+        font-size: 1rem;
+    }
+    .training-info {
+        grid-template-columns: 1fr;
+    }
+    .cta-container p {
+        font-size: 1rem;
+    }
+    .training-info h2 {
+        font-size: 1.5rem;
+    }
+
+    .card h3 {
+        font-size: 1.3rem;
+    }
+
+    .card p {
+        font-size: 0.9rem;
+    }
+
+    .about-container h2 {
+        font-size: 2rem;
+    }
+
+    .about-container p {
         font-size: 1rem;
     }
 }
