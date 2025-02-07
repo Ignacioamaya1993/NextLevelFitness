@@ -21,13 +21,14 @@ html, body {
 header {
     background-color: #34495e; /* Mantener el fondo oscuro */
     padding: 10px 0; /* Espaciado vertical del encabezado */
+    max-height: 120px;
 }
 
 /* Contenedor principal del header */
 .header-container {
     display: flex;
-    align-items: center; /* Alinea verticalmente los elementos */
-    justify-content: center; /* Centra todos los elementos horizontalmente */
+    align-items: center; 
+    justify-content: center;
     padding: 10px 0;
 }
 
@@ -37,7 +38,7 @@ header {
     align-items: center; /* Alinea el logo verticalmente */
     padding: 10px; /* Elimina el padding adicional */
     margin-right: 50px; /* Empuja el logo a la izquierda */
-
+    margin-top: -20px;
 }
 
 .logo img {
@@ -51,9 +52,7 @@ header {
     align-items: center;
     list-style: none;
     gap: 20px; /* Espaciado entre los elementos */
-    margin: 0;
-    padding: 0;
-}
+    margin-top: -30px;}
 
 .nav-menu li {
     display: inline-block;
