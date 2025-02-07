@@ -80,12 +80,6 @@ header {
     border-radius: 5px;
 }
 
-/* Contenido principal */
-main {
-    flex: 1; /* Hace que el contenido principal ocupe el espacio restante */
-    padding: 20px;
-}
-
 .hero {
     text-align: center;
     padding: 40px;
@@ -199,6 +193,7 @@ footer {
 
     .logo {
         margin-bottom: 10px; /* Espacio entre logo y menú */
+        margin-left: 18%;
     }
 
     .nav-menu {
