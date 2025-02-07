@@ -246,6 +246,7 @@ main {
     /* Ajustes de imagen */
     .about {
         background-size: cover;
+        max-width: 92%;
         background-position: center;
     }
     
@@ -256,7 +257,7 @@ main {
 
     /* Ajustes del botón CTA */
     .cta-button {
-        font-size: 0.9rem;
+        font-size: 0.7rem;
         padding: 10px 20px;
     }
 }
