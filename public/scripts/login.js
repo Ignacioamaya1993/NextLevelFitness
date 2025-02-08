@@ -97,7 +97,7 @@ loginForm.addEventListener("submit", async (event) => {
 
         Swal.fire({
             icon: "error",
-            title: "Error",
+            title: "Error al Iniciar Sesion",
             text: errorMessage,
             confirmButtonColor: "#6f42c1",
         });

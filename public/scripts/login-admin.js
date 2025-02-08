@@ -5,11 +5,11 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-document.getElementById("admin-login-form").addEventListener("submit", async (e) => {
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     
-    const email = document.getElementById("admin-email").value.trim();
-    const password = document.getElementById("admin-password").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -45,11 +45,37 @@ document.getElementById("admin-login-form").addEventListener("submit", async (e)
             await signOut(auth); // Cierra sesión si no existe
         }
     } catch (error) {
+        console.error("Error al iniciar sesión:", error);
+
+        let errorMessage = "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.";
+
+        switch (error.code) {
+            case "auth/invalid-credential":
+                errorMessage = "Las credenciales proporcionadas son incorrectas.";
+                break;
+            }
+        
         // Muestra el error de inicio de sesión con SweetAlert
-        await Swal.fire({
-            icon: 'error',
-            title: 'Error al iniciar sesión',
-            text: error.message,
+        Swal.fire({
+            icon: "error",
+            title: "Error al Iniciar Sesion",
+            text: errorMessage,
+            confirmButtonColor: "#6f42c1",
         });
     }
 });
+
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById("password");
+    const toggleIcon = document.querySelector(".toggle-password i");
+    
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleIcon.classList.replace("fa-eye-slash", "fa-eye");
+    } else {
+        passwordInput.type = "password";
+        toggleIcon.classList.replace("fa-eye", "fa-eye-slash");
+    }
+}
+
+window.togglePasswordVisibility = togglePasswordVisibility;

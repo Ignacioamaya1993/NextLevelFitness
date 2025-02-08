@@ -34,17 +34,9 @@ label span {
     gap: 20px;
 }
 
-.login-form label {
-    font-size: 0.9rem;
-    color: #333;
-    text-align: left;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
 .login-form input {
     padding: 12px;
-    font-size: 1rem;
+    font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
     width: 100%;
@@ -116,16 +108,4 @@ label span {
 
 .toggle-password:hover {
     color: #5a3794;
-}
-
-@media (max-width: 768px) {
-    #routine-list {
-        grid-template-columns: repeat(2, minmax(200px, 1fr));
-    }
-}
-
-@media (max-width: 480px) {
-    #routine-list {
-        grid-template-columns: 1fr;
-    }
 }
