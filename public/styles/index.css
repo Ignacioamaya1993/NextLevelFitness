@@ -1,16 +1,10 @@
-main {
-    justify-content: center; /* Centra horizontalmente */
-    height: 100vh; /* Asegura que el main ocupe toda la altura de la ventana */
-    width: 100%;
-}
-
 /* Estilos para la sección "Sobre nosotros" */
 .about {
-    max-width: 1210px;
+    max-width: 80%;
     margin-top: 3%;
-    margin-left: 4%;
-    max-height: 430px;
-    background-image: url('../assets/images/banner/banner\ about.webp');
+    margin-left: 10%;
+    max-height: 100%;
+    background-image: url('../assets/images/banner/bannerabout.webp');
     color: #ffffff;
     padding: 60px 20px;
     border-radius: 15px;
@@ -28,7 +22,6 @@ main {
 
 .about-container h2 {
     font-size: 2.5rem;
-    font-weight: 700;
     margin-bottom: 20px;
     line-height: 1.4;
     text-transform: uppercase;
@@ -38,6 +31,7 @@ main {
 .about-container p {
     font-size: 1.3rem;
     line-height: 1.8;
+    margin-top: 100px;
     margin-bottom: 40px;
     color: #f4f4f4;
     text-shadow: 1px 1px 2px black; /* Agrega borde negro suave alrededor del texto */
@@ -64,12 +58,13 @@ main {
 
 /* Sección de información de entrenamiento */
 .training-info {
+    position: relative;
     padding: 40px 20px;
     background-color: #f4f4f4;
     border-radius: 15px;
     text-align: center;
     max-width: 1200px;
-    margin-left: 4%;
+    margin-left: 18%;
     margin-top: 3%;
     margin-bottom: 50px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -206,13 +201,18 @@ main {
 }
 
 @media (max-width: 776px) {
-    .hero h1 {
-        font-size: 2rem;
+    
+    .about {
+        padding: 40px 20px;
+        max-width: 95%;
+        background-size: cover;
+        margin-left: 12px;
+        background-position: center;
+        max-height: none; /* Permite que la altura se ajuste en pantallas pequeñas */
     }
-    .hero p {
-        font-size: 1rem;
-    }
+
     .training-info {
+        margin-left: 0px;
         grid-template-columns: 1fr;
     }
     .cta-container p {
@@ -236,23 +236,6 @@ main {
 
     .about-container p {
         font-size: 1rem;
-    }
-
-    .about {
-        padding: 40px 20px;
-        max-height: none; /* Permite que la altura se ajuste en pantallas pequeñas */
-    }
-    
-    /* Ajustes de imagen */
-    .about {
-        background-size: cover;
-        max-width: 95%;
-        background-position: center;
-    }
-    
-    /* Ajustes para las tarjetas */
-    .cards-container {
-        grid-template-columns: 1fr; /* Las tarjetas ocuparán toda la fila */
     }
 
     /* Ajustes del botón CTA */

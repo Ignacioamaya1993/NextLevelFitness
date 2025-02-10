@@ -72,7 +72,12 @@ registroForm.addEventListener("submit", async (event) => {
         return;
     }
 
+    const registroButton = document.getElementById("registro-button");
+
     try {
+        registroButton.disabled = true;
+        registroButton.textContent = "Registrando...";
+
         // Registrar el usuario
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;

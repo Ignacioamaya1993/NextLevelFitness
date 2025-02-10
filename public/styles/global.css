@@ -80,38 +80,6 @@ header {
     border-radius: 5px;
 }
 
-.hero {
-    text-align: center;
-    padding: 40px;
-    background: linear-gradient(135deg, #a8dadc, #457b9d); /* Degradado moderno en tonos azules */
-    color: #f1faee; /* Blanco puro para el texto */
-}
-
-.hero h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-}
-
-.hero p {
-    font-size: 1.2rem;
-    margin: 20px 0;
-}
-
-.cta-button {
-    display: inline-block;
-    padding: 12px 25px;
-    background-color: #457b9d; /* Azul medio para el botón */
-    color: #f1faee;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-.cta-button:hover {
-    background-color: #1d3557; /* Azul más oscuro para hover */
-}
-
 /* Footer */
 footer {
     background-color: #34495e; /* Azul grisáceo oscuro */

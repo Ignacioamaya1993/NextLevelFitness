@@ -25,25 +25,94 @@
 
 #download-excel {
     position: absolute;
-    top: 200px; /* Ajusta según sea necesario */
-    right: 20px; /* Ajusta según sea necesario */
-    background: #4CAF50; /* Fondo verde (similar a Excel) */
-    border: 2px solid #388E3C; /* Borde más oscuro para contraste */
-    border-radius: 7px; /* Bordes redondeados */
-    padding: 6px; /* Espaciado interno */
+    top: 200px;
+    /* Ajusta según sea necesario */
+    right: 20px;
+    /* Ajusta según sea necesario */
+    background: #4CAF50;
+    /* Fondo verde (similar a Excel) */
+    border: 2px solid #388E3C;
+    /* Borde más oscuro para contraste */
+    border-radius: 7px;
+    /* Bordes redondeados */
+    padding: 6px;
+    /* Espaciado interno */
     cursor: pointer;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para resaltar */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    /* Sombra para resaltar */
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 #download-excel:hover {
-    transform: scale(1.1); /* Efecto de agrandamiento al pasar el mouse */
+    transform: scale(1.1);
+    /* Efecto de agrandamiento al pasar el mouse */
     box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
 }
 
 #download-excel img {
     width: 35px;
     height: 35px;
+}
+
+.filter-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    margin-top: -50px;
+
+}
+
+.filtro-label {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 50px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    border-radius: 50px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+}
+
+input:checked+.slider {
+    background-color: #4CAF50;
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
 }
 
 /* Contenedor de usuarios */
@@ -57,8 +126,10 @@
 
 /* Tarjetas de usuario */
 .usuario-card {
-    width: 300px;  /* Ancho fijo */
-    height: 95%; /* Alto fijo */
+    width: 300px;
+    /* Ancho fijo */
+    height: 95%;
+    /* Alto fijo */
     background: white;
     margin-top: 15px;
     padding: 20px;
@@ -67,7 +138,8 @@
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
     transition: transform 0.2s, box-shadow 0.2s;
     text-align: center;
-    overflow: hidden; /* Evita que el contenido sobresalga */
+    overflow: hidden;
+    /* Evita que el contenido sobresalga */
 }
 
 .usuario-card:hover {
@@ -166,34 +238,42 @@
 
 /* Botón para traspasar rutina*/
 .transfer-rutina-btn {
-    background: #00bcd4;  /* Verde */
+    background: #00bcd4;
+    /* Verde */
     color: white;
 }
 
 .transfer-rutina-btn:hover {
-    background: #e68900; /* Verde más oscuro */
+    background: #e68900;
+    /* Verde más oscuro */
 }
 
 /* Botón para aprobar usuario */
 .aprobar-btn {
-    background: #00bcd4;  /* Verde claro */
+    background: #00bcd4;
+    /* Verde claro */
     color: white;
 }
 
 .aprobar-btn:hover {
-    background: #e68900; /* Verde más oscuro */
+    background: #e68900;
+    /* Verde más oscuro */
 }
 
 /* Botón aprobado (deshabilitado) */
 .aprobar-btn[disabled] {
-    background: #e0d0d0; /* Gris claro */
-    color: #757575; /* Gris oscuro para el texto */
-    cursor: not-allowed; /* Cambiar el cursor para indicar que está deshabilitado */
+    background: #e0d0d0;
+    /* Gris claro */
+    color: #757575;
+    /* Gris oscuro para el texto */
+    cursor: not-allowed;
+    /* Cambiar el cursor para indicar que está deshabilitado */
 }
 
 /* Estilo para el botón aprobado */
 .aprobar-btn[disabled]:hover {
-    background: #9e9e9e; /* Gris claro sin cambio de color al hacer hover */
+    background: #9e9e9e;
+    /* Gris claro sin cambio de color al hacer hover */
 }
 
 /* Ordenamiento */
@@ -242,7 +322,8 @@
     outline: none;
 }
 
-.swal2-confirm, .swal2-cancel {
+.swal2-confirm,
+.swal2-cancel {
     font-size: 16px;
     border-radius: 5px;
     padding: 10px 20px;
@@ -271,8 +352,10 @@
 /* Diseño adaptado para pantallas móviles */
 @media (max-width: 768px) {
     .usuario-card {
-        width: 100%;  /* Ancho fijo */
-        height: 100%; /* Alto fijo */
+        width: 100%;
+        /* Ancho fijo */
+        height: 100%;
+        /* Alto fijo */
     }
 
     .swal2-popup {
@@ -289,19 +372,22 @@
         font-size: 14px;
     }
 
-    .swal2-confirm, .swal2-cancel {
+    .swal2-confirm,
+    .swal2-cancel {
         padding: 8px 16px;
         font-size: 14px;
     }
 
     #download-excel {
-        top: 295px; /* Ajusta según sea necesario */
+        top: 295px;
+        /* Ajusta según sea necesario */
     }
 }
 
 /* 1920x1080 - 3 filas de 8 ejercicios (Total: 24 por página) */
 @media (min-width: 1900px) {
     .usuarios-container {
-        grid-template-columns: repeat(6, 1fr); /* 8 ejercicios por fila */
+        grid-template-columns: repeat(6, 1fr);
+        /* 8 ejercicios por fila */
     }
 }
