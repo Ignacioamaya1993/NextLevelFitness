@@ -1,8 +1,15 @@
+main {
+    justify-content: center; /* Centra horizontalmente */
+    height: 100vh; /* Asegura que el main ocupe toda la altura de la ventana */
+    width: 100%;
+}
+
 /* Estilos para la sección "Sobre nosotros" */
 .about {
-    max-width: 80%;
+    width: 82%;
     margin-top: 3%;
-    margin-left: 10%;
+    margin-left: 9%;
+    margin-right: 3%;
     max-height: 100%;
     background-image: url('../assets/images/banner/bannerabout.webp');
     color: #ffffff;
@@ -37,6 +44,78 @@
     text-shadow: 1px 1px 2px black; /* Agrega borde negro suave alrededor del texto */
 }
 
+/* Sección de información de entrenamiento */
+.training-info {
+    min-width: 100%;
+    position: relative;
+    padding: 40px 20px;
+    text-align: center;
+    max-width: 1200px;
+    margin-top: 3%;
+    margin-bottom: 50px;
+}
+
+/* Título de la sección */
+.training-info h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #ffffff;
+}
+
+/* Contenedor de tarjetas */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas */
+    gap: 20px;
+    justify-content: center; /* Centra el grid dentro del contenedor */
+    max-width: 1500px; /* Ajusta según el tamaño de tus cards */
+    margin: 0 auto; /* Centra el contenedor en la página */
+}
+
+.card {
+    background: linear-gradient(45deg, #0a2a66, #1956a7, #1e90ff, #ffffff);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.5); /* Sombra más sutil */
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #050505;
+}
+
+.card p {
+    font-size: 1rem;
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+/* Efecto hover en las tarjetas */
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para la llamada a la acción */
+.cta-container {
+    margin-top: 40px;
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #333333;
+    border-radius: 10px;
+    margin-bottom: -30px;
+    color: white;
+}
+
+.cta-container p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
 .cta-button {
     font-size: 1.1rem;
     padding: 12px 30px;
@@ -51,162 +130,16 @@
 }
 
 .cta-button:hover {
-    background-color: #ff5733;
+    background-color: #1956a7;
     color: #ffffff;
     transform: scale(1.05);
-}
-
-/* Sección de información de entrenamiento */
-.training-info {
-    position: relative;
-    padding: 40px 20px;
-    background-color: #f4f4f4;
-    border-radius: 15px;
-    text-align: center;
-    max-width: 1200px;
-    margin-left: 18%;
-    margin-top: 3%;
-    margin-bottom: 50px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Título de la sección */
-.training-info h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 30px;
-    color: #333;
-}
-
-/* Contenedor de tarjetas */
-.cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    justify-items: center;
-}
-
-/* Estilos para las tarjetas */
-.card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 25px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.card h3 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #ff5733;
-}
-
-.card p {
-    font-size: 1rem;
-    color: #555;
-    line-height: 1.6;
-}
-
-/* Efecto hover en las tarjetas */
-.card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Contenedor de llamada a la acción */
-.cta-container {
-    margin-top: 40px;
-}
-
-.cta-container h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.cta-container p {
-    font-size: 1rem;
-    color: #333;
-    margin-bottom: 30px;
-}
-
-.cta-button {
-    font-size: 1rem;
-    padding: 12px 25px;
-    background-color: #ff5733;
-    color: #ffffff;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.cta-button:hover {
-    background-color: #c70039;
-    transform: scale(1.05);
-}
-
-/* Estilos para la audiencia objetivo */
-.target-audience {
-    text-align: center;
-    padding: 50px 20px;
-    background-color: #f9f9f9;
-}
-
-.target-audience h3 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-}
-
-.target-audience ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.target-audience li {
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    color: #555;
-}
-
-/* Estilos para la llamada a la acción */
-.cta-container {
-    text-align: center;
-    padding: 50px 20px;
-    background-color: #ff5733;
-    border-radius: 10px;
-    margin-bottom: -30px;
-    color: white;
-}
-
-.cta-container h3 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-}
-
-.cta-container p {
-    font-size: 1.2rem;
-    margin-bottom: 30px;
-}
-
-.cta-button {
-    background-color: #ffffff;
-    color: #ff5733;
-}
-
-.cta-button:hover {
-    background-color: #ff704d;
-    color: #ffffff;
 }
 
 @media (max-width: 776px) {
-    
     .about {
-        padding: 40px 20px;
-        max-width: 95%;
+        min-width: 90%;
         background-size: cover;
-        margin-left: 12px;
+        margin-left: 5%;
         background-position: center;
         max-height: none; /* Permite que la altura se ajuste en pantallas pequeñas */
     }
@@ -215,6 +148,15 @@
         margin-left: 0px;
         grid-template-columns: 1fr;
     }
+
+    .cards-container{
+        display: flex;
+        flex-direction: column; /* Cambiar a diseño vertical */
+        gap: 15px; /* Reducir el espacio entre elementos */
+        max-width: 100%; /* Asegurar que ocupe todo el ancho */
+        overflow-y: auto; /* Permite desplazamiento si es necesario */
+    }
+
     .cta-container p {
         font-size: 1rem;
     }

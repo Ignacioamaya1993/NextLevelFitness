@@ -1,29 +1,30 @@
 /* Estilos específicos para la página "Arma tus Rutinas" */
 main {
     padding: 20px;
+    flex: 1;
 }
 
 /* Sección de acceso restringido */
 .access-restricted {
     text-align: center;
     padding: 50px;
-    background-color: #ffffff;
+    background-color: #333333;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .access-restricted:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.01);
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
 }
 
 .access-restricted h2 {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 20px;
-    color: #1f2937;
+    color: #ffffff;
 }
 
 .access-restricted .cta-button {
@@ -120,7 +121,7 @@ main {
 
 .exercise-grid div {
     padding: 15px;
-    background-color: #fff;
+    background-color: #333333;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25); /* Ajuste del sombreado */
@@ -142,7 +143,7 @@ main {
 .exercise-grid div h3 {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #1d3557;
+    color: #fafbfc;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -174,28 +175,6 @@ main {
 
 .hidden {
     display: none;
-}
-
-/* --- Estilos para el popup de detalles del ejercicio --- */
-.exercise-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas: izquierda (video/instrucciones) y derecha (formulario) */
-    gap: 20px;
-    align-items: start;
-    text-align: left;
-    padding: 20px;
-    max-height: 80vh;
-
-}
-
-.exercise-details h3 {
-    grid-column: span 2;
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #1d3557;
-    margin-bottom: 5px; /* Reducir margen inferior */
-    margin-top: 0; /* Eliminar margen superior */
 }
 
 .exercise-content {
@@ -232,7 +211,7 @@ main {
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: #f8f9fa;
+    background-color: #333333;
 }
 
 /* --- Popup de detalles del ejercicio --- */
@@ -241,15 +220,15 @@ main {
     grid-template-rows: auto 1fr;
     gap: 20px;
     padding: 20px;
-    background-color: #ffffff;
+    background-color: #333333;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgb(255, 254, 254);
     max-width: 800px;
     max-height: 150vh;
     margin: 0 auto;
     text-align: left;
-    padding-top: 10px; /* Reducir espacio superior del popup */
-    padding-bottom: 10px; /* Reducir espacio inferior */
+    padding-top: 30px; /* Reducir espacio superior del popup */
+    padding-bottom: 30px; /* Reducir espacio inferior */
 }
 
 .popup-header {
@@ -260,8 +239,9 @@ main {
 
 .exercise-title {
     font-size: 1.8rem;
-    color: #1d3557;
+    color: #f8f9fa;
     font-weight: bold;
+    margin-bottom: 5%;
 }
 
 /* Contenido del popup */
@@ -277,21 +257,21 @@ main {
 
 .popup-left h4 {
     font-size: 1.2rem;
-    color: #1d3557;
+    color: #f9f9fa;
     margin-top: 15px;
 }
 
 .popup-left p {
     font-size: 1rem;
-    color: #333;
+    color: #fcfafa;
     line-height: 1.5;
 }
 
 .popup-right {
-    background-color: #f8f9fa;
+    background-color: #333333;
     padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgb(248, 246, 246);
 }
 
 .popup-right .form-group {
@@ -301,7 +281,7 @@ main {
 .popup-right label {
     font-size: 1rem;
     font-weight: bold;
-    color: #1d3557;
+    color: #f8f9fc;
 }
 
 .popup-right input,
@@ -325,19 +305,22 @@ main {
     width: 500px;
     height: 250px;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(250, 249, 249, 0.993);
 }
 
 /*popup pincipal*/
 .custom-popup {
+    background-color: #333333;
     width: 900px !important; /* Ajusta el ancho  */
     max-width: 5000px !important; /* Límite máximo de ancho */
     height: 2000px !important; /* Ajusta el alto  */
     max-height: 96vh; /* Límite máximo de alto */    
     overflow: auto; /* Permite scroll si el contenido es mayor al tamaño */
+    box-shadow: 0 4px 6px rgba(250, 249, 249, 0.993);
 }
 
 .swal2-title {
+    color: #f8f9fc;
     margin-top: 5px !important; /* Reducir margen superior */
     padding-top: 0px !important; /* Eliminar espacio extra */
 }
@@ -351,7 +334,7 @@ main {
     border-radius: 5px;
     resize: none; /* Desactiva el redimensionado manual si no es necesario */
     background-color: #f8f9fa;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 2px 4px rgb(248, 247, 247);
 }
 
 .form-group textarea:focus {

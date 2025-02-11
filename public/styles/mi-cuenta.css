@@ -4,28 +4,27 @@ main {
     flex-direction: column;
     align-items: center;
     padding: 30px;
-    background: linear-gradient(135deg, #f9fafb, #f4f4f4); /* Fondo degradado suave */
 }
 
 /* Sección de detalles de la cuenta */
 .account-details {
-    background-color: #ffffff;
+    background-color: #333333;
     padding: 20px;
     width: 100%;
     max-width: 600px;
     border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Sombra refinada */
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
     margin-bottom: 30px;
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .account-details:hover {
     transform: translateY(-5px); /* Elevación al pasar el mouse */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
+    box-shadow: 0 10px 25px rgb(247, 245, 245); /* Sombra más intensa */
 }
 
 .account-details h2 {
-    color: #1d3557; /* Morado principal */
+    color: #f7f8f8; /* Morado principal */
     border-bottom: 2px solid #6f42c1;
     padding-bottom: 5px;
     margin-bottom: 15px;
@@ -36,22 +35,22 @@ main {
 
 /* Sección de editar información */
 .edit-section {
-    background-color: #ffffff;
+    background-color: #333333;
     padding: 20px;
     width: 100%;
     max-width: 600px;
     border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .edit-section:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 25px rgb(248, 247, 247);
 }
 
 .edit-section h2 {
-    color: #1d3557; /* Morado principal */
+    color: #f5f6f8; /* Morado principal */
     border-bottom: 2px solid #6f42c1;
     padding-bottom: 5px;
     margin-bottom: 15px;
@@ -68,7 +67,7 @@ form {
 
 form label {
     font-size: 1rem;
-    color: #495057; /* Gris moderno */
+    color: #f8f9fa; /* Gris moderno */
     text-align: left;
 }
 

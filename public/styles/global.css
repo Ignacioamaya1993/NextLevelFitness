@@ -13,13 +13,13 @@ html, body {
     flex-direction: column; /* Configura un layout de columna flexible */
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
-    background-color: #f7f8fc; /* Fondo suave gris azulado */
-    color: #2c3e50; /* Azul grisáceo para el texto */
+    background-color: black; /* Fondo suave gris azulado */
+    color: #ffffff; /* Azul grisáceo para el texto */
 }
 
 /* Encabezado */
 header {
-    background-color: #34495e; /* Mantener el fondo oscuro */
+    background-color: #333333; /* Mantener el fondo oscuro */
     padding: 10px 0; /* Espaciado vertical del encabezado */
 }
 
@@ -82,7 +82,7 @@ header {
 
 /* Footer */
 footer {
-    background-color: #34495e; /* Azul grisáceo oscuro */
+    background-color: #333333;
     color: #ecf0f1; /* Blanco suave */
     font-size: 0.9rem;
     padding: 0px 0; /* Reducimos el padding */
