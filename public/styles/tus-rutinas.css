@@ -64,7 +64,7 @@ main {
 
 .today-routine .exercise-list li:hover {
     background-color: rgba(51, 51, 51, 0.4); /* Gris oscuro translúcido */
-    transition: background-color 0.3s ease-in-out;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .today-routine::before {
@@ -448,12 +448,12 @@ main {
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Sombra más suave */
-    transition: box-shadow 0.3s, transform 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .routine-item:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-4px); /* Movimiento más pronunciado */
+    transform: scale(1.05);
 }
 
 .routine-item .edit-button {
