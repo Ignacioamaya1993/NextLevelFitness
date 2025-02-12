@@ -117,7 +117,7 @@ main {
 /* Botón de descarga PDF */
 #download-pdf {
     position: absolute;
-    top: 21%;
+    top: 183px;
     right: 20px;
     background: #f8f8f8;
     border: 2px solid #388E3C;
@@ -126,7 +126,6 @@ main {
     cursor: pointer;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
-    display: none; /* Se mantiene oculto por defecto */
 }
 
 #download-pdf:hover {
@@ -135,8 +134,8 @@ main {
 }
 
 #download-pdf img {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
 }
 
 #routine-list {
