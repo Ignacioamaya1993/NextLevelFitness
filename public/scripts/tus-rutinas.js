@@ -122,14 +122,11 @@ function displayUserRoutines(routines) {
         const todayExercisesList = groupedRoutines[today]
             .map(exercise => {
                 const name = exercise.name || "Ejercicio sin nombre";
-                const exerciseId = exercise.id; // Agregar el ID del ejercicio
                 const series = exercise.series || 0;
                 const reps = exercise.repetitions || 0;
                 const weight = exercise.weight || 0;
                 const additionalData = exercise.additionalData || "Sin información adicional";
-                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData},
-                data-id="${exerciseId}" class="exercise-item">${name}</li>`;
-                
+                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
             })
             .join("");
 
@@ -164,8 +161,7 @@ function displayUserRoutines(routines) {
                 const reps = exercise.repetitions || 0;
                 const weight = exercise.weight || 0;
                 const additionalData = exercise.additionalData || "Sin información adicional";
-                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData},
-                data-id="${exerciseId}" class="exercise-item">${name}</li>`;
+                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
             })
             .join("");
 
