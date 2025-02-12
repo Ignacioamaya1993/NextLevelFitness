@@ -122,11 +122,14 @@ function displayUserRoutines(routines) {
         const todayExercisesList = groupedRoutines[today]
             .map(exercise => {
                 const name = exercise.name || "Ejercicio sin nombre";
+                const exerciseId = exercise.id; // Agregar el ID del ejercicio
                 const series = exercise.series || 0;
                 const reps = exercise.repetitions || 0;
                 const weight = exercise.weight || 0;
                 const additionalData = exercise.additionalData || "Sin información adicional";
-                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
+                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData},
+                data-id="${exerciseId}" class="exercise-item">${name}</li>`;
+                
             })
             .join("");
 
@@ -156,11 +159,13 @@ function displayUserRoutines(routines) {
         const exercisesList = groupedRoutines[day]
             .map(exercise => {
                 const name = exercise.name || "Ejercicio sin nombre";
+                const exerciseId = exercise.id; // Agregar el ID del ejercicio
                 const series = exercise.series || 0;
                 const reps = exercise.repetitions || 0;
                 const weight = exercise.weight || 0;
                 const additionalData = exercise.additionalData || "Sin información adicional";
-                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
+                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData},
+                data-id="${exerciseId}" class="exercise-item">${name}</li>`;
             })
             .join("");
 
@@ -175,6 +180,41 @@ function displayUserRoutines(routines) {
 
         routineList.appendChild(routineCard);
     });
+
+    // Agregar event listener para los ejercicios
+    document.querySelectorAll('.exercise-item').forEach(item => {
+        item.addEventListener('click', async (e) => {
+            const exerciseId = e.target.getAttribute('data-id');
+            const exerciseDetails = await getExerciseDetails(exerciseId);
+            if (exerciseDetails) {
+                showExerciseDetails(exerciseDetails.name, exerciseDetails.video, exerciseDetails.instructions);
+            }
+        });
+    });
+}
+
+async function getExerciseDetails(exerciseId) {
+    try {
+        const exerciseRef = collection(db, "categories");
+        const q = query(exerciseRef, where("id", "==", exerciseId));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const exerciseDoc = querySnapshot.docs[0].data();
+            return {
+                name: exerciseDoc.name,
+                video: exerciseDoc.video,
+                instructions: exerciseDoc.instructions
+            };
+        } else {
+            console.error("Ejercicio no encontrado");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error obteniendo los detalles del ejercicio:", error);
+        return null;
+    }
+}
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles
     const downloadButton = document.getElementById("download-pdf");
@@ -257,7 +297,6 @@ function displayUserRoutines(routines) {
         // Descargar el archivo PDF
         doc.save("rutinas.pdf");
     }
-}
 
 function openEditPopup(day, routines) {
     const popup = document.getElementById("edit-popup");

@@ -20,7 +20,7 @@ main {
 }
 
 .access-restricted:hover {
-    transform: scale(1.01);
+    transform: scale(1.05);
     box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
 }
 
