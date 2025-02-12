@@ -126,7 +126,7 @@ function displayUserRoutines(routines) {
                 const reps = exercise.repetitions || 0;
                 const weight = exercise.weight || 0;
                 const additionalData = exercise.additionalData || "Sin información adicional";
-                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
+                return `<li class="exercise-item" data-id="${exercise.id}">${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
             })
             .join("");
 
@@ -161,9 +161,10 @@ function displayUserRoutines(routines) {
                 const reps = exercise.repetitions || 0;
                 const weight = exercise.weight || 0;
                 const additionalData = exercise.additionalData || "Sin información adicional";
-                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
+                return `<li class="exercise-item" data-id="${exerciseId}">${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
             })
             .join("");
+
 
         routineCard.innerHTML = `
             <h3>${day === today ? `Esta es tu rutina para hoy (${today})` : `Rutina para el día ${day}`}</h3>
@@ -210,6 +211,31 @@ async function getExerciseDetails(exerciseId) {
         console.error("Error obteniendo los detalles del ejercicio:", error);
         return null;
     }
+}
+
+// Mostrar los detalles del ejercicio en un popup
+function showExerciseDetails(name, video, instructions) {
+    const modal = document.createElement("div");
+    modal.classList.add("modal");
+
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close-button">×</span>
+            <h2>${name}</h2>
+            <video controls>
+                <source src="${video}" type="video/mp4">
+                Tu navegador no soporta el video.
+            </video>
+            <p>${instructions}</p>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Cerrar el modal
+    modal.querySelector('.close-button').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
 }
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles
