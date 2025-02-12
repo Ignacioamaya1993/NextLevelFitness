@@ -80,7 +80,7 @@ main {
 
 .exercise-grid div {
     padding: 15px;
-    background-color: #fff;
+    background-color: #333333;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25); /* Ajuste del sombreado */
@@ -102,7 +102,7 @@ main {
 .exercise-grid div h3 {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #1d3557;
+    color: #fafbfc;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -192,7 +192,7 @@ main {
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: #f8f9fa;
+    background-color: #333333;
 }
 
 /* --- Popup de detalles del ejercicio --- */
@@ -201,15 +201,15 @@ main {
     grid-template-rows: auto 1fr;
     gap: 20px;
     padding: 20px;
-    background-color: #ffffff;
+    background-color: #333333;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgb(255, 254, 254);
     max-width: 800px;
     max-height: 150vh;
     margin: 0 auto;
     text-align: left;
-    padding-top: 10px; /* Reducir espacio superior del popup */
-    padding-bottom: 10px; /* Reducir espacio inferior */
+    padding-top: 30px; /* Reducir espacio superior del popup */
+    padding-bottom: 30px; /* Reducir espacio inferior */
 }
 
 .popup-header {
@@ -220,8 +220,9 @@ main {
 
 .exercise-title {
     font-size: 1.8rem;
-    color: #1d3557;
+    color: #f8f9fa;
     font-weight: bold;
+    margin-bottom: 5%;
 }
 
 /* Contenido del popup */
@@ -237,21 +238,21 @@ main {
 
 .popup-left h4 {
     font-size: 1.2rem;
-    color: #1d3557;
+    color: #f9f9fa;
     margin-top: 15px;
 }
 
 .popup-left p {
     font-size: 1rem;
-    color: #333;
+    color: #fcfafa;
     line-height: 1.5;
 }
 
 .popup-right {
-    background-color: #f8f9fa;
+    background-color: #333333;
     padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgb(248, 246, 246);
 }
 
 .popup-right .form-group {
@@ -261,7 +262,7 @@ main {
 .popup-right label {
     font-size: 1rem;
     font-weight: bold;
-    color: #1d3557;
+    color: #f8f9fc;
 }
 
 .popup-right input,
@@ -285,19 +286,22 @@ main {
     width: 500px;
     height: 250px;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(250, 249, 249, 0.993);
 }
 
 /*popup pincipal*/
 .custom-popup {
+    background-color: #333333;
     width: 900px !important; /* Ajusta el ancho  */
     max-width: 5000px !important; /* Límite máximo de ancho */
     height: 2000px !important; /* Ajusta el alto  */
     max-height: 96vh; /* Límite máximo de alto */    
     overflow: auto; /* Permite scroll si el contenido es mayor al tamaño */
+    box-shadow: 0 4px 6px rgba(250, 249, 249, 0.993);
 }
 
 .swal2-title {
+    color: #f8f9fc;
     margin-top: 5px !important; /* Reducir margen superior */
     padding-top: 0px !important; /* Eliminar espacio extra */
 }
@@ -374,10 +378,8 @@ main {
     }
 
     .popup-right {
-        background-color: #f8f9fa;
         padding: 15px;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .custom-popup {

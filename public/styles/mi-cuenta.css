@@ -135,6 +135,19 @@ button#logout-btn:disabled {
     display: none;
 }
 
+/* Contenedor principal del modal */
+.swal2-popup {
+    background-color: #333333;
+    border: 1px solid #e0e0e0;
+}
+
+/* Título del modal */
+.swal2-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
 @media (max-width: 768px) {
     #routine-list {
         grid-template-columns: repeat(2, minmax(200px, 1fr));

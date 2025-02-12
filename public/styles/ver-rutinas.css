@@ -233,6 +233,19 @@ main {
     border: 2px solid #3b82f6;
 }
 
+/* Contenedor principal del modal */
+.swal2-popup {
+    background-color: #333333;
+    border: 1px solid #e0e0e0;
+}
+
+/* Título del modal */
+.swal2-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
 /* Fondo semi-transparente al abrir el popup */
 #popup-overlay {
     display: none;

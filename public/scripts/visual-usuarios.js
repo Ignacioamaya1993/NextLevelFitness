@@ -317,7 +317,7 @@ async function traspasarRutinaUsuario(userId) {
             </select>
             <br>
             <label for="email-field">Email del usuario seleccionado:</label>
-            <input type="text" id="email-field" class="swal2-input" readonly>
+            <input type="text" id="email-field" class="swal2-email" readonly>
         `,
         showCancelButton: true,
         confirmButtonText: "Traspasar",

@@ -51,12 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const repeticiones = document.getElementById("repeticiones").value;
             const peso = document.getElementById("peso").value;
             const dia = document.getElementById("dias").value;
-        
-            if (!series || !repeticiones || !peso || !dia || !selectedExerciseName) {
-                alert("Por favor, complete todos los campos.");
-                return;
-            }
-        
+               
             console.log("Guardando rutina para usuario:", selectedUserId); 
         
             try {

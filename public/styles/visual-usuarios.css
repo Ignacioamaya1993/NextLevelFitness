@@ -294,6 +294,7 @@ input:checked+.slider:before {
 
 /* Estilos específicos para la ventana emergente de traspasar rutina */
 .swal2-popup {
+    background-color: #333333;
     border-radius: 10px;
     padding: 20px;
     font-family: 'Poppins', sans-serif;
@@ -301,19 +302,25 @@ input:checked+.slider:before {
 
 .swal2-title {
     font-size: 22px;
-    color: #333;
+    color: #ffffff;
     margin-bottom: 15px;
     text-align: center;
 }
 
-.swal2-input {
+.swal2-email,
+.swal2-input  {
     width: 100%;
+    color: #333333;
     padding: 12px;
     border-radius: 8px;
     border: 1px solid #ccc;
     margin: 10px 0;
     font-size: 16px;
     box-sizing: border-box;
+}
+
+.swal2-popup label {
+    color: #ffffff !important;
 }
 
 .swal2-input:focus {

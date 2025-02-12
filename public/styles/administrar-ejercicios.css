@@ -1,19 +1,11 @@
-/* Estilos generales para la sección de administración de ejercicios */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-}
-
 /* Contenedor principal */
 .routine-builder {
     max-width: 100%;
     margin: 20px auto;
     margin-top: 20px;
     padding: 20px;
-    background-color: #fff;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #333333;
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
     border-radius: 8px;
 }
 
@@ -90,6 +82,8 @@ body {
 
 /* Contenedor principal del modal */
 .swal2-popup {
+    background-color: #333333;
+    border: 1px solid #e0e0e0;
     width: 30%;
     border-radius: 12px;
 }
@@ -98,11 +92,16 @@ body {
 .swal2-title {
     font-size: 22px;
     font-weight: bold;
-    color: #333;
+    color: #ffffff;
+}
+
+.swal2-popup label {
+    color: #ffffff !important;
 }
 
 /* Inputs, selects y textarea */
 .swal2-input, .swal2-select, .swal2-textarea {
+    color: #ffffff;
     width: 90%;
     padding: 10px;
     border-radius: 8px;
@@ -133,6 +132,7 @@ body {
 /* Contenedor de la categoría */
 #category-container {
     display: flex;
+    width: 100%;
     gap: 10px;
     flex-direction: row; /* Para mantener los elementos en línea por defecto */
 }
@@ -185,17 +185,17 @@ body {
 
 .exercise-card {
     padding: 15px;
-    background-color: #fff;
+    background-color: #333333;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25); /* Ajuste del sombreado */
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
     text-align: center;
     transition: transform 0.2s;
 }
 
 .exercise-card:hover {
     transform: scale(1.05);
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15); /* Sombra al hacer hover */
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
 }
 
 .exercise-card img {
@@ -243,6 +243,8 @@ body {
 
 /* 🔵 POPUP de Edición */
 .swal-wide {
+    background-color: #333333;
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
     width: 75vw !important; /* Más ancho */
     max-width: 900px;  /* Límite máximo */
     min-width: 650px;  /* Evitar que sea demasiado angosto */
@@ -275,6 +277,7 @@ body {
 .edit-popup input,
 .edit-popup textarea {
     width: 93%;
+    color: #e5e7eb;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -289,6 +292,7 @@ body {
 
 /* 🔹 Labels */
 .edit-popup label {
+    color: #e5e7eb;
     font-weight: bold;
     font-size: 14px;
     margin-bottom: 5px;
@@ -301,7 +305,6 @@ body {
 }
 
 /* Media Query para dispositivos móviles */
-
 /* 1920x1080 - 3 filas de 8 ejercicios (Total: 24 por página) */
 @media (min-width: 1900px) {
     .exercise-grid {
