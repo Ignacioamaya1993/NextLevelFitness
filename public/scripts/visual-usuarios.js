@@ -37,39 +37,31 @@ async function cargarUsuarios(filtro = "", pagina = 1) {
         }
 
         console.log("Usuario autenticado:", user.uid);
+        console.log(`Cargando página ${pagina}...`);
 
         const filtroLower = filtro.toLowerCase();
+        
         let q;
-
-        // Iniciar la consulta según la página
-        if (filtro) {
+        if (pagina === 1) {
+            // Primera página sin `startAfter`
             q = query(
                 collection(db, "usuarios"),
                 orderBy("nombre"),
                 limit(usuariosPorPagina)
             );
+            ultimoDocumento = null; // Reiniciar `ultimoDocumento` solo en la página 1
         } else {
-            if (pagina === 1) {
-                console.log("Cargando página 1...");
-                q = query(
-                    collection(db, "usuarios"),
-                    orderBy("nombre"),
-                    limit(usuariosPorPagina)
-                );
-                ultimoDocumento = null; // Asegurarse de que se reinicia para la primera página
-            } else {
-                console.log("Cargando página", pagina, "con startAfter...");
-                if (!ultimoDocumento) {
-                    console.log("ERROR: No se ha encontrado el último documento en la página anterior");
-                    return;
-                }
-                q = query(
-                    collection(db, "usuarios"),
-                    orderBy("nombre"),
-                    startAfter(ultimoDocumento), 
-                    limit(usuariosPorPagina)
-                );
+            // Páginas siguientes con `startAfter`
+            if (!ultimoDocumento) {
+                console.error("No se puede paginar: `ultimoDocumento` es null");
+                return;
             }
+            q = query(
+                collection(db, "usuarios"),
+                orderBy("nombre"),
+                startAfter(ultimoDocumento),
+                limit(usuariosPorPagina)
+            );
         }
 
         // Limpiar suscripción anterior
@@ -98,17 +90,71 @@ async function cargarUsuarios(filtro = "", pagina = 1) {
         usuarios = usuariosFiltrados;
         paginaActual = pagina;
 
-        // Solo actualizar el último documento si hay resultados
+        // Actualizar `ultimoDocumento` si hay resultados
         if (usuariosSnapshot.docs.length > 0) {
             ultimoDocumento = usuariosSnapshot.docs[usuariosSnapshot.docs.length - 1];
-            console.log("Último documento actualizado:", ultimoDocumento.id);
-        }else {
-            console.log("No se encontraron más documentos.");
+            console.log("✅ Último documento actualizado:", ultimoDocumento);
+        } else {
+            console.warn("⚠️ No hay más documentos para paginar.");
+            return;
         }
 
-        mostrarUsuarios(usuarios);
+        mostrarUsuarios(usuariosFiltrados);
         mostrarPaginacion();
     });
+}
+
+async function mostrarPaginacion() {
+    console.log("Mostrando paginación...");
+    paginacionContainer.innerHTML = "";
+
+    const totalUsuarios = await obtenerTotalUsuarios();
+    const totalPages = Math.ceil(totalUsuarios / usuariosPorPagina);
+
+    if (totalPages <= 1) return;
+
+    if (paginaActual > 1) {
+        const prevButton = document.createElement("button");
+        prevButton.textContent = "Anterior";
+        prevButton.addEventListener("click", () => cambiarPagina(paginaActual - 1));
+        paginacionContainer.appendChild(prevButton);
+        console.log("Botón de Anterior agregado.");
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement("button");
+        pageButton.textContent = i;
+        if (i === paginaActual) pageButton.classList.add("active");
+        pageButton.addEventListener("click", () => cambiarPagina(i));
+        paginacionContainer.appendChild(pageButton);
+    }
+
+    if (paginaActual < totalPages) {
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "Siguiente";
+        nextButton.addEventListener("click", () => cambiarPagina(paginaActual + 1));
+        paginacionContainer.appendChild(nextButton);
+    }
+}
+
+function cambiarPagina(pagina) {
+    console.log("Cambiando a la página:", pagina);
+    if (pagina < 1) return;
+
+    paginaActual = pagina;
+
+    // Reiniciar `ultimoDocumento` solo cuando vuelves a la primera página
+    if (pagina === 1) {
+        ultimoDocumento = null;  // Reiniciar solo si es la primera página
+    }
+
+    cargarUsuarios(searchInput.value.trim(), pagina);  // Pasar la página correcta
+}
+
+async function obtenerTotalUsuarios() {
+    console.log("Obteniendo total de usuarios...");
+    const snapshot = await getDocs(collection(db, "usuarios"));
+    return snapshot.size; // Total de documentos en la colección
 }
 
 async function cambiarEstadoUsuario(userId, button) {
@@ -132,57 +178,6 @@ async function cambiarEstadoUsuario(userId, button) {
     } catch (error) {
         console.error("Error al cambiar el estado del usuario:", error);
     }
-}
-
-async function obtenerTotalUsuarios() {
-    console.log("Obteniendo total de usuarios...");
-    const snapshot = await getDocs(collection(db, "usuarios"));
-    return snapshot.size; // Total de documentos en la colección
-}
-
-async function mostrarPaginacion() {
-    console.log("Mostrando paginación...");
-    paginacionContainer.innerHTML = "";
-
-    const totalUsuarios = await obtenerTotalUsuarios();
-    const totalPages = Math.ceil(totalUsuarios / usuariosPorPagina);
-
-    if (totalPages <= 1) return;
-
-    if (paginaActual > 1) {
-        const prevButton = document.createElement("button");
-        prevButton.textContent = "Anterior";
-        prevButton.addEventListener("click", () => cambiarPagina(paginaActual - 1));
-        paginacionContainer.appendChild(prevButton);
-        console.log("Botón de Anterior agregado.");
-    }
-
-    for (let i = 1; i <= totalPages; i++) {
-        if (i === paginaActual || i === 1 || i === totalPages) { 
-            const pageButton = document.createElement("button");
-            pageButton.textContent = i;
-            if (i === paginaActual) pageButton.classList.add("active");
-            pageButton.addEventListener("click", () => cambiarPagina(i));
-            paginacionContainer.appendChild(pageButton);
-            console.log("Botón de página agregado:", i);
-        }
-    }
-
-    if (paginaActual < totalPages) {
-        const nextButton = document.createElement("button");
-        nextButton.textContent = "Siguiente";
-        nextButton.addEventListener("click", () => cambiarPagina(paginaActual + 1));
-        paginacionContainer.appendChild(nextButton);
-        console.log("Botón de Siguiente agregado.");
-    }
-}
-
-function cambiarPagina(pagina) {
-    console.log("Cambiando a la página:", pagina);
-    if (pagina < 1) return;
-    paginaActual = pagina;
-    ultimoDocumento = null; // Resetear la paginación al cambiar de página
-    cargarUsuarios(searchInput.value.trim(), pagina);  // Pasar la página correcta
 }
 
 // Variable global para el filtro

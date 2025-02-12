@@ -298,8 +298,24 @@ function renderPagination(totalItems, currentPage) {
                 const dia = document.getElementById('dias').value;
                 const adicionales = document.getElementById('adicionales').value;
             
-                if (!series || series <= 0 || !repeticiones || repeticiones <= 0 || !peso || peso <= 0) {
-                    Swal.showValidationMessage("Por favor, ingresa valores válidos para series, repeticiones y peso.");
+                // Validar campos requeridos y con valores válidos
+                if (!series || series <= 0) {
+                    Swal.showValidationMessage("Por favor, ingresa un valor válido para las series.");
+                    return;
+                }
+
+                if (!repeticiones || repeticiones <= 0) {
+                    Swal.showValidationMessage("Por favor, ingresa un valor válido para las repeticiones.");
+                    return;
+                }
+
+                if (!peso || peso <= 0) {
+                    Swal.showValidationMessage("Por favor, ingresa un valor válido para el peso.");
+                    return;
+                }
+
+                if (!dia) {
+                    Swal.showValidationMessage("Por favor, selecciona un día de la semana.");
                     return;
                 }
 
