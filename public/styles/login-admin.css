@@ -1,12 +1,3 @@
-/* Estilos generales */
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f4f4f9;
-    margin: 0;
-    padding: 0;
-    color: #333;
-}
-
 main {
     /* Usar flexbox para centrar el contenido dentro del main */
     display: flex;
@@ -18,16 +9,16 @@ main {
 .login-container {
     width: 480px; /* Tamaño fijo para mantener el ancho */
     padding: 30px;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: #333333;
     border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
     text-align: center;
 }
 
 .login-container h2 {
     font-size: 2rem;
     margin-bottom: 20px;
-    color: #1d3557; /* Morado principal */
+    color: #ffffff; /* Morado principal */
     font-weight: bold;
 }
 
@@ -40,7 +31,7 @@ main {
 .login-form input {
     padding: 12px;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 1px solid #e5e7eb;
     border-radius: 5px;
     width: 100%;
     background-color: #f9f9f9;

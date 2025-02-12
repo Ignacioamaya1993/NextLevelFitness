@@ -46,7 +46,7 @@
 #download-excel:hover {
     transform: scale(1.1);
     /* Efecto de agrandamiento al pasar el mouse */
-    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
 }
 
 #download-excel img {
@@ -65,7 +65,7 @@
 
 .filtro-label {
     font-size: 16px;
-    color: #333;
+    color: #ffffff;
     font-weight: bold;
     padding: 5px;
 }
@@ -130,32 +130,31 @@ input:checked+.slider:before {
     /* Ancho fijo */
     height: 95%;
     /* Alto fijo */
-    background: white;
+    background: #333333;
     margin-top: 15px;
     padding: 20px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: center;
     overflow: hidden;
-    /* Evita que el contenido sobresalga */
 }
 
 .usuario-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.01);
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
 }
 
 .usuario-card h2 {
     margin-bottom: 10px;
     font-size: 20px;
-    color: #333;
+    color: #ffffff;
 }
 
 .usuario-card p {
     font-size: 14px;
-    color: #666;
+    color: #ffffff;
     margin: 5px 0;
 }
 
@@ -382,6 +381,13 @@ input:checked+.slider:before {
         top: 295px;
         /* Ajusta según sea necesario */
     }
+
+    .filter-container {
+        left: -20%;
+        top: 6%;
+        margin-bottom: 10%;
+    }
+
 }
 
 /* 1920x1080 - 3 filas de 8 ejercicios (Total: 24 por página) */

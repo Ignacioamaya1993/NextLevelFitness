@@ -16,7 +16,7 @@ label span {
     padding: 30px;
     background-color: #333333;
     border-radius: 15px;
-    box-shadow: 0 4px 15px rgb(248, 247, 247);
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
     text-align: center;
 }
 

@@ -1,20 +1,5 @@
-/* Reset básico adaptado */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 .hidden {
     display: none !important;
-}
-
-html, body {
-    height: 100%;
-    font-family: 'Arial', sans-serif;
-    background-color: #f3f4f6;
-    min-height: 100vh;
-    color: #374151;
 }
 
 /* Estilos para la sección principal */
@@ -30,16 +15,16 @@ main {
 
 .today-routine {
     border: 3px solid transparent; /* Borde transparente por defecto */
-    background-color: rgba(173, 216, 230, 0.4); /* Fondo tenue azul claro */
-    box-shadow: 0 4px 15px rgba(100, 149, 237, 0.3); /* Sombra azul moderada */
+    background-color: rgba(51, 51, 51, 0.4); /* Fondo tenue gris oscuro */
+    box-shadow: 0 4px 15px rgba(51, 51, 51, 0.3); /* Sombra gris moderada */
     transform: scale(1.05); /* Efecto de agrandamiento ligero */
     animation: highlight 1.5s ease-in-out 3; /* La animación se repite 3 veces */
     position: relative;
 }
 
 .today-routine .exercise-list li:hover {
-    background-color: rgba(173, 216, 230, 0.4); /* Azul pastel translúcido */
-    transition: background-color 0.3s ease-in-out;
+    background-color: rgba(51, 51, 51, 0.4); /* Gris oscuro translúcido */
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .today-routine::before {
@@ -49,7 +34,7 @@ main {
     left: -3px;
     right: -3px;
     bottom: -3px;
-    background: linear-gradient(45deg, #87cefa, #98fb98); /* Degradado azul claro y verde menta */
+    background: linear-gradient(45deg, #333333, #888888); /* Degradado de gris oscuro a gris claro */
     border-radius: 5px;
     z-index: -1;
 }
@@ -101,11 +86,8 @@ main {
     display: grid;
     grid-template-columns: repeat(3, minmax(250px, 1fr));
     gap: 20px;
-    background-color: #ffffff;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 #routine-list:hover {
@@ -168,30 +150,30 @@ main {
 
 /* Agregar un hover para los elementos */
 .exercise-list li:hover {
-    background-color: #f0f0f0; /* Fondo gris claro al pasar el ratón */
+    background-color: rgba(51, 51, 51, 0.4); /* Fondo tenue gris oscuro */
     border-radius: 5px;
     padding-left: 35px; /* Espacio extra cuando se pasa el ratón */
 }
 
 /* Tarjetas de rutina */
 .routine-card {
-    background-color: #ffffff;
+    background-color: #333333;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
     padding: 20px;
     border: 1px solid #ccc;
     margin: 10px 0;
 }
 
 .routine-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.30);
+    transform: scale(1.03);
+    box-shadow: 0 6px 15px rgb(250, 248, 248); /* Sombra refinada */
 }
 
 .routine-card h3 {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #1f2937;
+    color: #fafbfc;
     margin-bottom: 10px;
 }
 
@@ -204,7 +186,7 @@ main {
 .routine-card li {
     font-size: 1rem;
     margin-bottom: 8px;
-    color: #374151;
+    color: #f8f9fc;
 }
 
 /* Agregar la clase 'exercise-list' dentro de tus tarjetas para aplicar el estilo */
@@ -240,10 +222,9 @@ main {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #ffffff;
+    background-color: #333333;
     padding: 30px;
     border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     width: 95%;
     max-width: 500px;
@@ -277,7 +258,6 @@ main {
     font-size: 1rem;
     background-color: #f9fafb;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra más visible */
     border: 1px solid #ddd; /* Bordes suaves */
     border-radius: 8px; /* Bordes redondeados */
     padding: 10px; /* Ajusta el espaciado interno */
@@ -355,13 +335,13 @@ main {
 
 #popup-content h3 {
     font-size: 1.8rem;
-    color: #1f2937;
+    color: #f0f2f5;
     margin-bottom: 10px;
 }
 
 #popup-content p {
     font-size: 1rem;
-    color: #4b5563;
+    color: #f7f9fc;
     margin-bottom: 20px;
 }
 
