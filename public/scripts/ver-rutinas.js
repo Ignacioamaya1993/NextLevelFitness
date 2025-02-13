@@ -6,8 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            console.log("No estás autenticado. Redirigiendo a login.");
-            alert("No estás autenticado. Redirigiendo a login.");
             window.location.href = "login-admin.html";
             return;
         }
