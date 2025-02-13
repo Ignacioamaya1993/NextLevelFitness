@@ -1,5 +1,7 @@
-import { db } from './firebaseConfig.js'; // Importa solo db
-import { collection, getDocs, query, where, updateDoc, deleteDoc, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import app from './firebaseConfig.js';
+import { getFirestore, collection, getDocs, query, where, updateDoc, getDoc, doc, deleteDoc, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", async () => {
     const user = JSON.parse(localStorage.getItem("currentUser"));
@@ -102,31 +104,61 @@ function groupRoutinesByDay(routines) {
         }, {});
 }
 
+async function fetchExerciseDetailsById(exerciseId, db) {
+    try {
+        console.log("🔍 Buscando ejercicio con ID:", exerciseId);
+
+        // Obtener todas las rutinas
+        const routinesSnapshot = await getDocs(collection(db, "routines"));
+
+        let exerciseData = null;
+
+        // Recorrer cada rutina para buscar el ejercicio
+        routinesSnapshot.forEach((doc) => {
+            const routineData = doc.data();
+            if (routineData.exercises) {
+                routineData.exercises.forEach((exercise) => {
+                    if (exercise.id === exerciseId) {
+                        exerciseData = exercise; // Guardar el ejercicio encontrado
+                    }
+                });
+            }
+        });
+
+        if (!exerciseData) {
+            throw new Error("El ejercicio no existe en Firestore.");
+        }
+
+        console.log("✅ Ejercicio encontrado:", exerciseData);
+        return exerciseData;
+    } catch (error) {
+        console.error("❌ Error obteniendo el ejercicio:", error);
+        return null;
+    }
+}
+
 function isMobileDevice() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-function displayUserRoutines(routines) {
+function displayUserRoutines(routines, db) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = "";
 
-    // Agrupar las rutinas por día
+    console.log("📥 Rutinas cargadas desde Firestore:", routines); // ✅ Verificación inicial
+
     const groupedRoutines = groupRoutinesByDay(routines);
     let today = new Date().toLocaleDateString("es-ES", { weekday: "long" }).toLowerCase();
 
     if (isMobileDevice() && groupedRoutines[today]) {
-        // En móvil, mostrar el día actual primero con diseño especial
         const todayRoutineCard = document.createElement("div");
         todayRoutineCard.classList.add("routine-card", "today-routine");
 
         const todayExercisesList = groupedRoutines[today]
             .map(exercise => {
-                const name = exercise.name || "Ejercicio sin nombre";
-                const series = exercise.series || 0;
-                const reps = exercise.repetitions || 0;
-                const weight = exercise.weight || 0;
-                const additionalData = exercise.additionalData || "Sin información adicional";
-                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
+                return `<li class="exercise-item" data-exercise="${exercise.id}">
+                    ${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg, ${exercise.additionalData}
+                </li>`;
             })
             .join("");
 
@@ -140,29 +172,32 @@ function displayUserRoutines(routines) {
         `;
 
         routineList.appendChild(todayRoutineCard);
-        delete groupedRoutines[today]; // Eliminar el día actual de la lista para no repetirlo
+        delete groupedRoutines[today]; 
     }
 
-    // En escritorio, resaltar el día actual sin cambiar el orden
     Object.keys(groupedRoutines).forEach(day => {
         const routineCard = document.createElement("div");
         routineCard.classList.add("routine-card");
 
-        // Si es el día actual, agregar la clase para resaltarlo en escritorio
         if (!isMobileDevice() && day === today) {
             routineCard.classList.add("today-routine");
         }
 
         const exercisesList = groupedRoutines[day]
-            .map(exercise => {
-                const name = exercise.name || "Ejercicio sin nombre";
-                const series = exercise.series || 0;
-                const reps = exercise.repetitions || 0;
-                const weight = exercise.weight || 0;
-                const additionalData = exercise.additionalData || "Sin información adicional";
-                return `<li>${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}</li>`;
-            })
-            .join("");
+        .map(exercise => {
+            const name = exercise.name?.trim() || "Ejercicio sin nombre"; 
+            const series = exercise.series || 0;
+            const reps = exercise.repetitions || 0;
+            const weight = exercise.weight || 0;
+            const additionalData = exercise.additionalData || "Sin información adicional";
+    
+            console.log("📌 Creando ejercicio en lista:", { name, exerciseId: exercise.id }); // ✅ Verificación
+
+            return `<li class="exercise-item" data-exercise="${exercise.id}">
+                ${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}
+            </li>`;
+        })
+        .join("");    
 
         routineCard.innerHTML = `
             <h3>${day === today ? `Esta es tu rutina para hoy (${today})` : `Rutina para el día ${day}`}</h3>
@@ -174,6 +209,24 @@ function displayUserRoutines(routines) {
         `;
 
         routineList.appendChild(routineCard);
+    });
+
+    document.querySelectorAll(".exercise-item").forEach(item => {
+        item.addEventListener("click", async (event) => {
+            const exerciseId = event.target.dataset.exercise;
+
+            console.log("📌 Clic en ejercicio:", { exerciseId }); // ✅ Verificación
+
+            if (!exerciseId) {
+                console.error("❌ Datos inválidos para obtener el ejercicio.", { exerciseId });
+                return;
+            }
+
+            const exerciseData = await fetchExerciseDetailsById(exerciseId, db);
+            if (exerciseData) {
+                showExerciseDetails(exerciseData.name, exerciseData.video, exerciseData.instructions);
+            }
+        });
     });
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles

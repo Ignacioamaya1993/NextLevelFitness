@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     
 
- async function loadExercises(db, exerciseGrid, page = 1, category = "all", searchQuery = "") {
+async function loadExercises(db, exerciseGrid, page = 1, category = "all", searchQuery = "") {
     let latestSearchId = 0; // Variable global para rastrear la búsqueda más reciente
     const searchId = ++latestSearchId; // Incrementa el ID de búsqueda
 
