@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        console.log("Usuario autenticado:", user.email);
-
         const userId = localStorage.getItem("selectedUserId");
         const routineList = document.getElementById("routine-list");
         const tituloRutinas = document.getElementById("titulo-rutinas");
