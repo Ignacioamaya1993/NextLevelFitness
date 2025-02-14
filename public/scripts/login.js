@@ -152,7 +152,7 @@ forgotPasswordLink.addEventListener("click", async () => {
             }
         },
         customClass: {
-            popup: 'custom-popup', // Se aplica la clase personalizada aquí
+            popup: 'custom-popup',
         },
     });
 
