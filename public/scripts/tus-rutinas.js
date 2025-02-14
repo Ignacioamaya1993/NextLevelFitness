@@ -242,8 +242,16 @@ function displayUserRoutines(routines, db) {
                 `,
                 confirmButtonText: "Cerrar",
             });
-        });
-    });  
+        // Añadir estilos dinámicamente
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .instructions-text {
+                color: white;
+            }
+        `;
+        document.head.appendChild(style);
+    });
+});
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles
     const downloadButton = document.getElementById("download-pdf");

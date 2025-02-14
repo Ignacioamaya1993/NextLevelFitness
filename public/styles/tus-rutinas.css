@@ -499,10 +499,6 @@ main {
     color: #007bff; /* Cambia el color al pasar el mouse (puedes ajustarlo) */
 }
 
-.instructions-text {
-    color: white;
-}
-
 /* Botón "Guardar" a la derecha */
 #save-changes {
     background-color: #3b82f6;
