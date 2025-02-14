@@ -211,39 +211,46 @@ function displayUserRoutines(routines, db) {
         routineList.appendChild(routineCard);
     });
 
-    document.querySelectorAll(".exercise-item").forEach(item => {
-        item.addEventListener("click", async (event) => {
-            const exerciseId = event.target.dataset.exercise;
+    async function fetchExerciseDetailsById(exerciseId) {
+        try {
+            console.log("🔍 Buscando ejercicio con ID:", exerciseId);
     
-            console.log("📌 Clic en ejercicio:", { exerciseId });
+            // Obtener todas las rutinas (deberíamos optimizar si sabes a qué rutina pertenece el ejercicio)
+            const routinesQuery = collection(db, "routines");
+            const routinesSnapshot = await getDocs(routinesQuery);
     
-            if (!exerciseId) {
-                console.error("❌ ID de ejercicio inválido.");
-                return;
-            }
+            let foundExercise = null;
     
-            const exerciseData = await fetchExerciseDetailsById(exerciseId);
+            // Iterar sobre cada rutina para buscar el ejercicio dentro de su array 'exercises'
+            routinesSnapshot.forEach((doc) => {
+                const data = doc.data();
+                const exercises = data.exercises || [];
     
-            if (!exerciseData) {
-                console.error("❌ No se pudo obtener la información del ejercicio.");
-                return;
-            }
-    
-            console.log("📌 Mostrando detalles del ejercicio:", exerciseData.name);
-            console.log("📌 Nombre del ejercicio:", exerciseData.name);
-            console.log("📌 Instrucciones:", exerciseData.instructions);
-            console.log("📌 Video URL:", exerciseData.videoUrl);
-    
-            Swal.fire({
-                title: exerciseData.name,
-                html: `
-                    <p>${exerciseData.instructions}</p>
-                    ${exerciseData.videoUrl ? `<iframe width="100%" height="315" src="${exerciseData.videoUrl}" frameborder="0" allowfullscreen></iframe>` : ''}
-                `,
-                confirmButtonText: "Cerrar"
+                const exercise = exercises.find(e => e.id === exerciseId);
+                if (exercise) {
+                    foundExercise = exercise;
+                }
             });
-        });
-    });   
+    
+            if (!foundExercise) {
+                console.error("❌ El ejercicio no existe en ninguna rutina.");
+                return null;
+            }
+    
+            console.log("✅ Ejercicio encontrado:", foundExercise);
+            return {
+                name: foundExercise.name || "Nombre no disponible",
+                instructions: foundExercise.instructions || "Instrucciones no disponibles",
+                videoUrl: foundExercise.video || "",
+                repetitions: foundExercise.repetitions || 0,
+                series: foundExercise.series || 0,
+                weight: foundExercise.weight || 0
+            };
+        } catch (error) {
+            console.error("❌ Error obteniendo el ejercicio:", error);
+            return null;
+        }
+    }    
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles
     const downloadButton = document.getElementById("download-pdf");
