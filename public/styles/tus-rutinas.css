@@ -91,7 +91,7 @@ main {
 }
 
 .error-message {
-    color: red;
+    color: rgb(255, 255, 255);
     font-size: 0.9em;
 }
 
@@ -501,10 +501,6 @@ main {
 
 .instructions-text {
     color: white;
-}
-
-.swal-text {
-    color: white !important;
 }
 
 /* Botón "Guardar" a la derecha */
