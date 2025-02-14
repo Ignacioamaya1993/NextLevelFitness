@@ -143,6 +143,20 @@ function isMobileDevice() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
+function getEmbedVideoUrl(videoUrl) {
+    let embedVideoUrl = "";
+    if (!videoUrl) return embedVideoUrl;
+
+    if (videoUrl.includes("youtube.com/shorts/")) {
+        embedVideoUrl = videoUrl.replace("youtube.com/shorts/", "youtube.com/embed/");
+    } else if (videoUrl.includes("youtube.com/watch?v=")) {
+        const videoId = videoUrl.split("v=")[1]?.split("&")[0];
+        embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
+    }
+
+    return embedVideoUrl;
+}
+
 function displayUserRoutines(routines, db) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = "";
@@ -239,13 +253,16 @@ function displayUserRoutines(routines, db) {
             Swal.fire({
                 title: exerciseData.name,
                 html: `
-                    <p>${exerciseData.instructions}</p>
-                    ${exerciseData.videoUrl ? `<iframe width="100%" height="315" src="${exerciseData.videoUrl}" frameborder="0" allowfullscreen></iframe>` : ''}
+                    <p><strong>Instrucciones:</strong> ${exerciseData.instructions}</p>
+                    ${exerciseData.videoUrl ? `<iframe width="100%" height="315" src="${getEmbedVideoUrl(exerciseData.videoUrl)}" frameborder="0" allowfullscreen></iframe>` : ''}
+                    <p><strong>Series:</strong> ${exerciseData.series}</p>
+                    <p><strong>Repeticiones:</strong> ${exerciseData.repetitions}</p>
+                    <p><strong>Peso:</strong> ${exerciseData.weight} kg</p>
                 `,
-                confirmButtonText: "Cerrar"
+                confirmButtonText: "Cerrar",
             });
         });
-    });   
+    });  
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles
     const downloadButton = document.getElementById("download-pdf");
