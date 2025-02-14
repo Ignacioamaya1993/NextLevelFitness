@@ -162,7 +162,7 @@ forgotPasswordLink.addEventListener("click", async () => {
             Swal.fire({
                 icon: "success",
                 title: "Correo enviado",
-                text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
+                html: `<p class="swal-text">Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.</p>`,
                 confirmButtonColor: "#6f42c1",
                 customClass: {
                     popup: 'custom-popup',

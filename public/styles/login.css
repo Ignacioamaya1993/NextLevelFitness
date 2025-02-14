@@ -105,6 +105,10 @@ label span {
     color: white !important;
 }
 
+.instructions-text {
+    color: white;
+}
+
 /* Título */
 .custom-title {
     color: white; /* Asegurarse que el título también sea blanco */
