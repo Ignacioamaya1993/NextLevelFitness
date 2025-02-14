@@ -97,16 +97,19 @@ loginForm.addEventListener("submit", async (event) => {
 
         Swal.fire({
             icon: "error",
-            title: "Error al Iniciar Sesion",
+            title: "Error al Iniciar Sesión",
             text: errorMessage,
             confirmButtonColor: "#6f42c1",
             customClass: {
                 popup: 'custom-popup',
                 title: 'custom-title',
                 content: 'custom-content',
+            },
+        });
     }
 });
 
+// Función para mostrar/ocultar contraseña
 function togglePasswordVisibility() {
     const passwordType = passwordInput.getAttribute("type");
     passwordInput.setAttribute(
@@ -152,6 +155,11 @@ forgotPasswordLink.addEventListener("click", async () => {
                 title: "Correo enviado",
                 text: "Hemos enviado un enlace para recuperar tu contraseña. Revisa tu bandeja de entrada.",
                 confirmButtonColor: "#6f42c1",
+                customClass: {
+                    popup: 'custom-popup',
+                    title: 'custom-title',
+                    content: 'custom-content',
+                },
             });
         } catch (error) {
             console.error("Error al enviar el correo de recuperación:", error);
@@ -164,9 +172,12 @@ forgotPasswordLink.addEventListener("click", async () => {
                 title: "Error",
                 text: message,
                 confirmButtonColor: "#6f42c1",
+                customClass: {
+                    popup: 'custom-popup',
+                    title: 'custom-title',
+                    content: 'custom-content',
+                },
             });
         }
     }
 });
-}
-})
