@@ -96,6 +96,22 @@ label span {
     padding-right: 40px; /* Espacio para el ícono */
 }
 
+/* Estilo del contenido */
+.custom-popup {
+    background-color: #1e1e1e;  /* Fondo oscuro */
+    color: white; /* Color blanco para el texto */
+}
+
+/* Título */
+.custom-title {
+    color: white; /* Asegurarse que el título también sea blanco */
+}
+
+/* Contenido del mensaje */
+.custom-content {
+    color: white !important; /* Asegura que el texto dentro del contenido sea blanco */
+}
+
 .toggle-password {
     position: absolute;
     right: 10px;
