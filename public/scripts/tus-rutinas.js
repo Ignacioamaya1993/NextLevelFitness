@@ -505,7 +505,7 @@ function renderEditFields(container, exercise, index, day, exercises) {
     deleteButton.addEventListener("click", () => {
         Swal.fire({
             title: `¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`,
-            html: `<p class="swal-text">'No podrás deshacer esta acción..</p>`,
+            html: `<p class="swal-text">No podrás deshacer esta acción.</p>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar",
@@ -601,22 +601,39 @@ async function saveChanges(day, exercises) {
 
             if (!hasChanges) {
                 console.warn("No se detectaron cambios en los ejercicios.");
-                Swal.fire("Sin cambios", "No se han realizado modificaciones.", "info");
+                Swal.fire({
+                    title: "Sin cambios",
+                    html: `<p class="swal-text">No se han realizado modificaciones.</p>`,  // Estilo personalizado aquí
+                    icon: "info"
+                });
                 return;
             }
+            
 
             await updateDoc(routineDoc.ref, { exercises });
 
-            Swal.fire("Éxito", "La rutina se actualizó correctamente.", "success").then(() => {
+            Swal.fire({
+                title: "Éxito",
+                html: `<p class="swal-text">La rutina se actualizó correctamente.</p>`,  // Agregar clase swal-text
+                icon: "success"
+            }).then(() => {
                 location.reload();
             });
         } else {
             console.error(`Se encontraron ${querySnapshot.size} documentos para el día ${day}`);
-            Swal.fire("Error", "No se pudo actualizar la rutina.", "error");
+            Swal.fire({
+                title: "Error",
+                html: `<p class="swal-text">No se pudo actualizar la rutina.</p>`,  // Agregar clase swal-text
+                icon: "error"
+            });
         }
     } catch (error) {
         console.error("Error al guardar los cambios en la rutina:", error);
-        Swal.fire("Error", "No se pudo guardar la rutina. Revisa la consola para más detalles.", "error");
+        Swal.fire({
+            title: "Error",
+            html: `<p class="swal-text">No se pudo guardar la rutina. Revisa la consola para más detalles.</p>`,  // Agregar clase swal-text
+            icon: "error"
+        });
     }
 }
 
@@ -672,20 +689,20 @@ async function deleteRoutine(day) {
             // Notificar al usuario sobre el éxito de la operación
             Swal.fire({
                 title: "Éxito",
-                html: `<p class="swal-text">'La rutina para el día ${day} ha sido eliminada.</p>`,
+                html: `<p class="swal-text">La rutina para el día ${day} ha sido eliminada.</p>`,
                 icon: "success",
             }).then(() => location.reload()); // Recarga la página después de eliminar la rutina
         } else {
             Swal.fire({
                 title: "Error",
-                html: `<p class="swal-text">'No se encontró la rutina para el día especificado.</p>`,
+                html: `<p class="swal-text">No se encontró la rutina para el día especificado.</p>`,
                 icon: "error",
             });
         }
     } catch (error) {
         Swal.fire({
             title: "Error",
-            text: "Ocurrió un error al eliminar la rutina.",
+            html: `<p class="swal-text">Ocurrió un error al eliminar la rutina.</p>`,
             icon: "error",
         });
         console.error("Error al eliminar la rutina:", error);
