@@ -238,7 +238,7 @@ function displayUserRoutines(routines, db) {
                 title: exerciseData.name,
                 html: `
                     ${exerciseData.videoUrl ? `<iframe width="100%" height="315" src="${getEmbedVideoUrl(exerciseData.videoUrl)}" frameborder="0" allowfullscreen></iframe>` : ''}
-                <p><strong>Instrucciones:</strong> <span class="instructions-text">${exerciseData.instructions}</span></p>
+                    <p><strong><span class="instructions-text">Instrucciones:</span></strong> <span class="instructions-text">${exerciseData.instructions}</span></p>
                 `,
                 confirmButtonText: "Cerrar",
             });
