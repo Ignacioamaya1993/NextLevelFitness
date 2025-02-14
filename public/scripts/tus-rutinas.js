@@ -47,20 +47,14 @@ async function getUserRoutines(userId) {
         const routinesRef = collection(db, "routines");
         const q = query(routinesRef, where("userId", "==", userId));
 
-        // Intentar obtener los datos desde caché primero
-        let querySnapshot = await getDocs(q, { source: "cache" });
+        // Obtener desde caché sin esperar
+        const cachePromise = getDocs(q, { source: "cache" }).catch(() => null);
+        const serverPromise = getDocs(q, { source: "server" });
 
-        if (querySnapshot.empty) {
-            console.log("No hay datos en caché, obteniendo desde Firestore...");
-            querySnapshot = await getDocs(q, { source: "server" }); // Consultar Firestore si la caché está vacía
-        }
+        let querySnapshot = await cachePromise || await serverPromise; // Usar caché si está disponible
+        if (!querySnapshot || querySnapshot.empty) querySnapshot = await serverPromise; // Si no hay datos en caché, ir al servidor
 
-        const routines = [];
-        querySnapshot.forEach((doc) => {
-            routines.push({ ...doc.data(), id: doc.id });
-        });
-
-        return routines;
+        return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     } catch (error) {
         console.error("Error obteniendo rutinas:", error);
         return [];
