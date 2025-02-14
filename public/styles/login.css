@@ -98,7 +98,7 @@ label span {
 
 /* Estilo del contenido */
 .custom-popup .swal2-input-label .inputPlaceholder{
-    color: white; /* Color blanco para el texto */
+    color: white !important;
 }
 
 /* Título */
