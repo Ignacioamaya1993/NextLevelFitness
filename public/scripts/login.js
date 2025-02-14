@@ -155,7 +155,6 @@ forgotPasswordLink.addEventListener("click", async () => {
             popup: 'custom-popup', // Se aplica la clase personalizada aquí
         },
     });
-});
 
     if (email) {
         try {
@@ -190,3 +189,4 @@ forgotPasswordLink.addEventListener("click", async () => {
             });
         }
     }
+});
