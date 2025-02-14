@@ -490,6 +490,15 @@ main {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.exercise-item {
+    cursor: pointer; /* Cambia el cursor a puntero cuando se pasa por encima */
+}
+
+.exercise-item:hover {
+    text-decoration: underline; /* Agrega un subrayado cuando el usuario pasa el mouse */
+    color: #007bff; /* Cambia el color al pasar el mouse (puedes ajustarlo) */
+}
+
 /* Botón "Guardar" a la derecha */
 #save-changes {
     background-color: #3b82f6;
