@@ -100,7 +100,6 @@ function groupRoutinesByDay(routines) {
 
 async function fetchExerciseDetailsById(exerciseId) {
     try {
-        console.log("🔍 Buscando ejercicio con ID:", exerciseId);
 
         // Obtener todas las rutinas (deberíamos optimizar si sabes a qué rutina pertenece el ejercicio)
         const routinesQuery = collection(db, "routines");
@@ -124,14 +123,10 @@ async function fetchExerciseDetailsById(exerciseId) {
             return null;
         }
 
-        console.log("✅ Ejercicio encontrado:", foundExercise);
         return {
             name: foundExercise.name || "Nombre no disponible",
             instructions: foundExercise.instructions || "Instrucciones no disponibles",
             videoUrl: foundExercise.video || "",
-            repetitions: foundExercise.repetitions || 0,
-            series: foundExercise.series || 0,
-            weight: foundExercise.weight || 0
         };
     } catch (error) {
         console.error("❌ Error obteniendo el ejercicio:", error);
@@ -160,8 +155,6 @@ function getEmbedVideoUrl(videoUrl) {
 function displayUserRoutines(routines, db) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = "";
-
-    console.log("📥 Rutinas cargadas desde Firestore:", routines); // ✅ Verificación inicial
 
     const groupedRoutines = groupRoutinesByDay(routines);
     let today = new Date().toLocaleDateString("es-ES", { weekday: "long" }).toLowerCase();
@@ -207,8 +200,6 @@ function displayUserRoutines(routines, db) {
             const weight = exercise.weight || 0;
             const additionalData = exercise.additionalData || "Sin información adicional";
     
-            console.log("📌 Creando ejercicio en lista:", { name, exerciseId: exercise.id }); // ✅ Verificación
-
             return `<li class="exercise-item" data-exercise="${exercise.id}">
                 ${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}
             </li>`;
@@ -230,9 +221,7 @@ function displayUserRoutines(routines, db) {
     document.querySelectorAll(".exercise-item").forEach(item => {
         item.addEventListener("click", async (event) => {
             const exerciseId = event.target.dataset.exercise;
-    
-            console.log("📌 Clic en ejercicio:", { exerciseId });
-    
+        
             if (!exerciseId) {
                 console.error("❌ ID de ejercicio inválido.");
                 return;
@@ -245,19 +234,11 @@ function displayUserRoutines(routines, db) {
                 return;
             }
     
-            console.log("📌 Mostrando detalles del ejercicio:", exerciseData.name);
-            console.log("📌 Nombre del ejercicio:", exerciseData.name);
-            console.log("📌 Instrucciones:", exerciseData.instructions);
-            console.log("📌 Video URL:", exerciseData.videoUrl);
-    
             Swal.fire({
                 title: exerciseData.name,
                 html: `
-                    <p><strong>Instrucciones:</strong> ${exerciseData.instructions}</p>
                     ${exerciseData.videoUrl ? `<iframe width="100%" height="315" src="${getEmbedVideoUrl(exerciseData.videoUrl)}" frameborder="0" allowfullscreen></iframe>` : ''}
-                    <p><strong>Series:</strong> ${exerciseData.series}</p>
-                    <p><strong>Repeticiones:</strong> ${exerciseData.repetitions}</p>
-                    <p><strong>Peso:</strong> ${exerciseData.weight} kg</p>
+                    <p><strong>Instrucciones:</strong> ${exerciseData.instructions}</p>
                 `,
                 confirmButtonText: "Cerrar",
             });
