@@ -41,7 +41,7 @@ loginForm.addEventListener("submit", async (event) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
+    
         if (!user.emailVerified) {
             await auth.signOut();
             Swal.fire({
@@ -49,6 +49,9 @@ loginForm.addEventListener("submit", async (event) => {
                 title: "Correo no verificado",
                 text: "Por favor, verifica tu correo antes de iniciar sesión.",
                 confirmButtonColor: "#6f42c1",
+                customClass: {
+                    popup: 'custom-popup', // Se aplica la clase personalizada aquí
+                },
             });
             return;
         }
