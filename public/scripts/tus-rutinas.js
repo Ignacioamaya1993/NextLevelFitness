@@ -214,20 +214,36 @@ function displayUserRoutines(routines, db) {
     document.querySelectorAll(".exercise-item").forEach(item => {
         item.addEventListener("click", async (event) => {
             const exerciseId = event.target.dataset.exercise;
-
-            console.log("📌 Clic en ejercicio:", { exerciseId }); // ✅ Verificación
-
+    
+            console.log("📌 Clic en ejercicio:", { exerciseId });
+    
             if (!exerciseId) {
-                console.error("❌ Datos inválidos para obtener el ejercicio.", { exerciseId });
+                console.error("❌ ID de ejercicio inválido.");
                 return;
             }
-
-            const exerciseData = await fetchExerciseDetailsById(exerciseId, db);
-            if (exerciseData) {
-                showExerciseDetails(exerciseData.name, exerciseData.video, exerciseData.instructions);
+    
+            const exerciseData = await fetchExerciseDetailsById(exerciseId);
+    
+            if (!exerciseData) {
+                console.error("❌ No se pudo obtener la información del ejercicio.");
+                return;
             }
+    
+            console.log("📌 Mostrando detalles del ejercicio:", exerciseData.name);
+            console.log("📌 Nombre del ejercicio:", exerciseData.name);
+            console.log("📌 Instrucciones:", exerciseData.instructions);
+            console.log("📌 Video URL:", exerciseData.videoUrl);
+    
+            Swal.fire({
+                title: exerciseData.name,
+                html: `
+                    <p>${exerciseData.instructions}</p>
+                    ${exerciseData.videoUrl ? `<iframe width="100%" height="315" src="${exerciseData.videoUrl}" frameborder="0" allowfullscreen></iframe>` : ''}
+                `,
+                confirmButtonText: "Cerrar"
+            });
         });
-    });
+    });   
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles
     const downloadButton = document.getElementById("download-pdf");
