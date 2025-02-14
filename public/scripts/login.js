@@ -66,9 +66,12 @@ loginForm.addEventListener("submit", async (event) => {
                 title: "Acceso denegado",
                 text: "Tu cuenta aún no ha sido aprobada por el administrador.",
                 confirmButtonColor: "#6f42c1",
+                customClass: {
+                    popup: 'custom-popup', // Se aplica la clase personalizada aquí
+                },
             });
             return;
-        }
+        }       
 
         // Usuario aprobado, guardar en localStorage y redirigir
         const currentUser = {
