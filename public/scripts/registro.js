@@ -129,15 +129,20 @@ registroForm.addEventListener("submit", async (event) => {
         }
     });
 
-// Función para mostrar mensajes de error o éxito con SweetAlert
-function mostrarMensaje(texto, tipo) {
-    Swal.fire({
-        icon: tipo, // 'success' o 'error'
-        title: tipo === 'success' ? 'Éxito' : 'Error',
-        text: texto,
-        confirmButtonText: 'Aceptar'
-    });
-}
+    function mostrarMensaje(texto, tipo) {
+        Swal.fire({
+            icon: tipo, // 'success' o 'error'
+            title: tipo === 'success' ? 'Éxito' : 'Error',
+            text: texto,
+            confirmButtonText: 'Aceptar',
+            customClass: {
+                // Aquí le agregamos la clase para los textos
+                popup: 'custom-popup',
+                title: 'custom-title',
+                content: 'custom-content',
+            },
+        });
+    }    
 
 // Función para alternar la visibilidad de las contraseñas
 document.querySelectorAll('.toggle-password').forEach(icon => {
