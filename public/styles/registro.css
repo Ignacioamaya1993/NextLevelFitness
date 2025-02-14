@@ -144,13 +144,13 @@ button:hover {
 }
 
 #mensaje.success {
-    background-color: #d4edda; /* Verde claro */
-    color: #155724; /* Verde oscuro */
+    background-color: #ffffff; /* Verde claro */
+    color: #ffffff; /* Verde oscuro */
 }
 
 #mensaje.error {
     background-color: #f8d7da; /* Rojo claro */
-    color: #721c24; /* Rojo oscuro */
+    color: #ffffff; /* Rojo oscuro */
 }
 
 /* Clase para ocultar elementos */
