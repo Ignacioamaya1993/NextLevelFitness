@@ -51,12 +51,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const categoriesRef = collection(db, "categories");
     
-            // Intentar cargar desde caché primero
-            let categoriesSnapshot = await getDocs(categoriesRef, { source: "cache" });
+            // Obtener desde caché sin esperar
+            const cachePromise = getDocs(categoriesRef, { source: "cache" }).catch(() => null);
+            const serverPromise = getDocs(categoriesRef, { source: "server" });
     
-            if (categoriesSnapshot.empty) {
+            let categoriesSnapshot = await cachePromise || await serverPromise; // Usar caché si está disponible
+    
+            if (!categoriesSnapshot || categoriesSnapshot.empty) {
                 console.log("No hay datos en caché, obteniendo desde Firestore...");
-                categoriesSnapshot = await getDocs(categoriesRef, { source: "server" });
+                categoriesSnapshot = await serverPromise; // Si no hay datos en caché, ir al servidor
             }
     
             renderCategories(categoriesSnapshot);
@@ -64,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (error) {
             console.error("Error al cargar categorías:", error);
         }
-    }
+    }    
     
     // Función auxiliar para renderizar las categorías
     function renderCategories(snapshot) {
