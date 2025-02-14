@@ -238,20 +238,12 @@ function displayUserRoutines(routines, db) {
                 title: exerciseData.name,
                 html: `
                     ${exerciseData.videoUrl ? `<iframe width="100%" height="315" src="${getEmbedVideoUrl(exerciseData.videoUrl)}" frameborder="0" allowfullscreen></iframe>` : ''}
-                    <p><strong>Instrucciones:</strong> ${exerciseData.instructions}</p>
+                <p><strong>Instrucciones:</strong> <span class="instructions-text">${exerciseData.instructions}</span></p>
                 `,
                 confirmButtonText: "Cerrar",
             });
-        // Añadir estilos dinámicamente
-        const style = document.createElement('style');
-        style.innerHTML = `
-            .instructions-text {
-                color: white;
-            }
-        `;
-        document.head.appendChild(style);
-    });
-});
+        });
+    });  
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles
     const downloadButton = document.getElementById("download-pdf");
