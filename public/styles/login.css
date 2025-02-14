@@ -97,7 +97,7 @@ label span {
 }
 
 /* Estilo del contenido */
-.custom-popup .swal2-input-label {
+.custom-popup .swal2-input-label .swal2-input::placeholder{
     color: white !important;
 }
 
