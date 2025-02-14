@@ -105,10 +105,6 @@ label span {
     color: white !important;
 }
 
-.instructions-text {
-    color: white;
-}
-
 /* Título */
 .custom-title {
     color: white; /* Asegurarse que el título también sea blanco */
@@ -143,4 +139,10 @@ label span {
     font-size: 22px;
     font-weight: bold;
     color: #ffffff;
+}
+
+.custom-popup .swal2-content,
+.custom-popup .swal2-html-container,
+.custom-popup .swal2-text {
+    color: white !important;
 }
