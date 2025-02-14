@@ -505,7 +505,7 @@ function renderEditFields(container, exercise, index, day, exercises) {
     deleteButton.addEventListener("click", () => {
         Swal.fire({
             title: `¿Estás seguro de eliminar el ejercicio "${exercise.name}"?`,
-            text: 'No podrás deshacer esta acción.',
+            html: `<p class="swal-text">'No podrás deshacer esta acción..</p>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar",
@@ -672,13 +672,13 @@ async function deleteRoutine(day) {
             // Notificar al usuario sobre el éxito de la operación
             Swal.fire({
                 title: "Éxito",
-                text: `La rutina para el día ${day} ha sido eliminada.`,
+                html: `<p class="swal-text">'La rutina para el día ${day} ha sido eliminada.</p>`,
                 icon: "success",
             }).then(() => location.reload()); // Recarga la página después de eliminar la rutina
         } else {
             Swal.fire({
                 title: "Error",
-                text: "No se encontró la rutina para el día especificado.",
+                html: `<p class="swal-text">'No se encontró la rutina para el día especificado.</p>`,
                 icon: "error",
             });
         }
