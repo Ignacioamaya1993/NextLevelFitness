@@ -36,9 +36,6 @@ async function cargarUsuarios(filtro = "", pagina = 1) {
             return;
         }
 
-        console.log("Usuario autenticado:", user.uid);
-        console.log(`Cargando página ${pagina}...`);
-
         const filtroLower = filtro.toLowerCase();
         
         let q;
@@ -93,9 +90,7 @@ async function cargarUsuarios(filtro = "", pagina = 1) {
         // Actualizar `ultimoDocumento` si hay resultados
         if (usuariosSnapshot.docs.length > 0) {
             ultimoDocumento = usuariosSnapshot.docs[usuariosSnapshot.docs.length - 1];
-            console.log("✅ Último documento actualizado:", ultimoDocumento);
         } else {
-            console.warn("⚠️ No hay más documentos para paginar.");
             return;
         }
 
@@ -105,7 +100,6 @@ async function cargarUsuarios(filtro = "", pagina = 1) {
 }
 
 async function mostrarPaginacion() {
-    console.log("Mostrando paginación...");
     paginacionContainer.innerHTML = "";
 
     const totalUsuarios = await obtenerTotalUsuarios();
@@ -118,7 +112,6 @@ async function mostrarPaginacion() {
         prevButton.textContent = "Anterior";
         prevButton.addEventListener("click", () => cambiarPagina(paginaActual - 1));
         paginacionContainer.appendChild(prevButton);
-        console.log("Botón de Anterior agregado.");
     }
 
     for (let i = 1; i <= totalPages; i++) {
@@ -138,7 +131,6 @@ async function mostrarPaginacion() {
 }
 
 function cambiarPagina(pagina) {
-    console.log("Cambiando a la página:", pagina);
     if (pagina < 1) return;
 
     paginaActual = pagina;
@@ -152,7 +144,6 @@ function cambiarPagina(pagina) {
 }
 
 async function obtenerTotalUsuarios() {
-    console.log("Obteniendo total de usuarios...");
     const snapshot = await getDocs(collection(db, "usuarios"));
     return snapshot.size; // Total de documentos en la colección
 }

@@ -11,16 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        console.log("Usuario autenticado:", user.email);
-
         const selectedUserId = localStorage.getItem("selectedUserId");
 
         if (!selectedUserId) {
             console.error("No se ha encontrado el userId en localStorage.");
             return;
         }
-
-        console.log("Usuario seleccionado:", selectedUserId);
 
         // Función para cargar los datos del usuario seleccionado
         async function cargarUsuario() {
@@ -51,9 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const repeticiones = document.getElementById("repeticiones").value;
             const peso = document.getElementById("peso").value;
             const dia = document.getElementById("dias").value;
-               
-            console.log("Guardando rutina para usuario:", selectedUserId); 
-        
+                       
             try {
                 const ejerciciosRef = collection(db, "usuarios", selectedUserId, "rutinas");  // Guardar en el usuario correcto
                 await addDoc(ejerciciosRef, {
@@ -65,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     fecha: new Date()
                 });
         
-                console.log("Rutina guardada correctamente para", selectedUserId);
             } catch (error) {
                 console.error("Error al guardar la rutina:", error);
             }
@@ -105,14 +98,19 @@ document.addEventListener("DOMContentLoaded", () => {
         async function loadCategories() {
             try {
                 const categoriesRef = collection(db, "categories");
-                let categoriesSnapshot = await getDocs(categoriesRef, { source: "cache" });
-
-                if (categoriesSnapshot.empty) {
-                    console.log("No hay datos en caché, obteniendo desde Firestore...");
-                    categoriesSnapshot = await getDocs(categoriesRef, { source: "server" });
+        
+                // Obtener desde caché sin esperar
+                const cachePromise = getDocs(categoriesRef, { source: "cache" }).catch(() => null);
+                const serverPromise = getDocs(categoriesRef, { source: "server" });
+        
+                let categoriesSnapshot = await cachePromise || await serverPromise; // Usar caché si está disponible
+        
+                if (!categoriesSnapshot || categoriesSnapshot.empty) {
+                    categoriesSnapshot = await serverPromise; // Si no hay datos en caché, ir al servidor
                 }
-
+        
                 renderCategories(categoriesSnapshot);
+        
             } catch (error) {
                 console.error("Error al cargar categorías:", error);
             }
@@ -127,8 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 option.textContent = doc.id;
                 categoryFilter.appendChild(option);
             });
-
-            console.log("Categorías actualizadas.");
         }
     
 // Función para cargar y mostrar los ejercicios con paginación
@@ -208,7 +204,6 @@ async function loadExercises(db, exerciseGrid, page = 1, category = "all", searc
             // Mostrar la paginación
             renderPagination(filteredExercises.length, page);
 
-            console.log("Ejercicios cargados correctamente.");
         }
     } catch (error) {
         console.error("Error al cargar ejercicios:", error);

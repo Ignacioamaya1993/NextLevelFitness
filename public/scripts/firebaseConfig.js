@@ -18,9 +18,7 @@ const db = getFirestore(app); // Obtención de Firestore
 // Habilitar caché local
 enableIndexedDbPersistence(db).catch((err) => {
     if (err.code === "failed-precondition") {
-      console.log("No se puede habilitar persistencia: Múltiples pestañas abiertas.");
     } else if (err.code === "unimplemented") {
-      console.log("El navegador no soporta IndexedDB.");
     }
   });
 

@@ -43,7 +43,6 @@ celularInput.addEventListener("input", (event) => {
 // Manejar el envío del formulario
 registroForm.addEventListener("submit", async (event) => {
     event.preventDefault(); // Evita que se recargue la página
-    console.log("Formulario de registro enviado");
 
     // Obtener los valores de los campos
     const nombre = document.getElementById("nombre").value.trim();
@@ -81,7 +80,6 @@ registroForm.addEventListener("submit", async (event) => {
         // Registrar el usuario
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        console.log("Usuario registrado exitosamente:", user);
     
         // Mostrar mensaje de registro exitoso
         mostrarMensaje("Registro exitoso. Verifica tu correo antes de iniciar sesión.", "success");
@@ -102,13 +100,9 @@ registroForm.addEventListener("submit", async (event) => {
         };    
         
         await setDoc(doc(db, "usuarios", user.uid), nuevoUsuario);
-
-        await setDoc(doc(db, "usuarios", user.uid), nuevoUsuario); // Usar el UID como ID del documento
-        console.log("Usuario guardado en Firestore correctamente.");
     
         // Cerrar sesión después de registrar
         await signOut(auth);
-        console.log("Usuario desconectado después del registro.");
         
         registroForm.reset();
     } catch (error) {

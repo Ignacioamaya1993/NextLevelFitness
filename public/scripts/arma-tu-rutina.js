@@ -58,8 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             let categoriesSnapshot = await cachePromise || await serverPromise; // Usar caché si está disponible
     
             if (!categoriesSnapshot || categoriesSnapshot.empty) {
-                console.log("No hay datos en caché, obteniendo desde Firestore...");
-                categoriesSnapshot = await serverPromise; // Si no hay datos en caché, ir al servidor
+            categoriesSnapshot = await serverPromise; // Si no hay datos en caché, ir al servidor
             }
     
             renderCategories(categoriesSnapshot);
@@ -79,8 +78,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             option.textContent = doc.id;
             categoryFilter.appendChild(option);
         });
-    
-        console.log("Categorías actualizadas.");
     }
     
 
@@ -169,8 +166,6 @@ async function loadExercises(db, exerciseGrid, page = 1, category = "all", searc
 
             // Mostrar la paginación
             renderPagination(filteredExercises.length, page);
-
-            console.log("Ejercicios cargados correctamente.");
         }
     } catch (error) {
         console.error("Error al cargar ejercicios:", error);

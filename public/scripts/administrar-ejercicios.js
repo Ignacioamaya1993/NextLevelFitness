@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        console.log("Usuario autenticado:", user.email);
-
         const routineBuilder = document.getElementById("routine-builder");
         const categoryFilter = document.getElementById("category-filter");
         const exerciseGrid = document.getElementById("exercise-grid");
@@ -52,19 +50,22 @@ document.addEventListener("DOMContentLoaded", () => {
             await addNewExercise(db);
         });
 
-        async function loadCategories(db, categoryFilter) {
+        async function loadCategories() {
             try {
                 const categoriesRef = collection(db, "categories");
-
-                let categoriesSnapshot = await getDocs(categoriesRef, { source: "cache" });
-
-                if (categoriesSnapshot.empty) {
-                    console.log("No hay datos en caché, obteniendo desde Firestore...");
-                    categoriesSnapshot = await getDocs(categoriesRef, { source: "server" });
+        
+                // Obtener desde caché sin esperar
+                const cachePromise = getDocs(categoriesRef, { source: "cache" }).catch(() => null);
+                const serverPromise = getDocs(categoriesRef, { source: "server" });
+        
+                let categoriesSnapshot = await cachePromise || await serverPromise; // Usar caché si está disponible
+        
+                if (!categoriesSnapshot || categoriesSnapshot.empty) {
+                    categoriesSnapshot = await serverPromise; // Si no hay datos en caché, ir al servidor
                 }
-
+        
                 renderCategories(categoriesSnapshot);
-
+        
             } catch (error) {
                 console.error("Error al cargar categorías:", error);
             }
@@ -80,8 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 option.textContent = doc.id;
                 categoryFilter.appendChild(option);
             });
-
-            console.log("Categorías actualizadas.");
         }
 
 // Función para cargar y mostrar los ejercicios con paginación
@@ -166,10 +165,7 @@ async function loadExercises(db, exerciseGrid, page = 1, category = "all", searc
                         if (result.isConfirmed) {
                             try {
                                 // Eliminamos el ejercicio de Firestore
-                                const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
-                                console.log(`Ruta del ejercicio: categories/${category}/exercises/${exercise.id}`);
-                                console.log('Categoría:', exercise.Categoria);
-                                console.log('ID del ejercicio:', exercise.id); 
+                                const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`); 
                                 await deleteDoc(exerciseRef);
                                 Swal.fire('¡Eliminado!', 'El ejercicio ha sido eliminado.', 'success');
                                 
@@ -200,8 +196,6 @@ async function loadExercises(db, exerciseGrid, page = 1, category = "all", searc
 
             // Mostrar la paginación
             renderPagination(filteredExercises.length, page);
-
-            console.log("Ejercicios cargados correctamente.");
         }
     } catch (error) {
         console.error("Error al cargar ejercicios:", error);

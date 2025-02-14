@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        console.log("Usuario autenticado:", user.email);
-
         const userId = localStorage.getItem("selectedUserId");
         const routineList = document.getElementById("routine-list");
         const tituloRutinas = document.getElementById("titulo-rutinas");
@@ -46,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
 cargarUsuario();
 
         if (!userId) {
-            console.log("No se ha seleccionado un usuario válido.");
             alert("No se ha seleccionado un usuario válido.");
             window.location.href = "visual-usuarios.html";
             return;
@@ -354,7 +351,6 @@ saveButton.addEventListener("click", () => {
 });
 
 closeButton.addEventListener("click", () => {
-    console.log("Botón cancelar presionado");
     closePopup();
 });
 
@@ -534,13 +530,6 @@ async function saveChanges(day, exercises) {
                 const existingWeight = existingExercise.weight || 0;
                 const existingAdditionalData = existingExercise.additionalData || "";
 
-                // Mostrar en consola los valores antes y después de la modificación
-                console.log(`Ejercicio ${index + 1}:`);
-                console.log(`  Series: ${existingSeries} -> ${newSeries}`);
-                console.log(`  Repeticiones: ${existingReps} -> ${newReps}`);
-                console.log(`  Peso: ${existingWeight} -> ${newWeight}`);
-                console.log(`  Información adicional: "${existingAdditionalData}" -> "${newAdditionalData}"`);
-
                 // Verificar si algún valor ha cambiado
                 if (
                     newSeries !== existingSeries ||
@@ -563,8 +552,6 @@ async function saveChanges(day, exercises) {
                 Swal.fire("Sin cambios", "No se han realizado modificaciones.", "info");
                 return;
             }
-
-            console.log("Se detectaron cambios, procediendo con la actualización...");
 
             await updateDoc(routineDoc.ref, { exercises });
 
