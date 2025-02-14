@@ -100,7 +100,10 @@ loginForm.addEventListener("submit", async (event) => {
             title: "Error al Iniciar Sesion",
             text: errorMessage,
             confirmButtonColor: "#6f42c1",
-        });
+            customClass: {
+                popup: 'custom-popup',
+                title: 'custom-title',
+                content: 'custom-content',
     }
 });
 
@@ -165,3 +168,5 @@ forgotPasswordLink.addEventListener("click", async () => {
         }
     }
 });
+}
+})
