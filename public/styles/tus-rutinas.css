@@ -503,6 +503,10 @@ main {
     color: white;
 }
 
+.swal-text {
+    color: white !important;
+}
+
 /* Botón "Guardar" a la derecha */
 #save-changes {
     background-color: #3b82f6;

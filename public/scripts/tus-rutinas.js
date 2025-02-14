@@ -271,7 +271,7 @@ function displayUserRoutines(routines, db) {
                 const day = e.target.dataset.day;
                 Swal.fire({
                     title: `¿Estás seguro de eliminar la rutina para el día ${day}?`,
-                    text: "Esta acción no se puede deshacer.",
+                    html: `<p class="swal-text">Esta acción no se puede deshacer.</p>`,  // Estilo personalizado aquí
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Sí, eliminar",
