@@ -97,7 +97,11 @@ label span {
 }
 
 /* Estilo del contenido */
-.custom-popup .swal2-input-label .swal2-input::placeholder{
+.custom-popup .swal2-input-label {
+    color: white !important;
+}
+
+.custom-popup .swal2-input::placeholder {
     color: white !important;
 }
 
