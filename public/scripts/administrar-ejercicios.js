@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        console.log("Usuario autenticado:", user.email);
+
         const routineBuilder = document.getElementById("routine-builder");
         const categoryFilter = document.getElementById("category-filter");
         const exerciseGrid = document.getElementById("exercise-grid");
@@ -17,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const addExerciseBtn = document.getElementById("add-exercise-btn");
 
         let currentPage = 1; // Página actual
-        const itemsPerPage = 24; // Número de items por página
+        const itemsPerPage = 20; // Número de items por página
 
         routineBuilder.classList.remove("hidden");
 
@@ -61,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 let categoriesSnapshot = await cachePromise || await serverPromise; // Usar caché si está disponible
         
                 if (!categoriesSnapshot || categoriesSnapshot.empty) {
+                    console.log("No hay datos en caché, obteniendo desde Firestore...");
                     categoriesSnapshot = await serverPromise; // Si no hay datos en caché, ir al servidor
                 }
         
@@ -69,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (error) {
                 console.error("Error al cargar categorías:", error);
             }
-        }
+        }        
 
         // Función auxiliar para renderizar las categorías
         function renderCategories(snapshot) {
@@ -81,6 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 option.textContent = doc.id;
                 categoryFilter.appendChild(option);
             });
+
+            console.log("Categorías actualizadas.");
         }
 
 // Función para cargar y mostrar los ejercicios con paginación
@@ -160,24 +165,39 @@ async function loadExercises(db, exerciseGrid, page = 1, category = "all", searc
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar'
+                        cancelButtonText: 'Cancelar',
+                        customClass: {
+                            popup: "swal-custom-text" // Aplicar la clase para texto blanco
+                        }
                     }).then(async (result) => {
                         if (result.isConfirmed) {
                             try {
                                 // Eliminamos el ejercicio de Firestore
-                                const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`); 
+                                const exerciseRef = doc(db, `categories/${exercise.Categoria}/exercises/${exercise.id}`);
                                 await deleteDoc(exerciseRef);
-                                Swal.fire('¡Eliminado!', 'El ejercicio ha sido eliminado.', 'success');
-                                
-                                // Recargar ejercicios con los parámetros actuales
-                                loadExercises(db, exerciseGrid, page, category, searchQuery);
+                                Swal.fire({
+                                    title: '¡Eliminado!',
+                                    text: 'El ejercicio ha sido eliminado.',
+                                    icon: 'success',
+                                    customClass: {
+                                        popup: "swal-custom-text"
+                                    }
+                                });
+                                loadExercises(db, exerciseGrid, page); // Volver a cargar los ejercicios
                             } catch (error) {
-                                Swal.fire('Error', 'No se pudo eliminar el ejercicio.', 'error');
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'No se pudo eliminar el ejercicio.',
+                                    icon: 'error',
+                                    customClass: {
+                                        popup: "swal-custom-text"
+                                    }
+                                });
                                 console.error("Error al eliminar ejercicio:", error);
                             }
                         }
                     });
-                });
+                });                
 
                 exerciseCard.innerHTML = ` 
                     <h3>${exercise.Nombre}</h3>
@@ -196,6 +216,8 @@ async function loadExercises(db, exerciseGrid, page = 1, category = "all", searc
 
             // Mostrar la paginación
             renderPagination(filteredExercises.length, page);
+
+            console.log("Ejercicios cargados correctamente.");
         }
     } catch (error) {
         console.error("Error al cargar ejercicios:", error);
@@ -359,6 +381,8 @@ function renderPagination(totalItems, currentPage) {
         }
 
         function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercise) {
+            console.log("Ejercicio recibido:", exercise); // Verifica que exercise tenga datos
+        
             Swal.fire({
                 title: `Editar ejercicio: ${Nombre}`,
                 html: `
@@ -410,45 +434,59 @@ function renderPagination(totalItems, currentPage) {
                     const newImage = document.getElementById("new-image").value.trim() || Imagen;
                     const newVideo = document.getElementById("new-video").value.trim() || Video;
                     const newInstructions = document.getElementById("new-instructions").value.trim() || Instrucciones;
-        
+                
                     try {
                         const db = getFirestore();
-        
-                        // Si el ejercicio tiene un campo 'categoria', usamos ese valor como referencia
-                        const category = exercise.categoria;
-        
+                
+                        // Intentar leer la categoría en ambas formas (mayúscula y minúscula)
+                        const category = exercise.Categoria || exercise.categoria;
+                        console.log("Categoría obtenida:", category); // Depuración
+                
                         if (!category) {
                             throw new Error("La categoría del ejercicio no está definida.");
                         }
-        
-                        // Obtener la referencia al documento del ejercicio en la colección correspondiente
+                
+                        // Obtener la referencia en Firestore
                         const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
-        
+                
+                        // Verificar si el documento existe
                         const docSnapshot = await getDoc(exerciseRef);
-        
-                        if (docSnapshot.exists()) {
-                            // El documento existe, proceder con la actualización
-                            await updateDoc(exerciseRef, {
-                                Imagen: newImage,
-                                Video: newVideo,
-                                Instrucciones: newInstructions
-                            });
-                            // Mostrar el mensaje de éxito y recargar la página
-                            Swal.fire("¡Actualizado!", "El ejercicio se ha actualizado correctamente.", "success")
-                            .then(() => {
-                                window.location.reload(); // Recargar la página
-                            });
-                        } else {
-                            // El documento no existe, manejar el error
-                            Swal.fire("Error", "No se pudo encontrar el ejercicio para actualizar.", "error");
-                            console.error("Documento no encontrado:", exerciseRef);
+                        if (!docSnapshot.exists()) {
+                            throw new Error("No se pudo encontrar el ejercicio para actualizar.");
                         }
+                
+                        // Actualizar en Firestore
+                        await updateDoc(exerciseRef, {
+                            Imagen: newImage,
+                            Video: newVideo,
+                            Instrucciones: newInstructions
+                        });
+                
+                        Swal.fire({
+                            title: "¡Actualizado!",
+                            text: "El ejercicio se ha actualizado correctamente.",
+                            icon: "success",
+                            customClass: {
+                                popup: "swal-custom" // Aplicará el estilo CSS
+                            }
+                        }).then(() => {
+                            window.location.reload(); // Recarga la página después de cerrar el alert
+                        });
+                        
+                
                     } catch (error) {
-                        Swal.fire("Error", `No se pudo actualizar el ejercicio: ${error.message}`, "error");
+                        Swal.fire({
+                            title: "Error",
+                            text: `No se pudo actualizar el ejercicio: ${error.message}`,
+                            icon: "error",
+                            customClass: {
+                                popup: "swal-custom" // Clase CSS para el color del texto
+                            }
+                        });
                         console.error("Error al actualizar ejercicio:", error);
-                    }
-                }
+                    }                    
+                }                
             });
-        }
+        }        
     });
 });

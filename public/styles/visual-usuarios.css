@@ -355,6 +355,33 @@ input:checked+.slider:before {
     background: #d32f2f;
 }
 
+/* Cambia el color de los textos a blanco en las alertas */
+.swal2-popup {
+    color: white !important;
+}
+
+.swal2-title {
+    color: white !important;
+}
+
+.swal2-html-container {
+    color: white !important;
+}
+
+.swal2-input {
+    background-color: #333 !important;
+    color: white !important;
+}
+
+.swal2-label {
+    color: white !important;
+}
+
+.swal2-confirm, .swal2-cancel {
+    background-color: #6f42c1 !important;
+    color: white !important;
+}
+
 /* Diseño adaptado para pantallas móviles */
 @media (max-width: 768px) {
     .usuario-card {
@@ -394,7 +421,6 @@ input:checked+.slider:before {
         top: 6%;
         margin-bottom: 10%;
     }
-
 }
 
 /* 1920x1080 - 3 filas de 8 ejercicios (Total: 24 por página) */

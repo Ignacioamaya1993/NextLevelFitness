@@ -75,6 +75,19 @@ main {
     margin-top: 10px;
 }
 
+/* Cambia el color de los textos a blanco en las alertas */
+.swal2-popup {
+    color: white !important;
+}
+
+.swal2-title {
+    color: white !important;
+}
+
+.swal2-html-container {
+    color: white !important;
+}
+
 .toggle-password {
     position: absolute;
     right: 10px;

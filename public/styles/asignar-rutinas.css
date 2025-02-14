@@ -15,6 +15,19 @@ main {
     gap: 15px;
 }
 
+/* Establecer el color blanco para el texto dentro de la alerta */
+.swal2-popup {
+    color: white !important;
+}
+
+.swal2-title {
+    color: white !important;
+}
+
+.swal2-html-container {
+    color: white !important;
+}
+
 /* Estilos para el contenedor de la paginación */
 #pagination-container {
     display: flex;

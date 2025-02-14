@@ -166,6 +166,19 @@ main {
     transform: scale(1.05);
 }
 
+/* Establecer el color blanco para el texto dentro de la alerta */
+.swal2-popup {
+    color: white !important;
+}
+
+.swal2-title {
+    color: white !important;
+}
+
+.swal2-html-container {
+    color: white !important;
+}
+
 .loading-message, .empty-message {
     text-align: center;
     font-size: 1.2rem;

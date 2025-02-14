@@ -334,6 +334,24 @@ main {
     transform: translateY(-2px);
 }
 
+/* Asegúrate de que el texto de la alerta sea blanco */
+.swal2-popup {
+    color: white !important;
+}
+
+.swal2-title {
+    color: white !important;
+}
+
+.swal2-html-container {
+    color: white !important;
+}
+
+.swal2-confirm, .swal2-cancel {
+    background-color: #6f42c1 !important;
+    color: white !important;
+}
+
 /* Animación del popup */
 @keyframes popup-show {
     from {

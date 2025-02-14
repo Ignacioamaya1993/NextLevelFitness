@@ -59,6 +59,39 @@ main {
     letter-spacing: 1px;
 }
 
+.custom-popup {
+    background-color: #333; /* Fondo oscuro para mayor contraste */
+    color: #fff; /* Texto en blanco */
+}
+
+.custom-title {
+    color: #fff !important; /* Asegura que el título sea blanco */
+}
+
+.custom-content {
+    color: #fff !important; /* Asegura que el texto del contenido sea blanco */
+}
+
+.swal2-input, .swal2-textarea {
+    background-color: #444; /* Ajusta el fondo de los inputs */
+    color: #fff; /* Texto en blanco */
+    border: 1px solid #666;
+}
+
+.swal2-confirm, .swal2-cancel {
+    background-color: #6f42c1 !important; /* Color de botón */
+    color: #fff !important;
+}
+
+/* Estilo del contenido */
+.custom-popup .swal2-input-label {
+    color: white !important;
+}
+
+.custom-popup .swal2-input::placeholder {
+    color: white !important;
+}
+
 form {
     display: flex;
     flex-direction: column;

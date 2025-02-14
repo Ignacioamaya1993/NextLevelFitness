@@ -549,7 +549,11 @@ async function saveChanges(day, exercises) {
 
             if (!hasChanges) {
                 console.warn("No se detectaron cambios en los ejercicios.");
-                Swal.fire("Sin cambios", "No se han realizado modificaciones.", "info");
+                Swal.fire({
+                    title: "Sin cambios",
+                    html: `<p class="swal-text">No se han realizado modificaciones.</p>`,  // Estilo personalizado aquí
+                    icon: "info"
+                });
                 return;
             }
 

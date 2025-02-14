@@ -285,6 +285,10 @@ main {
     color: #ffffff;
 }
 
+.swal-text {
+    color: white !important;
+}
+
 /* Selector y campos de edición */
 #edit-popup select,
 #edit-popup input[type="text"],
