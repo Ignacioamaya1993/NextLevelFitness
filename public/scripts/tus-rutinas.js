@@ -405,7 +405,6 @@ function openEditPopup(day, routines) {
     });
 
     closeButton.addEventListener("click", () => {
-        console.log("Botón cancelar presionado");
         closePopup();
     });
     
@@ -544,22 +543,6 @@ saveButton.addEventListener("click", () => {
 const inputElement = document.getElementById("my-input");
 inputElement.addEventListener("input", preventNegativeValues);
 
-async function guardarHistorialPeso(userId, ejercicioID, nuevoPeso) {
-    try {
-        const historialRef = collection(db, `usuarios/${userId}/historialPesos`);
-
-        await addDoc(historialRef, {
-            ejercicioID: ejercicioID,
-            peso: nuevoPeso,
-            fecha: Timestamp.now()
-        });
-
-        console.log(`Historial guardado: Usuario ${userId}, Ejercicio ${ejercicioID}, Peso ${nuevoPeso} kg.`);
-    } catch (error) {
-        console.error("Error al guardar el historial de peso:", error);
-    }
-}
-
 async function saveChanges(day, exercises) {
     try {
         const routinesRef = collection(db, "routines");
@@ -599,13 +582,6 @@ async function saveChanges(day, exercises) {
                 const existingWeight = existingExercise.weight || 0;
                 const existingAdditionalData = existingExercise.additionalData || "";
 
-                // Mostrar en consola los valores antes y después de la modificación
-                console.log(`Ejercicio ${index + 1}:`);
-                console.log(`  Series: ${existingSeries} -> ${newSeries}`);
-                console.log(`  Repeticiones: ${existingReps} -> ${newReps}`);
-                console.log(`  Peso: ${existingWeight} -> ${newWeight}`);
-                console.log(`  Información adicional: "${existingAdditionalData}" -> "${newAdditionalData}"`);
-
                 // Verificar si algún valor ha cambiado
                 if (
                     newSeries !== existingSeries ||
@@ -628,8 +604,6 @@ async function saveChanges(day, exercises) {
                 Swal.fire("Sin cambios", "No se han realizado modificaciones.", "info");
                 return;
             }
-
-            console.log("Se detectaron cambios, procediendo con la actualización...");
 
             await updateDoc(routineDoc.ref, { exercises });
 
