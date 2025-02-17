@@ -3,12 +3,12 @@ import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.co
 
 // Configuración de Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyAyyZYcW9s1REMP5kn0XZeISfLIjZQsCJU",
-    authDomain: "next-level-fitness-52989.firebaseapp.com",
-    projectId: "next-level-fitness-52989",
-    storageBucket: "next-level-fitness-52989.appspot.com",
-    messagingSenderId: "35987157867",
-    appId: "1:35987157867:web:cbc810334c47aac36e522e",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Inicializa Firebase
