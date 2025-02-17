@@ -1,1 +1,7 @@
-node_modules
+Next Level/public/scripts/firebaseConfig.js
+
+../scripts/firebaseConfig.js
+
+./scripts/firebaseConfig.js
+
+/scripts/firebaseConfig.js
