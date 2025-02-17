@@ -9,7 +9,8 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "scripts/**"
+      "scripts/**",
+      "styles/**"
     ],
     "rewrites": [
       {
