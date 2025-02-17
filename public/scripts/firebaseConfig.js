@@ -3,12 +3,13 @@ import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.co
 
 // Configuración de Firebase
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDU6pLvhH9TjyaIW2pjY-aaPc_4XvoyraE",
+  authDomain: "equipo-fpt.firebaseapp.com",
+  projectId: "equipo-fpt",
+  storageBucket: "equipo-fpt.firebasestorage.app",
+  messagingSenderId: "884544819482",
+  appId: "1:884544819482:web:98457ba765b5f4c5575ca3",
+  measurementId: "G-FN7EB5EP9C"
 };
 
 // Inicializa Firebase
