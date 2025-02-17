@@ -1,15 +1,17 @@
-node_modules
+# Ignorar dependencias de Node.js
+node_modules/
 
-.firebase
+# Ignorar la carpeta interna de Firebase, que es generada localmente
+.firebase/
 
-firebase logout
+# Ignorar el archivo de sesión de Firebase
+firebase logout/
 
+# Ignorar archivos de configuración de Firebase que no deben ser subidos
 firebase.json
-
 firestore.indexes.json
-
 firestore.rules
 
+# Ignorar los archivos de dependencias de NPM
 package-lock.json
-
 package.json
