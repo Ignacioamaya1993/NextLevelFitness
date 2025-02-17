@@ -3,13 +3,13 @@ import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.co
 
 // Configuración de Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDU6pLvhH9TjyaIW2pjY-aaPc_4XvoyraE",
-  authDomain: "equipo-fpt.firebaseapp.com",
-  projectId: "equipo-fpt",
-  storageBucket: "equipo-fpt.firebasestorage.app",
-  messagingSenderId: "884544819482",
-  appId: "1:884544819482:web:98457ba765b5f4c5575ca3",
-  measurementId: "G-FN7EB5EP9C"
+  apiKey: "AIzaSyAyyZYcW9s1REMP5kn0XZeISfLIjZQsCJU",
+  authDomain: "next-level-fitness-52989.firebaseapp.com",
+  projectId: "next-level-fitness-52989",
+  storageBucket: "next-level-fitness-52989.firebasestorage.app",
+  messagingSenderId: "35987157867",
+  appId: "1:35987157867:web:cbc810334c47aac36e522e",
+  measurementId: "G-T1HDKGPH2S"
 };
 
 // Inicializa Firebase
