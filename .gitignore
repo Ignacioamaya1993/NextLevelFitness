@@ -1,1 +1,15 @@
-firebaseConfig.js
+node_modules
+
+.firebase
+
+firebase logout
+
+firebase.json
+
+firestore.indexes.json
+
+firestore.rules
+
+package-lock.json
+
+package.json
