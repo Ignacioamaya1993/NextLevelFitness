@@ -144,7 +144,6 @@ main {
 
 /* Card grande (estirada) */
 .card-wide {
-    background: linear-gradient(45deg, #0a2a66, #1956a7, #1e90ff, #ffffff);
     background-image: url('../assets/images/banner/fondocards.png');
     background-size: cover;
     background-position: center;
@@ -152,15 +151,21 @@ main {
     border-radius: 15px;
     padding: 40px;
     margin: 20px 0;
-    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.5); /* Sombra más sutil */
     color: white;
     text-align: center;
 }
 
 .card-wide h2 {
+    color: yellow;    
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 20px;
+}
+
+.card-wide p {
+    background-color: rgba(117, 113, 112, 0.4); /* Gris con opacidad */
+    border-radius: 10px;
 }
 
 .card-wide img {
@@ -179,7 +184,6 @@ main {
 /* Cards laterales */
 .card-left,
 .card-right {
-    background: linear-gradient(45deg, #0a2a66, #1956a7, #1e90ff, #ffffff);
     background-image: url('../assets/images/banner/fondoplanes.png');
     background-size: cover;
     background-position: center;
@@ -188,7 +192,7 @@ main {
     padding: 30px;
     flex: 1;
     box-shadow: 0 6px 15px rgba(255, 255, 255, 0.5);
-    color: white;
+    color: yellow;
     text-align: left;
 }
 
@@ -208,6 +212,18 @@ main {
     margin-bottom: 10px;
 }
 
+.card-left ul {
+    background-color: rgba(117, 113, 112, 0.4); /* Gris con opacidad */
+    border-radius: 10px;
+    color: white;
+}
+
+.card-right p,
+.card-left p {
+    background-color: rgba(117, 113, 112, 0.4); /* Gris con opacidad */
+    border-radius: 10px;
+    color: white;
+}
 
 @media (max-width: 776px) {
     .about {
