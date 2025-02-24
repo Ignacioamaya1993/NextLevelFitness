@@ -51,7 +51,6 @@ main {
     padding: 40px 20px;
     text-align: center;
     max-width: 1200px;
-    margin-top: 3%;
     margin-bottom: 50px;
 }
 
@@ -136,6 +135,80 @@ main {
     transform: scale(1.05);
 }
 
+/* Contenedor principal */
+.new-training-info {
+    width: 82%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Card grande (estirada) */
+.card-wide {
+    background: linear-gradient(45deg, #0a2a66, #1956a7, #1e90ff, #ffffff);
+    background-image: url('../assets/images/banner/fondocards.png');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
+    border-radius: 15px;
+    padding: 40px;
+    margin: 20px 0;
+    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.5);
+    color: white;
+    text-align: center;
+}
+
+.card-wide h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.card-wide img {
+    width: 250px;
+    margin-top: 10px;
+}
+
+/* Contenedor para las cards laterales */
+.card-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+/* Cards laterales */
+.card-left,
+.card-right {
+    background: linear-gradient(45deg, #0a2a66, #1956a7, #1e90ff, #ffffff);
+    background-image: url('../assets/images/banner/fondoplanes.png');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
+    border-radius: 15px;
+    padding: 30px;
+    flex: 1;
+    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.5);
+    color: white;
+    text-align: left;
+}
+
+.card-left h3,
+.card-right h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.card-left ul {
+    list-style: none;
+    padding: 0;
+}
+
+.card-left ul li {
+    margin-bottom: 10px;
+}
+
+
 @media (max-width: 776px) {
     .about {
         min-width: 90%;
@@ -149,6 +222,10 @@ main {
         margin-left: 0px;
         grid-template-columns: 1fr;
     }
+
+        .card-container {
+            flex-direction: column;
+        }
 
     .cards-container{
         display: flex;
