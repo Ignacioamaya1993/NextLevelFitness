@@ -181,6 +181,12 @@ main {
     margin: 20px 0;
 }
 
+.card-container p{
+    background-color: rgba(117, 113, 112, 0.4); /* Gris con opacidad */
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+}
 /* Cards laterales */
 .card-left,
 .card-right {
@@ -212,14 +218,8 @@ main {
     margin-bottom: 10px;
 }
 
-.card-left ul {
-    background-color: rgba(117, 113, 112, 0.4); /* Gris con opacidad */
-    border-radius: 10px;
-    color: white;
-}
-
-.card-right p,
-.card-left p {
+.card-left ul, 
+.card-right ul{
     background-color: rgba(117, 113, 112, 0.4); /* Gris con opacidad */
     border-radius: 10px;
     color: white;
