@@ -140,6 +140,8 @@ main {
     width: 82%;
     margin: 0 auto;
     text-align: center;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px black; /* Agrega borde negro suave alrededor del texto */
 }
 
 /* Card grande (estirada) */
@@ -154,6 +156,12 @@ main {
     box-shadow: 0 6px 15px rgba(255, 255, 255, 0.5); /* Sombra más sutil */
     color: white;
     text-align: center;
+}
+
+.card-wide:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .card-wide h2 {
@@ -200,6 +208,13 @@ main {
     box-shadow: 0 6px 15px rgba(255, 255, 255, 0.5);
     color: yellow;
     text-align: left;
+}
+
+.card-left:hover,
+.card-right:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .card-left h3,
