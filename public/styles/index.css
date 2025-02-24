@@ -239,16 +239,13 @@ main {
         grid-template-columns: 1fr;
     }
 
-        .card-container {
-            flex-direction: column;
-        }
-
-    .cards-container{
+    .card-container, 
+    .cards-container {
         display: flex;
         flex-direction: column; /* Cambiar a diseño vertical */
         gap: 15px; /* Reducir el espacio entre elementos */
         max-width: 100%; /* Asegurar que ocupe todo el ancho */
-        overflow-y: auto; /* Permite desplazamiento si es necesario */
+        overflow-y: auto; /* Permite desplazamiento si es necesario */    
     }
 
     .cta-container p {
