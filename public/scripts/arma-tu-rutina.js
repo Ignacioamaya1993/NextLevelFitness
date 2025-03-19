@@ -353,4 +353,27 @@ async function showExerciseDetails(nombre, video, instrucciones) {
         }
     });
 }
+
+async function guardarRutina(selectedExerciseName) {  // Asegurar que recibe el ejercicio seleccionado
+    const series = document.getElementById("series").value;
+    const repeticiones = document.getElementById("repeticiones").value;
+    const peso = document.getElementById("peso").value;
+    const dia = document.getElementById("dias").value;
+               
+    try {
+        const ejerciciosRef = collection(db, "usuarios", selectedUserId, "rutinas");  // Guardar en el usuario correcto
+        await addDoc(ejerciciosRef, {
+            ejercicio: selectedExerciseName,
+            series: series,
+            repeticiones: repeticiones,
+            peso: peso,
+            dia: dia,
+            fecha: new Date()
+        });
+
+    } catch (error) {
+        console.error("Error al guardar la rutina:", error);
+    }
+}
+
 });
