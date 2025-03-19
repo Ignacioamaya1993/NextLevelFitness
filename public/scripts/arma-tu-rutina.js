@@ -361,7 +361,7 @@ async function guardarRutina(selectedExerciseName) {  // Asegurar que recibe el 
     const dia = document.getElementById("dias").value;
                
     try {
-        const ejerciciosRef = collection(db, "usuarios", selectedUserId, "rutinas");  // Guardar en el usuario correcto
+        const ejerciciosRef = collection(db, "usuarios", currentUser, "rutinas");  // Guardar en el usuario correcto
         await addDoc(ejerciciosRef, {
             ejercicio: selectedExerciseName,
             series: series,
