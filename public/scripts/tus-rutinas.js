@@ -100,14 +100,11 @@ function groupRoutinesByDay(routines) {
 
 async function fetchExerciseDetailsById(exerciseId) {
     try {
-
-        // Obtener todas las rutinas (deberíamos optimizar si sabes a qué rutina pertenece el ejercicio)
         const routinesQuery = collection(db, "routines");
         const routinesSnapshot = await getDocs(routinesQuery);
 
         let foundExercise = null;
 
-        // Iterar sobre cada rutina para buscar el ejercicio dentro de su array 'exercises'
         routinesSnapshot.forEach((doc) => {
             const data = doc.data();
             const exercises = data.exercises || [];
@@ -126,7 +123,7 @@ async function fetchExerciseDetailsById(exerciseId) {
         return {
             name: foundExercise.name || "Nombre no disponible",
             instructions: foundExercise.instructions || "Instrucciones no disponibles",
-            videoUrl: foundExercise.video || "",
+            videoUrl: foundExercise.video || "", // Asegúrate de que esta URL apunte a Cloudinary
         };
     } catch (error) {
         console.error("❌ Error obteniendo el ejercicio:", error);
@@ -151,23 +148,19 @@ function displayUserRoutines(routines, db) {
 
         const todayExercisesList = groupedRoutines[today]
             .map(exercise => {
-                return `<li class="exercise-item" data-exercise="${exercise.id}">
-                    ${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg, ${exercise.additionalData}
-                </li>`;
+                return `<li class="exercise-item" data-exercise="${exercise.id}">${exercise.name} - ${exercise.series} series, ${exercise.repetitions} reps, ${exercise.weight} kg, ${exercise.additionalData}</li>`;
             })
             .join("");
 
         todayRoutineCard.innerHTML = `
             <h2 class="highlight-title">Esta es tu rutina para hoy (${today})</h2>
-            <ul class="exercise-list">
-                ${todayExercisesList}
-            </ul>
+            <ul class="exercise-list">${todayExercisesList}</ul>
             <button class="edit-button" data-day="${today}">Editar</button>
             <button class="delete-button" data-day="${today}">Eliminar</button>
         `;
 
         routineList.appendChild(todayRoutineCard);
-        delete groupedRoutines[today]; 
+        delete groupedRoutines[today];
     }
 
     Object.keys(groupedRoutines).forEach(day => {
@@ -179,24 +172,22 @@ function displayUserRoutines(routines, db) {
         }
 
         const exercisesList = groupedRoutines[day]
-        .map(exercise => {
-            const name = exercise.name?.trim() || "Ejercicio sin nombre"; 
-            const series = exercise.series || 0;
-            const reps = exercise.repetitions || 0;
-            const weight = exercise.weight || 0;
-            const additionalData = exercise.additionalData || "Sin información adicional";
-    
-            return `<li class="exercise-item" data-exercise="${exercise.id}">
-                ${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}
-            </li>`;
-        })
-        .join("");    
+            .map(exercise => {
+                const name = exercise.name?.trim() || "Ejercicio sin nombre";
+                const series = exercise.series || 0;
+                const reps = exercise.repetitions || 0;
+                const weight = exercise.weight || 0;
+                const additionalData = exercise.additionalData || "Sin información adicional";
+
+                return `<li class="exercise-item" data-exercise="${exercise.id}">
+                    ${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}
+                </li>`;
+            })
+            .join("");
 
         routineCard.innerHTML = `
             <h3>${day === today ? `Esta es tu rutina para hoy (${today})` : `Rutina para el día ${day}`}</h3>
-            <ul class="exercise-list">
-                ${exercisesList}
-            </ul>
+            <ul class="exercise-list">${exercisesList}</ul>
             <button class="edit-button" data-day="${day}">Editar</button>
             <button class="delete-button" data-day="${day}">Eliminar</button>
         `;
@@ -207,29 +198,32 @@ function displayUserRoutines(routines, db) {
     document.querySelectorAll(".exercise-item").forEach(item => {
         item.addEventListener("click", async (event) => {
             const exerciseId = event.target.dataset.exercise;
-        
+
             if (!exerciseId) {
                 console.error("❌ ID de ejercicio inválido.");
                 return;
             }
-    
+
             const exerciseData = await fetchExerciseDetailsById(exerciseId);
-    
+
             if (!exerciseData) {
                 console.error("❌ No se pudo obtener la información del ejercicio.");
                 return;
             }
-    
+
             Swal.fire({
                 title: exerciseData.name,
                 html: `
-                    <source src="${video}" type="video/mp4">
+                    <video width="100%" controls>
+                        <source src="${exerciseData.videoUrl}" type="video/mp4">
+                        Tu navegador no soporta la etiqueta de video.
+                    </video>
                     <p><strong><span class="instructions-text">Instrucciones:</span></strong> <span class="instructions-text">${exerciseData.instructions}</span></p>
                 `,
                 confirmButtonText: "Cerrar",
             });
         });
-    });  
+    });
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles
     const downloadButton = document.getElementById("download-pdf");
