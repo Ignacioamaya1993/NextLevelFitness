@@ -297,7 +297,7 @@ async function showExerciseDetails(nombre, video, instrucciones) {
                 const routinesRef = collection(db, "routines");
             
                 const q = query(routinesRef, 
-                    where("userId", "==", selectedUserId), 
+                    where("userId", "==", currentUser), 
                     where("day", "==", dia)
                 );                
                 
@@ -330,7 +330,7 @@ async function showExerciseDetails(nombre, video, instrucciones) {
                     Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
                 } else {
                     await addDoc(routinesRef, {
-                        userId: selectedUserId,
+                        userId: currentUser,
                         day: dia,
                         exercises: [{
                             id: exerciseId,
