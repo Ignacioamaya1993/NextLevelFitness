@@ -1,6 +1,7 @@
 import app from './firebaseConfig.js';
 import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { uploadToCloudinary } from "./cloudinary.js"; // Importamos la función de Cloudinary
 
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
@@ -267,226 +268,210 @@ function renderPagination(totalItems, currentPage) {
     }
 }
 
-        async function addNewExercise(db) {
+async function addNewExercise(db) {
+    try {
+        const categoriesRef = collection(db, "categories");
+        const categoriesSnapshot = await getDocs(categoriesRef);
+
+        let categories = [];
+        categoriesSnapshot.forEach(doc => categories.push(doc.id));
+
+        const { value: formValues } = await Swal.fire({
+            title: "Agregar nuevo ejercicio",
+            html: `
+                <label for="category-select">Categoría:</label>
+                <select id="category-select" class="swal2-select">
+                    <option value="">-- Selecciona una categoría --</option>
+                    ${categories.map(category => `<option value="${category}">${category}</option>`).join("")}
+                    <option value="other">Otra (escribir nueva)</option>
+                </select>
+                <input id="new-exercise-category" class="swal2-input" placeholder="Nueva categoría">
+
+                <label for="new-exercise-name">Nombre del ejercicio:</label>
+                <input id="new-exercise-name" class="swal2-input" placeholder="Ejemplo: Press de banca">
+
+                <label for="new-exercise-image">Imagen:</label>
+                <input type="file" id="new-exercise-image" class="swal2-input">
+
+                <label for="new-exercise-video">Video:</label>
+                <input type="file" id="new-exercise-video" class="swal2-input">
+
+                <label for="new-exercise-instructions">Instrucciones (opcional):</label>
+                <textarea id="new-exercise-instructions" class="swal2-textarea" placeholder="Describe cómo se realiza el ejercicio..."></textarea>
+            `,
+            showCancelButton: true,
+            confirmButtonText: "Agregar",
+            preConfirm: async () => {
+                const selectedCategory = document.getElementById("category-select").value;
+                const newCategory = document.getElementById("new-exercise-category").value.trim();
+                const exerciseName = document.getElementById("new-exercise-name").value.trim();
+                const exerciseImage = document.getElementById("new-exercise-image").files[0]; // Archivo
+                const exerciseVideo = document.getElementById("new-exercise-video").files[0]; // Archivo
+                const exerciseInstructions = document.getElementById("new-exercise-instructions").value.trim();
+
+                if (!exerciseName) return Swal.showValidationMessage("El nombre del ejercicio es obligatorio.");
+                if (!selectedCategory && !newCategory) return Swal.showValidationMessage("Debes seleccionar o escribir una categoría.");
+                if (!exerciseImage) return Swal.showValidationMessage("Debes subir una imagen.");
+                if (!exerciseVideo) return Swal.showValidationMessage("Debes subir un video.");
+
+                Swal.fire({
+                    title: "Subiendo archivos...",
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                const imageUrl = await uploadToCloudinary(exerciseImage, "ejercicios");
+                const videoUrl = await uploadToCloudinary(exerciseVideo, "ejercicios");
+
+                return {
+                    Nombre: exerciseName,
+                    Categoria: selectedCategory === "other" ? newCategory : selectedCategory,
+                    Imagen: imageUrl,
+                    Video: videoUrl,
+                    Instrucciones: exerciseInstructions
+                };
+            }
+        });
+
+        if (formValues) {
+            const categoryRef = doc(db, `categories/${formValues.Categoria}`);
+            const categorySnapshot = await getDoc(categoryRef);
+            if (!categorySnapshot.exists()) await setDoc(categoryRef, {});
+
+            const exercisesRef = collection(db, `categories/${formValues.Categoria}/exercises`);
+            await addDoc(exercisesRef, formValues);
+
+            Swal.fire("¡Ejercicio agregado!", "", "success");
+            loadExercises(db, exerciseGrid);
+        }
+    } catch (error) {
+        Swal.fire("Error", "No se pudo agregar el ejercicio.", "error");
+        console.error("Error al agregar ejercicio:", error);
+    }
+}
+
+function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercise) {
+    console.log("Ejercicio recibido:", exercise); // Verifica que exercise tenga datos
+
+    Swal.fire({
+        title: `Editar ejercicio: ${Nombre}`,
+        html: `
+            <div class="edit-popup">
+                <!-- Columna izquierda (Imágenes) -->
+                <div class="column">
+                    <div class="input-group">
+                        <label>Imagen actual:</label>
+                        <input type="text" id="current-image" class="swal2-input" value="${Imagen || ''}" disabled>
+                    </div>
+                    <div class="input-group">
+                        <label>Nueva imagen:</label>
+                        <input type="file" id="new-image" class="swal2-file">
+                    </div>
+                </div>
+
+                <!-- Columna derecha (Videos) -->
+                <div class="column">
+                    <div class="input-group">
+                        <label>Video actual:</label>
+                        <input type="text" id="current-video" class="swal2-input" value="${Video || ''}" disabled>
+                    </div>
+                    <div class="input-group">
+                        <label>Nuevo video:</label>
+                        <input type="file" id="new-video" class="swal2-file">
+                    </div>
+                </div>
+
+                <!-- Instrucciones -->
+                <div class="instructions-group">
+                    <div class="input-group">
+                        <label>Instrucciones actuales:</label>
+                        <textarea id="current-instructions" class="swal2-textarea" disabled>${Instrucciones || ''}</textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Nuevas instrucciones:</label>
+                        <textarea id="new-instructions" class="swal2-textarea" placeholder="Escribe las nuevas instrucciones..."></textarea>
+                    </div>
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: "Guardar cambios",
+        cancelButtonText: "Cancelar",
+        customClass: {
+            popup: "swal-wide"
+        },
+        preConfirm: async () => {
+            const newImageFile = document.getElementById("new-image").files[0];
+            const newVideoFile = document.getElementById("new-video").files[0];
+            const newInstructions = document.getElementById("new-instructions").value.trim() || Instrucciones;
+
+            // Mostrar el Swal de carga al iniciar la subida de archivos
+            Swal.fire({
+                title: "Subiendo archivos...",
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
             try {
-                const categoriesRef = collection(db, "categories");
-                const categoriesSnapshot = await getDocs(categoriesRef);
-        
-                let categories = [];
-                categoriesSnapshot.forEach(doc => categories.push(doc.id));
-        
-                const { value: formValues } = await Swal.fire({
-                    title: "Agregar nuevo ejercicio",
-                    html: `
-                        <label for="category-select">Categoría:</label>
-                        <div id="category-container">
-                            <select id="category-select" class="swal2-select">
-                                <option value="">-- Selecciona una categoría --</option>
-                                ${categories.map(category => `<option value="${category}">${category}</option>`).join("")}
-                                <option value="other">Otra (escribir nueva)</option>
-                            </select>
-                            <input id="new-exercise-category" class="swal2-input" placeholder="Nueva categoría">
-                        </div>
-        
-                        <label for="new-exercise-name">Nombre del ejercicio:</label>
-                        <input id="new-exercise-name" class="swal2-input" placeholder="Ejemplo: Press de banca">
-        
-                        <label for="new-exercise-image">URL de imagen:</label>
-                        <input id="new-exercise-image" class="swal2-input" placeholder="https://imagen.com/ejemplo.jpg">
-        
-                        <label for="new-exercise-video">URL de video:</label>
-                        <input id="new-exercise-video" class="swal2-input" placeholder="https://youtube.com/...">
-        
-                        <label for="new-exercise-instructions">Instrucciones (opcional):</label>
-                        <textarea id="new-exercise-instructions" class="swal2-textarea" placeholder="Describe cómo se realiza el ejercicio..."></textarea>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: "Agregar",
-                    didOpen: () => {
-                        const categorySelect = document.getElementById("category-select");
-                        const newCategoryInput = document.getElementById("new-exercise-category");
-                        const categoryContainer = document.getElementById("category-container");
-        
-                        categorySelect.addEventListener("change", () => {
-                            if (categorySelect.value === "other") {
-                                newCategoryInput.style.display = "block";
-                                categoryContainer.classList.add("expand"); // Cambiar a columna
-                            } else {
-                                newCategoryInput.style.display = "none";
-                                categoryContainer.classList.remove("expand"); // Volver a fila
-                                newCategoryInput.value = categorySelect.value;
-                            }
-                        });
-                    },
-                    preConfirm: () => {
-                        const selectedCategory = document.getElementById("category-select").value;
-                        const newCategory = document.getElementById("new-exercise-category").value.trim();
-                        const exerciseName = document.getElementById("new-exercise-name").value.trim();
-                        const exerciseImage = document.getElementById("new-exercise-image").value.trim();
-                        const exerciseVideo = document.getElementById("new-exercise-video").value.trim();
-                        const exerciseInstructions = document.getElementById("new-exercise-instructions").value.trim();
-        
-                        // Validaciones
-                        if (!exerciseName) {
-                            Swal.showValidationMessage("El nombre del ejercicio es obligatorio.");
-                            return false;
-                        }
-                        if (!selectedCategory && !newCategory) {
-                            Swal.showValidationMessage("Debes seleccionar o escribir una categoría.");
-                            return false;
-                        }
-                        if (selectedCategory === "other" && !newCategory) {
-                            Swal.showValidationMessage("Si eliges 'Otra', debes escribir una nueva categoría.");
-                            return false;
-                        }
-                        if (!exerciseImage) {
-                            Swal.showValidationMessage("La URL de la imagen es obligatoria.");
-                            return false;
-                        }
-                        if (!exerciseVideo) {
-                            Swal.showValidationMessage("La URL del video es obligatoria.");
-                            return false;
-                        }
-        
-                        return {
-                            Nombre: exerciseName,
-                            Categoria: selectedCategory === "other" ? newCategory : selectedCategory,
-                            Imagen: exerciseImage,
-                            Video: exerciseVideo,
-                            Instrucciones: exerciseInstructions
-                        };
+                const db = getFirestore();
+                const category = exercise.Categoria || exercise.categoria;
+                
+                if (!category) {
+                    throw new Error("La categoría del ejercicio no está definida.");
+                }
+
+                const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
+
+                const docSnapshot = await getDoc(exerciseRef);
+                if (!docSnapshot.exists()) {
+                    throw new Error("No se pudo encontrar el ejercicio para actualizar.");
+                }
+
+                let newImageUrl = Imagen;
+                let newVideoUrl = Video;
+
+                // Subir imagen a Cloudinary si el usuario seleccionó un archivo nuevo
+                if (newImageFile) {
+                    newImageUrl = await uploadToCloudinary(newImageFile, "gym_images");
+                }
+
+                // Subir video a Cloudinary si el usuario seleccionó un archivo nuevo
+                if (newVideoFile) {
+                    newVideoUrl = await uploadToCloudinary(newVideoFile, "gym_videos");
+                }
+
+                // Actualizar en Firestore
+                await updateDoc(exerciseRef, {
+                    Imagen: newImageUrl,
+                    Video: newVideoUrl,
+                    Instrucciones: newInstructions
+                });
+
+                Swal.fire({
+                    title: "¡Actualizado!",
+                    text: "El ejercicio se ha actualizado correctamente.",
+                    icon: "success",
+                    customClass: {
+                        popup: "swal-custom"
+                    }
+                }).then(() => {
+                    window.location.reload();
+                });
+
+            } catch (error) {
+                Swal.fire({
+                    title: "Error",
+                    text: `No se pudo actualizar el ejercicio: ${error.message}`,
+                    icon: "error",
+                    customClass: {
+                        popup: "swal-custom"
                     }
                 });
-        
-                if (formValues) {
-                    const categoryRef = doc(db, `categories/${formValues.Categoria}`);
-        
-                    // Verificar si la categoría existe antes de agregar
-                    const categorySnapshot = await getDoc(categoryRef);
-                    if (!categorySnapshot.exists()) {
-                        await setDoc(categoryRef, {});
-                    }
-        
-                    // Agregar el ejercicio a la categoría
-                    const exercisesRef = collection(db, `categories/${formValues.Categoria}/exercises`);
-                    await addDoc(exercisesRef, formValues);
-        
-                    Swal.fire("¡Ejercicio agregado!", "", "success");
-                    loadExercises(db, exerciseGrid);
-                }
-            } catch (error) {
-                Swal.fire("Error", "No se pudo agregar el ejercicio.", "error");
-                console.error("Error al agregar ejercicio:", error);
+                console.error("Error al actualizar ejercicio:", error);
             }
         }
+    });
+}
 
-        function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercise) {
-            console.log("Ejercicio recibido:", exercise); // Verifica que exercise tenga datos
-        
-            Swal.fire({
-                title: `Editar ejercicio: ${Nombre}`,
-                html: `
-                    <div class="edit-popup">
-                        <!-- Columna izquierda (Imágenes) -->
-                        <div class="column">
-                            <div class="input-group">
-                                <label>Imagen actual:</label>
-                                <input type="text" id="current-image" class="swal2-input" value="${Imagen || ''}" disabled>
-                            </div>
-                            <div class="input-group">
-                                <label>Nueva imagen:</label>
-                                <input type="text" id="new-image" class="swal2-input" placeholder="Nueva URL de imagen">
-                            </div>
-                        </div>
-        
-                        <!-- Columna derecha (Videos) -->
-                        <div class="column">
-                            <div class="input-group">
-                                <label>Video actual:</label>
-                                <input type="text" id="current-video" class="swal2-input" value="${Video || ''}" disabled>
-                            </div>
-                            <div class="input-group">
-                                <label>Nuevo video:</label>
-                                <input type="text" id="new-video" class="swal2-input" placeholder="Nueva URL de video">
-                            </div>
-                        </div>
-        
-                        <!-- Instrucciones -->
-                        <div class="instructions-group">
-                            <div class="input-group">
-                                <label>Instrucciones actuales:</label>
-                                <textarea id="current-instructions" class="swal2-textarea" disabled>${Instrucciones || ''}</textarea>
-                            </div>
-                            <div class="input-group">
-                                <label>Nuevas instrucciones:</label>
-                                <textarea id="new-instructions" class="swal2-textarea" placeholder="Escribe las nuevas instrucciones..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: "Guardar cambios",
-                cancelButtonText: "Cancelar",
-                customClass: {
-                    popup: "swal-wide"
-                },
-                preConfirm: async () => {
-                    const newImage = document.getElementById("new-image").value.trim() || Imagen;
-                    const newVideo = document.getElementById("new-video").value.trim() || Video;
-                    const newInstructions = document.getElementById("new-instructions").value.trim() || Instrucciones;
-                
-                    try {
-                        const db = getFirestore();
-                
-                        // Intentar leer la categoría en ambas formas (mayúscula y minúscula)
-                        const category = exercise.Categoria || exercise.categoria;
-                        console.log("Categoría obtenida:", category); // Depuración
-                
-                        if (!category) {
-                            throw new Error("La categoría del ejercicio no está definida.");
-                        }
-                
-                        // Obtener la referencia en Firestore
-                        const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
-                
-                        // Verificar si el documento existe
-                        const docSnapshot = await getDoc(exerciseRef);
-                        if (!docSnapshot.exists()) {
-                            throw new Error("No se pudo encontrar el ejercicio para actualizar.");
-                        }
-                
-                        // Actualizar en Firestore
-                        await updateDoc(exerciseRef, {
-                            Imagen: newImage,
-                            Video: newVideo,
-                            Instrucciones: newInstructions
-                        });
-                
-                        Swal.fire({
-                            title: "¡Actualizado!",
-                            text: "El ejercicio se ha actualizado correctamente.",
-                            icon: "success",
-                            customClass: {
-                                popup: "swal-custom" // Aplicará el estilo CSS
-                            }
-                        }).then(() => {
-                            window.location.reload(); // Recarga la página después de cerrar el alert
-                        });
-                        
-                
-                    } catch (error) {
-                        Swal.fire({
-                            title: "Error",
-                            text: `No se pudo actualizar el ejercicio: ${error.message}`,
-                            icon: "error",
-                            customClass: {
-                                popup: "swal-custom" // Clase CSS para el color del texto
-                            }
-                        });
-                        console.error("Error al actualizar ejercicio:", error);
-                    }                    
-                }                
-            });
-        }        
     });
 });

@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (error) {
                 console.error("Error al guardar la rutina:", error);
             }
-        }        
+        }
 
         // Cargar categorías y ejercicios
         const routineBuilder = document.getElementById("routine-builder");
@@ -253,16 +253,7 @@ function renderPagination(totalItems, currentPage) {
     }
 }
 
-
 async function showExerciseDetails(nombre, video, instrucciones) {
-    let embedVideoUrl = "";
-    if (video.includes("youtube.com/shorts/")) {
-        embedVideoUrl = video.replace("youtube.com/shorts/", "youtube.com/embed/");
-    } else if (video.includes("youtube.com/watch?v=")) {
-        const videoId = video.split("v=")[1]?.split("&")[0];
-        embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
-    }
-
     const contentHTML = `
         <div class="exercise-popup">
             <div class="popup-header">
@@ -271,7 +262,11 @@ async function showExerciseDetails(nombre, video, instrucciones) {
             <div class="popup-content">
                 <div class="popup-left">
                     <div class="video-container">
-                        <iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>
+                        <!-- Se inserta el video desde Cloudinary -->
+                        <video controls>
+                            <source src="${video}" type="video/mp4">
+                            Tu navegador no soporta el formato de video.
+                        </video>
                     </div>
                     <h4>Instrucciones</h4>
                     <p>${instrucciones}</p>
@@ -396,6 +391,7 @@ async function showExerciseDetails(nombre, video, instrucciones) {
         }
     });
 }
+
 
 })
 })
