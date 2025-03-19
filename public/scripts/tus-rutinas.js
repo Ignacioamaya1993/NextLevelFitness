@@ -138,20 +138,6 @@ function isMobileDevice() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-function getEmbedVideoUrl(videoUrl) {
-    let embedVideoUrl = "";
-    if (!videoUrl) return embedVideoUrl;
-
-    if (videoUrl.includes("youtube.com/shorts/")) {
-        embedVideoUrl = videoUrl.replace("youtube.com/shorts/", "youtube.com/embed/");
-    } else if (videoUrl.includes("youtube.com/watch?v=")) {
-        const videoId = videoUrl.split("v=")[1]?.split("&")[0];
-        embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
-    }
-
-    return embedVideoUrl;
-}
-
 function displayUserRoutines(routines, db) {
     const routineList = document.getElementById("routine-list");
     routineList.innerHTML = "";
@@ -237,7 +223,7 @@ function displayUserRoutines(routines, db) {
             Swal.fire({
                 title: exerciseData.name,
                 html: `
-                    ${exerciseData.videoUrl ? `<iframe width="100%" height="315" src="${getEmbedVideoUrl(exerciseData.videoUrl)}" frameborder="0" allowfullscreen></iframe>` : ''}
+                    <source src="${video}" type="video/mp4">
                     <p><strong><span class="instructions-text">Instrucciones:</span></strong> <span class="instructions-text">${exerciseData.instructions}</span></p>
                 `,
                 confirmButtonText: "Cerrar",
