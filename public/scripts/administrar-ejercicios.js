@@ -1,7 +1,7 @@
 import app from './firebaseConfig.js';
 import { getFirestore, collection, getDocs, getDoc, addDoc, updateDoc, doc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { uploadToCloudinary } from "./cloudinary.js"; // Importamos la función de Cloudinary
+import { openCloudinaryWidget } from "./cloudinary.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const auth = getAuth(app);
@@ -269,10 +269,12 @@ function renderPagination(totalItems, currentPage) {
 }
 
 async function addNewExercise(db) {
+    let imageUrl = "";
+    let videoUrl = "";
+
     try {
         const categoriesRef = collection(db, "categories");
         const categoriesSnapshot = await getDocs(categoriesRef);
-
         let categories = [];
         categoriesSnapshot.forEach(doc => categories.push(doc.id));
 
@@ -290,38 +292,51 @@ async function addNewExercise(db) {
                 <label for="new-exercise-name">Nombre del ejercicio:</label>
                 <input id="new-exercise-name" class="swal2-input" placeholder="Ejemplo: Press de banca">
 
-                <label for="new-exercise-image">Imagen:</label>
-                <input type="file" id="new-exercise-image" class="swal2-input">
+                <label>Imagen:</label>
+                <button id="upload-image-btn" class="swal2-confirm swal2-styled" style="margin-bottom:10px;">Subir Imagen</button>
+                <img id="image-preview" src="" style="display:none; max-width:100%; border-radius:5px; margin-bottom:10px;" />
 
-                <label for="new-exercise-video">Video:</label>
-                <input type="file" id="new-exercise-video" class="swal2-input">
+                <label>Video:</label>
+                <button id="upload-video-btn" class="swal2-confirm swal2-styled" style="margin-bottom:10px;">Subir Video</button>
+                <video id="video-preview" style="display:none; max-width:100%; border-radius:5px; margin-bottom:10px;" controls></video>
 
                 <label for="new-exercise-instructions">Instrucciones (opcional):</label>
                 <textarea id="new-exercise-instructions" class="swal2-textarea" placeholder="Describe cómo se realiza el ejercicio..."></textarea>
             `,
+            didOpen: () => {
+                const imageBtn = document.getElementById("upload-image-btn");
+                const videoBtn = document.getElementById("upload-video-btn");
+
+                imageBtn.addEventListener("click", () => {
+                    openCloudinaryWidget(url => {
+                        imageUrl = url;
+                        const preview = document.getElementById("image-preview");
+                        preview.src = url;
+                        preview.style.display = "block";
+                    }, "ejercicios");
+                });
+
+                videoBtn.addEventListener("click", () => {
+                    openCloudinaryWidget(url => {
+                        videoUrl = url;
+                        const preview = document.getElementById("video-preview");
+                        preview.src = url;
+                        preview.style.display = "block";
+                    }, "ejercicios");
+                });
+            },
             showCancelButton: true,
             confirmButtonText: "Agregar",
             preConfirm: async () => {
                 const selectedCategory = document.getElementById("category-select").value;
                 const newCategory = document.getElementById("new-exercise-category").value.trim();
                 const exerciseName = document.getElementById("new-exercise-name").value.trim();
-                const exerciseImage = document.getElementById("new-exercise-image").files[0]; // Archivo
-                const exerciseVideo = document.getElementById("new-exercise-video").files[0]; // Archivo
                 const exerciseInstructions = document.getElementById("new-exercise-instructions").value.trim();
 
                 if (!exerciseName) return Swal.showValidationMessage("El nombre del ejercicio es obligatorio.");
                 if (!selectedCategory && !newCategory) return Swal.showValidationMessage("Debes seleccionar o escribir una categoría.");
-                if (!exerciseImage) return Swal.showValidationMessage("Debes subir una imagen.");
-                if (!exerciseVideo) return Swal.showValidationMessage("Debes subir un video.");
-
-                Swal.fire({
-                    title: "Subiendo archivos...",
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                const imageUrl = await uploadToCloudinary(exerciseImage, "ejercicios");
-                const videoUrl = await uploadToCloudinary(exerciseVideo, "ejercicios");
+                if (!imageUrl) return Swal.showValidationMessage("Debes subir una imagen.");
+                if (!videoUrl) return Swal.showValidationMessage("Debes subir un video.");
 
                 return {
                     Nombre: exerciseName,
@@ -351,37 +366,33 @@ async function addNewExercise(db) {
 }
 
 function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercise) {
-    console.log("Ejercicio recibido:", exercise); // Verifica que exercise tenga datos
+    console.log("Ejercicio recibido:", exercise);
+
+    let newImageUrl = null;
+    let newVideoUrl = null;
 
     Swal.fire({
         title: `Editar ejercicio: ${Nombre}`,
         html: `
             <div class="edit-popup">
-                <!-- Columna izquierda (Imágenes) -->
                 <div class="column">
                     <div class="input-group">
                         <label>Imagen actual:</label>
                         <input type="text" id="current-image" class="swal2-input" value="${Imagen || ''}" disabled>
                     </div>
                     <div class="input-group">
-                        <label>Nueva imagen:</label>
-                        <input type="file" id="new-image" class="swal2-file">
+                        <button id="upload-image-btn" class="swal2-confirm swal2-styled" style="margin-top: 5px;">Subir nueva imagen</button>
                     </div>
                 </div>
-
-                <!-- Columna derecha (Videos) -->
                 <div class="column">
                     <div class="input-group">
                         <label>Video actual:</label>
                         <input type="text" id="current-video" class="swal2-input" value="${Video || ''}" disabled>
                     </div>
                     <div class="input-group">
-                        <label>Nuevo video:</label>
-                        <input type="file" id="new-video" class="swal2-file">
+                        <button id="upload-video-btn" class="swal2-confirm swal2-styled" style="margin-top: 5px;">Subir nuevo video</button>
                     </div>
                 </div>
-
-                <!-- Instrucciones -->
                 <div class="instructions-group">
                     <div class="input-group">
                         <label>Instrucciones actuales:</label>
@@ -394,6 +405,22 @@ function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercise) {
                 </div>
             </div>
         `,
+        didOpen: () => {
+            // Asignar los botones a sus widgets
+            document.getElementById('upload-image-btn').addEventListener('click', () => {
+                openCloudinaryWidget((url) => {
+                    newImageUrl = url;
+                    document.getElementById('current-image').value = url;
+                }, "gym_images");
+            });
+
+            document.getElementById('upload-video-btn').addEventListener('click', () => {
+                openCloudinaryWidget((url) => {
+                    newVideoUrl = url;
+                    document.getElementById('current-video').value = url;
+                }, "gym_videos");
+            });
+        },
         showCancelButton: true,
         confirmButtonText: "Guardar cambios",
         cancelButtonText: "Cancelar",
@@ -401,13 +428,10 @@ function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercise) {
             popup: "swal-wide"
         },
         preConfirm: async () => {
-            const newImageFile = document.getElementById("new-image").files[0];
-            const newVideoFile = document.getElementById("new-video").files[0];
             const newInstructions = document.getElementById("new-instructions").value.trim() || Instrucciones;
 
-            // Mostrar el Swal de carga al iniciar la subida de archivos
             Swal.fire({
-                title: "Subiendo archivos...",
+                title: "Guardando cambios...",
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
@@ -415,35 +439,16 @@ function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercise) {
             try {
                 const db = getFirestore();
                 const category = exercise.Categoria || exercise.categoria;
-                
-                if (!category) {
-                    throw new Error("La categoría del ejercicio no está definida.");
-                }
+                if (!category) throw new Error("La categoría del ejercicio no está definida.");
 
                 const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
 
                 const docSnapshot = await getDoc(exerciseRef);
-                if (!docSnapshot.exists()) {
-                    throw new Error("No se pudo encontrar el ejercicio para actualizar.");
-                }
+                if (!docSnapshot.exists()) throw new Error("No se encontró el ejercicio.");
 
-                let newImageUrl = Imagen;
-                let newVideoUrl = Video;
-
-                // Subir imagen a Cloudinary si el usuario seleccionó un archivo nuevo
-                if (newImageFile) {
-                    newImageUrl = await uploadToCloudinary(newImageFile, "gym_images");
-                }
-
-                // Subir video a Cloudinary si el usuario seleccionó un archivo nuevo
-                if (newVideoFile) {
-                    newVideoUrl = await uploadToCloudinary(newVideoFile, "gym_videos");
-                }
-
-                // Actualizar en Firestore
                 await updateDoc(exerciseRef, {
-                    Imagen: newImageUrl,
-                    Video: newVideoUrl,
+                    Imagen: newImageUrl || Imagen,
+                    Video: newVideoUrl || Video,
                     Instrucciones: newInstructions
                 });
 
@@ -454,9 +459,7 @@ function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercise) {
                     customClass: {
                         popup: "swal-custom"
                     }
-                }).then(() => {
-                    window.location.reload();
-                });
+                }).then(() => window.location.reload());
 
             } catch (error) {
                 Swal.fire({
