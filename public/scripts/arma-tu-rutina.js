@@ -215,27 +215,23 @@ function renderPagination(totalItems, currentPage) {
     }
 }
 
-function getYouTubeEmbedUrl(url) {
-    const match = url.match(
-        /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w\-]{11})/
-    );
-    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
-}
-
 async function showExerciseDetails(nombre, video, instrucciones) {
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    if (!user || !user.isLoggedIn) {
-        Swal.fire("Error", "Debes estar logueado para guardar rutinas.", "error");
-        return;
-    }
+    let embedVideoUrl = "";
+    let isYouTube = false;
 
-    const embedUrl = getYouTubeEmbedUrl(video);
-    const videoHtml = embedUrl
-        ? `<iframe width="100%" height="315" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`
-        : `<video controls style="width:100%; max-height:315px;">
-               <source src="${video}" type="video/mp4">
-               Tu navegador no soporta el formato de video.
-           </video>`;
+    if (video.includes("youtube.com/shorts/")) {
+        const videoId = video.split("shorts/")[1]?.split("?")[0];
+        embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
+        isYouTube = true;
+    } else if (video.includes("youtube.com/watch?v=")) {
+        const videoId = video.split("v=")[1]?.split("&")[0];
+        embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
+        isYouTube = true;
+    } else if (video.includes("youtu.be/")) {
+        const videoId = video.split("youtu.be/")[1]?.split("?")[0];
+        embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
+        isYouTube = true;
+    }
 
     const contentHTML = `
         <div class="exercise-popup">
@@ -245,7 +241,13 @@ async function showExerciseDetails(nombre, video, instrucciones) {
             <div class="popup-content">
                 <div class="popup-left">
                     <div class="video-container">
-                        ${videoHtml}
+                        ${isYouTube
+                            ? `<iframe width="100%" height="315" src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>`
+                            : `<video controls width="100%">
+                                <source src="${video}" type="video/mp4">
+                                Tu navegador no soporta el formato de video.
+                            </video>`
+                        }
                     </div>
                     <h4>Instrucciones</h4>
                     <p>${instrucciones}</p>
@@ -295,7 +297,6 @@ async function showExerciseDetails(nombre, video, instrucciones) {
             title: 'swal2-title'
         },
         width: 'auto',
-
         preConfirm: async () => {
             const series = parseInt(document.getElementById('series').value, 10);
             const repeticiones = parseInt(document.getElementById('repeticiones').value, 10);
@@ -331,49 +332,38 @@ async function showExerciseDetails(nombre, video, instrucciones) {
                 const querySnapshot = await getDocs(q);
 
                 let existingRoutineDoc = null;
-
                 if (!querySnapshot.empty) {
                     existingRoutineDoc = querySnapshot.docs[0];
                 }
 
                 const exerciseId = crypto.randomUUID();
 
+                const exerciseData = {
+                    id: exerciseId,
+                    name: nombre,
+                    series: parseInt(series, 10),
+                    repetitions: parseInt(repeticiones, 10),
+                    weight: parseFloat(peso),
+                    video: video,
+                    instructions: instrucciones,
+                    additionalData: adicionales,
+                };
+
                 if (existingRoutineDoc) {
                     const routineData = existingRoutineDoc.data();
-                    const updatedExercises = [...routineData.exercises, {
-                        id: exerciseId,
-                        name: nombre,
-                        series: parseInt(series, 10),
-                        repetitions: parseInt(repeticiones, 10),
-                        weight: parseFloat(peso),
-                        video: video,
-                        instructions: instrucciones,
-                        additionalData: adicionales,
-                    }];
-
+                    const updatedExercises = [...routineData.exercises, exerciseData];
                     await updateDoc(doc(db, "routines", existingRoutineDoc.id), {
                         exercises: updatedExercises,
                     });
-
-                    Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
                 } else {
                     await addDoc(routinesRef, {
                         userId: user.uid,
                         day: dia,
-                        exercises: [{
-                            id: exerciseId,
-                            name: nombre,
-                            series: parseInt(series, 10),
-                            repetitions: parseInt(repeticiones, 10),
-                            weight: parseFloat(peso),
-                            video: video,
-                            instructions: instrucciones,
-                            additionalData: adicionales,
-                        }],
+                        exercises: [exerciseData],
                     });
-
-                    Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
                 }
+
+                Swal.fire("Guardado", "El ejercicio se ha añadido a tu rutina para este día.", "success");
             } catch (error) {
                 console.error("Error al guardar el ejercicio:", error);
                 Swal.fire("Error", "No se pudo guardar el ejercicio.", "error");
