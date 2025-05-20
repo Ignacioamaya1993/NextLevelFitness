@@ -216,6 +216,9 @@ function renderPagination(totalItems, currentPage) {
 }
 
 async function showExerciseDetails(nombre, video, instrucciones) {
+    console.log("Ejecutando showExerciseDetails...");
+    console.log("Video recibido:", video);
+
     let embedVideoUrl = "";
     let isYouTube = false;
 
@@ -223,15 +226,28 @@ async function showExerciseDetails(nombre, video, instrucciones) {
         const videoId = video.split("shorts/")[1]?.split("?")[0];
         embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
         isYouTube = true;
+        console.log("Detectado como YouTube Shorts. ID:", videoId);
     } else if (video.includes("youtube.com/watch?v=")) {
         const videoId = video.split("v=")[1]?.split("&")[0];
         embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
         isYouTube = true;
+        console.log("Detectado como YouTube watch. ID:", videoId);
     } else if (video.includes("youtu.be/")) {
         const videoId = video.split("youtu.be/")[1]?.split("?")[0];
         embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
         isYouTube = true;
+        console.log("Detectado como YouTube shortlink. ID:", videoId);
+    } else if (video.includes("youtube.com/embed/")) {
+        // ya viene en formato embed
+        embedVideoUrl = video;
+        isYouTube = true;
+        console.log("Video ya en formato embed:", embedVideoUrl);
+    } else {
+        console.log("Video no es de YouTube. Mostrando como video local.");
     }
+
+    console.log("Embed URL final:", embedVideoUrl);
+    console.log("¿Es YouTube?:", isYouTube);
 
     const contentHTML = `
         <div class="exercise-popup">
@@ -286,6 +302,8 @@ async function showExerciseDetails(nombre, video, instrucciones) {
             </div>
         </div>`;
 
+            console.log("HTML generado para el popup:", contentHTML);
+
     Swal.fire({
         title: "Detalles del ejercicio",
         html: contentHTML,
@@ -333,7 +351,7 @@ async function showExerciseDetails(nombre, video, instrucciones) {
 
                 let existingRoutineDoc = null;
                 if (!querySnapshot.empty) {
-                    existingRoutineDoc = querySnapshot.docs[0];
+                existingRoutineDoc = querySnapshot.docs[0];
                 }
 
                 const exerciseId = crypto.randomUUID();

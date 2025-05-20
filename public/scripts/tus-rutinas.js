@@ -211,13 +211,38 @@ function displayUserRoutines(routines, db) {
                 return;
             }
 
+            const video = exerciseData.videoUrl || "";
+            let embedVideoUrl = "";
+            let isYouTube = false;
+
+            if (video.includes("youtube.com/shorts/")) {
+                const videoId = video.split("shorts/")[1]?.split("?")[0];
+                embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
+                isYouTube = true;
+            } else if (video.includes("youtube.com/watch?v=")) {
+                const videoId = video.split("v=")[1]?.split("&")[0];
+                embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
+                isYouTube = true;
+            } else if (video.includes("youtu.be/")) {
+                const videoId = video.split("youtu.be/")[1]?.split("?")[0];
+                embedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
+                isYouTube = true;
+            } else if (video.includes("youtube.com/embed/")) {
+                embedVideoUrl = video;
+                isYouTube = true;
+            }
+
+            const videoHtml = isYouTube
+                ? `<iframe width="100%" height="315" src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>`
+                : `<video width="100%" controls>
+                    <source src="${video}" type="video/mp4">
+                    Tu navegador no soporta la etiqueta de video.
+                </video>`;
+
             Swal.fire({
                 title: exerciseData.name,
                 html: `
-                    <video width="100%" controls>
-                        <source src="${exerciseData.videoUrl}" type="video/mp4">
-                        Tu navegador no soporta la etiqueta de video.
-                    </video>
+                    ${videoHtml}
                     <p><strong><span class="instructions-text">Instrucciones:</span></strong> <span class="instructions-text">${exerciseData.instructions}</span></p>
                 `,
                 confirmButtonText: "Cerrar",
