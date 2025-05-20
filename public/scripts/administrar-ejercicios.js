@@ -459,8 +459,14 @@ async function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercis
                     Instrucciones: newInstructions
                 });
 
-                Swal.fire("¡Actualizado!", "El ejercicio se ha actualizado correctamente.", "success")
-                    .then(() => window.location.reload());
+                Swal.fire({
+                    title: "¡Actualizado!",
+                    text: "El ejercicio se ha actualizado correctamente.",
+                    icon: "success",
+                    iconColor: "#ffffff", // color blanco
+                    color: "#ffffff", // color del texto
+                    confirmButtonColor: "#3085d6" // opcional: cambia el color del botón también si lo deseas
+                }).then(() => window.location.reload());
 
             } catch (error) {
                 Swal.fire("Error", `No se pudo actualizar el ejercicio: ${error.message}`, "error");

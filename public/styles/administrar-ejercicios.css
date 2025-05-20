@@ -342,44 +342,48 @@
     .edit-popup {
         flex-direction: column;
         align-items: stretch;
-        background: #f8f9fa;
+        background: #333333;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 8px rgb(248, 244, 244);
     }
 
     .edit-popup input,
     .edit-popup textarea {
         width: 100%;
         padding: 10px;
-        margin-right: 40%;
         border: 1px solid #ccc;
         border-radius: 8px;
         font-size: 14px;
+        margin-left: 0px;
     }
 
     .edit-popup label {
         font-weight: bold;
-        margin-top: 10px;
         display: block;
+        margin-right: 50px;
         color: #333;
     }
 
+    /*boton subir nueva imagen*/
     .edit-popup button {
-        width: 100%;
-        padding: 12px;
+        width: 70%;
         border-radius: 8px;
         font-size: 16px;
         font-weight: bold;
         cursor: pointer;
+        margin-left: -25%;
+        margin-bottom: 20px;
     }
 
+    /*boton para guardar cambios*/
     .edit-popup .save-btn {
         background-color: #007bff;
         color: white;
         border: none;
     }
-
+    
+    /*boton para cancelar cambios*/
     .edit-popup .cancel-btn {
         background-color: #6c757d;
         color: white;
@@ -387,15 +391,15 @@
         margin-top: 10px;
     }
 
+    /*campos nueva imagen actual y boton nueva imagen (posicion)*/
     .column {
         width: 100%;
-        margin-left: -10%;
-
     }
 
     .instructions-group{
-        margin-left: -10%;
+        margin-left: 0%;
     }
+    
     .exercise-grid {
         grid-template-columns: 1fr;
     }
