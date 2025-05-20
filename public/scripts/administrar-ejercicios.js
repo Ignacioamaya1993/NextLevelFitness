@@ -280,29 +280,35 @@ async function addNewExercise(db) {
         const { value: formValues } = await Swal.fire({
             title: "Agregar nuevo ejercicio",
             html: `
-                <label for="category-select">Categoría:</label>
-                <select id="category-select" class="swal2-select">
-                    <option value="">-- Selecciona una categoría --</option>
-                    ${categories.map(category => `<option value="${category}">${category}</option>`).join("")}
-                    <option value="other">Otra (escribir nueva)</option>
-                </select>
-                <input id="new-exercise-category" class="swal2-input" placeholder="Nueva categoría">
+                <link rel="stylesheet" href="popup-add.css">
+                <div class="add-exercise-form">
+                    <label for="category-select">Categoría:</label>
+                    <select id="category-select" class="swal2-select">
+                        <option value="">-- Selecciona una categoría --</option>
+                        ${categories.map(category => `<option value="${category}">${category}</option>`).join("")}
+                        <option value="other">Otra (escribir nueva)</option>
+                    </select>
 
-                <label for="new-exercise-name">Nombre del ejercicio:</label>
-                <input id="new-exercise-name" class="swal2-input" placeholder="Ejemplo: Press de banca">
+                    <input id="new-exercise-category" class="swal2-input" placeholder="Nueva categoría" style="display:none;">
 
-                <label>Imagen:</label>
-                <button id="upload-image-btn" class="swal2-confirm swal2-styled" style="margin-bottom:10px;">Subir Imagen</button>
-                <img id="image-preview" src="" style="display:none; max-width:100%; border-radius:5px; margin-bottom:10px;" />
+                    <label for="new-exercise-name">Nombre del ejercicio:</label>
+                    <input id="new-exercise-name" class="swal2-input" placeholder="Ejemplo: Press de banca">
 
-                <label for="new-exercise-video">URL del video (YouTube):</label>
-                <input id="new-exercise-video" class="swal2-input" placeholder="https://www.youtube.com/watch?v=...">
+                    <label>Imagen:</label>
+                    <button id="upload-image-btn" class="swal2-confirm swal2-styled">Subir Imagen</button>
+                    <img id="image-preview" src="" style="display:none; max-width:100%; border-radius:5px;" />
 
-                <label for="new-exercise-instructions">Instrucciones (opcional):</label>
-                <textarea id="new-exercise-instructions" class="swal2-textarea" placeholder="Describe cómo se realiza el ejercicio..."></textarea>
+                    <label for="new-exercise-video">URL del video (YouTube):</label>
+                    <input id="new-exercise-video" class="swal2-input" placeholder="https://www.youtube.com/watch?v=...">
+
+                    <label for="new-exercise-instructions">Instrucciones (opcional):</label>
+                    <textarea id="new-exercise-instructions" class="swal2-textarea" placeholder="Describe cómo se realiza el ejercicio..."></textarea>
+                </div>
             `,
             didOpen: () => {
                 const imageBtn = document.getElementById("upload-image-btn");
+                const categorySelect = document.getElementById("category-select");
+                const newCategoryInput = document.getElementById("new-exercise-category");
 
                 imageBtn.addEventListener("click", () => {
                     openCloudinaryWidget(url => {
@@ -311,6 +317,10 @@ async function addNewExercise(db) {
                         preview.src = url;
                         preview.style.display = "block";
                     }, "ejercicios");
+                });
+
+                categorySelect.addEventListener("change", () => {
+                    newCategoryInput.style.display = categorySelect.value === "other" ? "block" : "none";
                 });
             },
             showCancelButton: true,
@@ -383,24 +393,28 @@ async function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercis
     Swal.fire({
         title: `Editar ejercicio: ${Nombre}`,
         html: `
+            <link rel="stylesheet" href="popup-edit.css">
             <div class="edit-popup">
-                <div class="column">
+                <div class="row">
                     <div class="input-group">
                         <label>Imagen actual:</label>
                         <input type="text" id="current-image" class="swal2-input" value="${Imagen || ''}" disabled>
                     </div>
-                    <div class="input-group">
-                        <button id="upload-image-btn" class="swal2-confirm swal2-styled" style="margin-top: 5px;">Subir nueva imagen</button>
+                    <div class="button-group">
+                        <button id="upload-image-btn" class="swal2-confirm swal2-styled">Subir nueva imagen</button>
                     </div>
                 </div>
-                <div class="input-group">
+
+                <div class="input-group full-width">
                     <label>URL del video (actual):</label>
                     <input type="text" id="current-video" class="swal2-input" value="${Video || ''}" disabled>
                 </div>
-                <div class="input-group">
+
+                <div class="input-group full-width">
                     <label>URL del nuevo video (YouTube):</label>
                     <input type="text" id="new-video-url" class="swal2-input" placeholder="https://www.youtube.com/watch?v=...">
                 </div>
+
                 <div class="instructions-group">
                     <div class="input-group">
                         <label>Instrucciones actuales:</label>
@@ -463,9 +477,9 @@ async function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercis
                     title: "¡Actualizado!",
                     text: "El ejercicio se ha actualizado correctamente.",
                     icon: "success",
-                    iconColor: "#ffffff", // color blanco
-                    color: "#ffffff", // color del texto
-                    confirmButtonColor: "#3085d6" // opcional: cambia el color del botón también si lo deseas
+                    iconColor: "#ffffff",
+                    color: "#ffffff",
+                    confirmButtonColor: "#3085d6"
                 }).then(() => window.location.reload());
 
             } catch (error) {

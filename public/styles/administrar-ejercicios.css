@@ -80,6 +80,28 @@
     margin-right: 5px;
 }
 
+.add-exercise-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.add-exercise-form label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+#upload-image-btn {
+    align-self: flex-start;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-left: 38%;
+}
+
+#image-preview {
+    margin-top: 8px;
+}
+
 /* Contenedor principal del modal */
 .swal2-popup {
     background-color: #333333;
@@ -121,11 +143,13 @@
 .swal2-select {
     cursor: pointer;
     background: #fff;
+    margin-left: 10px;
 }
 
-/* Área de texto */
+/* Área de texto nuevas instrucciones*/
 .swal2-textarea {
     min-height: 80px;
+    margin-left: 10px;
     resize: vertical;
 }
 
@@ -140,11 +164,6 @@
 /* Si la categoría seleccionada es 'Otra', se cambia a columna */
 #category-container.expand {
     flex-direction: column;
-}
-
-/* Selector de categoría */
-#category-select {
-    flex: 1;
 }
 
 /* Input para nueva categoría */
@@ -254,10 +273,8 @@
 /* 🔹 Contenedor General */
 .edit-popup {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
 }
 
 /* 🔹 Columnas para imágenes y videos */
@@ -338,6 +355,13 @@
         border-radius: 12px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
+
+    #upload-image-btn {
+    align-self: flex-start;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-left: 30%;
+}
 
     .edit-popup {
         flex-direction: column;
