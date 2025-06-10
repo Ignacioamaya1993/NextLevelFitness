@@ -276,7 +276,7 @@ async function showExerciseDetails(nombre, video, instrucciones) {
                         </div>
                         <div class="form-group">
                             <label for="repeticiones">Repeticiones: <span style="color: red;">*</span></label>
-                            <input type="number" id="repeticiones" min="1" placeholder="Ingrese las repeticiones" required>
+                            <input type="text" id="repeticiones" placeholder="Ej: 8-10, 6-6-8, fallo..." required>
                         </div>
                         <div class="form-group">
                             <label for="peso">Peso (kg): <span style="color: red;">*</span></label>
@@ -327,8 +327,8 @@ async function showExerciseDetails(nombre, video, instrucciones) {
                 return;
             }
 
-            if (!repeticiones || repeticiones <= 0) {
-                Swal.showValidationMessage("Por favor, ingresa un valor válido para las repeticiones.");
+            if (!repeticiones || repeticiones.trim() === "") {
+                Swal.showValidationMessage("Por favor, ingresa una cantidad de repeticiones.");
                 return;
             }
 
