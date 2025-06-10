@@ -266,7 +266,7 @@ async function showExerciseDetails(nombre, video, instrucciones) {
                         }
                     </div>
                     <h4>Instrucciones</h4>
-                    <p>${instrucciones}</p>
+                    <p>${instrucciones.replace(/\n/g, "<br>")}</p>
                 </div>
                 <div class="popup-right">
                     <form id="exercise-form">
