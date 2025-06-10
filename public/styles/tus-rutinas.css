@@ -505,6 +505,8 @@ main {
 
 .instructions-text {
     color: white;
+    text-align: left;
+    display: block; /* para que el texto ocupe el ancho completo y el alineado funcione bien */
 }
 
 /* Botón "Guardar" a la derecha */
