@@ -211,6 +211,10 @@ function displayUserRoutines(routines, db) {
                 return;
             }
 
+            const instruccionesFormateadas = exerciseData.instructions
+            ? exerciseData.instructions.replace(/\n/g, "<br>")
+            : "Sin instrucciones.";
+
             const video = exerciseData.videoUrl || "";
             let embedVideoUrl = "";
             let isYouTube = false;
@@ -243,7 +247,7 @@ function displayUserRoutines(routines, db) {
                 title: exerciseData.name,
                 html: `
                     ${videoHtml}
-                    <p><strong><span class="instructions-text">Instrucciones:</span></strong> <span class="instructions-text">${exerciseData.instructions}</span></p>
+                    <p><strong><span class="instructions-text">Instrucciones:</span></strong> <span class="instructions-text">${instruccionesFormateadas}</span></p>
                 `,
                 confirmButtonText: "Cerrar",
             });
