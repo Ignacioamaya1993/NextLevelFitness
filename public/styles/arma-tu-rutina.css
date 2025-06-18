@@ -172,7 +172,11 @@ main {
 }
 
 .swal2-title {
-    color: white !important;
+    color: #f8f9fc;
+    margin-top: 5px !important; /* Reducir margen superior */
+    padding-top: 0px !important; /* Eliminar espacio extra */
+    font-size: 22px;
+    font-weight: bold;
 }
 
 .swal2-html-container {
@@ -188,12 +192,6 @@ main {
 
 .hidden {
     display: none;
-}
-
-.exercise-content {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
 }
 
 .instructions {
@@ -228,22 +226,6 @@ main {
 }
 
 /* --- Popup de detalles del ejercicio --- */
-.exercise-popup {
-    display: flex;
-    flex-direction: column;    gap: 20px;
-    padding: 20px;
-    background-color: #333333;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgb(255, 254, 254);
-    max-width: 800px;
-    max-height: none;
-    margin: 0 auto;
-    height: auto;
-    text-align: left;
-    padding-top: 30px; /* Reducir espacio superior del popup */
-    padding-bottom: 30px; /* Reducir espacio inferior */
-}
-
 .popup-header {
     text-align: center;
     border-bottom: 2px solid #e0e0e0;
@@ -259,38 +241,13 @@ main {
 
 /* 🔧 Permitir que el popup crezca según el contenido */
 .swal2-popup.custom-popup {
-  max-height: none !important;
-  height: auto !important;
-  overflow: visible !important;
-  padding: 20px;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 20px;
 }
 
 /* Contenido del popup */
-.popup-content {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  max-height: none;
-  gap: 20px;
-}
-
-.popup-left, .popup-right {
-  width: 48%;
-}
-
-.popup-left h4 {
-    font-size: 1.2rem;
-    color: #f9f9fa;
-    margin-top: 15px;
-}
-
-.popup-left p {
-    font-size: 1rem;
-    color: #fcfafa;
-    line-height: 1.5;
-}
-
 .popup-right {
     background-color: #333333;
     padding: 15px;
@@ -324,28 +281,51 @@ main {
     outline: none;
 }
 
+/* Contenedor del contenido principal: video + formulario */
+.popup-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* Contenedor del video */
 .video-container {
-    width: 100%;
-    max-width: 500px; /* Ajusta el tamaño máximo según lo necesites */
-    margin: 0 auto; /* Centrar el video si es necesario */
-    border-radius: 8px;
-    overflow: hidden;
+    flex: 1;
+    min-width: 300px;
+    max-width: 500px;
 }
 
+.video-container iframe,
 .video-container video {
-    width: 100%; /* Asegura que el video se ajuste al contenedor */
-    height: auto; /* Mantiene la relación de aspecto */
+    width: 100%;      /* mantengo ancho completo */
+    height: 450px;    /* aumento la altura, por ejemplo 450px */
+    object-fit: contain; /* para que el video mantenga la proporción sin recortar */
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.15);
 }
 
-/* Instrucciones debajo */
+/* Contenedor del formulario */
+.exercise-form-container {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+    background-color: #333333;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgb(248, 246, 246);
+}
+/* Sección de instrucciones debajo */
 .popup-instructions {
-  width: 100%;
-  margin-top: 20px;
-  padding-top: 10px;
-  border-top: 1px solid #e0e0e0;
-  color: white;
-  font-size: 1rem;
-  line-height: 1.5;
+    width: 100%;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+    color: white;
+    font-size: 1rem;
+    line-height: 1.5;
 }
 
 /*popup pincipal*/
@@ -359,23 +339,10 @@ main {
     box-shadow: 0 4px 6px rgba(250, 249, 249, 0.993);
 }
 
-.swal2-title {
-    color: #f8f9fc;
-    margin-top: 5px !important; /* Reducir margen superior */
-    padding-top: 0px !important; /* Eliminar espacio extra */
-}
-
 /* Contenedor principal del modal */
 .swal2-popup {
     background-color: #333333;
     border: 1px solid #e0e0e0;
-}
-
-/* Título del modal */
-.swal2-title {
-    font-size: 22px;
-    font-weight: bold;
-    color: #ffffff;
 }
 
 .form-group textarea {
@@ -399,67 +366,54 @@ main {
 
 /* Media Query para dispositivos móviles */
 @media (max-width: 768px) {
-    .exercise-popup {
-        display: flex;
-        flex-direction: column; /* Cambiar a diseño vertical */
-        gap: 15px; /* Reducir el espacio entre elementos */
-        max-width: 100%; /* Asegurar que ocupe todo el ancho */
-        max-height: 90vh !important; /* Más espacio para el contenido */
-        overflow-y: auto; /* Permite desplazamiento si es necesario */
-    }
-
     .popup-header {
-        text-align: center; /* Mantener el título centrado */
-        padding: 10px 0; /* Reducir el espacio interno */
+        text-align: center;
+        padding: 10px 0;
     }
 
     .exercise-title {
-        font-size: 1.5rem; /* Ajustar el tamaño del título para móvil */
+        font-size: 1.5rem;
     }
 
-    .popup-content {
-        display: flex;
-        flex-direction: column; /* Asegurar contenido apilado */
-        gap: 15px;
+    /* Contenedor principal: pasa a columna para apilar */
+    .popup-body {
+        flex-direction: column !important;
+        gap: 20px;
     }
 
-    .popup-left, .popup-right {
-        padding: 8px;
-        width: 100%; /* Asegurarse de que ocupen todo el ancho */
+    /* Video ocupa todo el ancho y tiene más altura para móvil */
+    .video-container {
+        max-width: 100% !important;
+        min-width: 100% !important;
+    }
+    .video-container iframe,
+    .video-container video {
+        width: 100%;
+        height: 250px; /* o el alto que prefieras para móvil */
     }
 
-    .video-container iframe {
-        width: 100%; /* Video ocupa todo el ancho disponible */
-        height: 200px; /* Ajustar la altura del video */
-    }
-
-    .instrucciones {
-        font-size: 1rem; /* Ajustar tamaño de texto */
-        padding: 10px 0; /* Espaciado entre instrucciones */
-    }
-
-    .exercise-form {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        width: 100%; /* Asegurar que el formulario ocupe todo el ancho */
-    }
-
-    .form-group {
-        width: 100%; /* Asegurar que los formularios ocupen todo el ancho */
-    }
-
+    /* Formulario también a todo el ancho */
     .popup-right {
+        max-width: 100% !important;
+        min-width: 100% !important;
         padding: 15px;
         border-radius: 8px;
     }
 
+    /* Instrucciones */
+    .popup-instructions {
+        text-align: left !important; /* más legible en móvil */
+        padding-top: 10px;
+        font-size: 1rem;
+    }
+
+    /* Popup general */
     .custom-popup {
-        width: 100% !important; /* Asegurarse que el popup ocupe todo el ancho */
+        width: 100% !important;
         max-width: 100% !important;
-        height: auto !important; /* Ajustar la altura para que se adapte al contenido */
+        height: auto !important;
         max-height: none !important;
-        padding: 20px; /* Añadir algo de espacio interno */
-        overflow-y: auto; /* Habilitar desplazamiento si es necesario */
+        padding: 20px;
+        overflow-y: auto;
     }
 }

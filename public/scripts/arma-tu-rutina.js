@@ -239,21 +239,19 @@ async function showExerciseDetails(nombre, video, instrucciones) {
     }
 
     const contentHTML = `
-        <div class="exercise-popup">
-            <div class="popup-header">
-                <h3 class="exercise-title">${nombre}</h3>
-            </div>
+        <div class="popup-header">
+            <h3 class="exercise-title">${nombre}</h3>
+        </div>
 
-            <div class="popup-left">
-                <div class="video-container">
-                    ${isYouTube
-                        ? `<iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>`
-                        : `<video controls>
-                              <source src="${video}" type="video/mp4">
-                              Tu navegador no soporta el formato de video.
-                           </video>`
-                    }
-                </div>
+        <div class="popup-body">
+            <div class="video-container">
+                ${isYouTube
+                    ? `<iframe src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>`
+                    : `<video controls>
+                            <source src="${video}" type="video/mp4">
+                            Tu navegador no soporta el formato de video.
+                        </video>`
+                }
             </div>
 
             <div class="popup-right">
@@ -287,12 +285,13 @@ async function showExerciseDetails(nombre, video, instrucciones) {
                     </div>
                 </form>
             </div>
+        </div>
 
-            <div class="popup-instructions">
-                <h4>Instrucciones</h4>
-                <p>${instrucciones.replace(/\n/g, "<br>")}</p>
-            </div>
-        </div>`;
+        <div class="popup-instructions" style="text-align: left;">
+            <h4>Instrucciones</h4>
+            <p>${instrucciones.replace(/\n/g, "<br>")}</p>
+        </div>
+    `;
 
     Swal.fire({
         title: "Detalles del ejercicio",

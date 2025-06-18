@@ -240,6 +240,43 @@ main {
     color: white;
 }
 
+/* Botón flotante de WhatsApp con animación */
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25d366;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 30px;
+    z-index: 1000;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(30px);
+    pointer-events: none;
+    animation: whatsappFadeIn 1s ease forwards;
+    animation-delay: 1.2s; /* Tiempo que espera antes de aparecer */
+}
+
+@keyframes whatsappFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1);
+    background-color: #1ebe5b;
+}
+
 @media (max-width: 776px) {
     .about {
         min-width: 90%;
@@ -298,3 +335,11 @@ main {
         padding: 10px 20px;
     }
 }
+
+    .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        bottom: 15px;
+        right: 15px;
+        font-size: 24px;
+    }
