@@ -259,13 +259,15 @@ main {
 
 /* Contenido del popup */
 .popup-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas */
-    gap: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 .popup-left, .popup-right {
-    padding: 8px;
+    width: 48%;
 }
 
 .popup-left h4 {
@@ -324,6 +326,17 @@ main {
 .video-container video {
     width: 100%; /* Asegura que el video se ajuste al contenedor */
     height: auto; /* Mantiene la relación de aspecto */
+}
+
+/* Instrucciones debajo */
+.popup-instructions {
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+    color: white;
+    font-size: 1rem;
+    line-height: 1.5;
 }
 
 /*popup pincipal*/
