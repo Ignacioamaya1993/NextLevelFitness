@@ -249,58 +249,60 @@ async function showExerciseDetails(nombre, video, instrucciones) {
     console.log("Embed URL final:", embedVideoUrl);
     console.log("¿Es YouTube?:", isYouTube);
 
-    const contentHTML = `
-        <div class="exercise-popup">
-            <div class="popup-header">
-                <h3 class="exercise-title">${nombre}</h3>
+const contentHTML = `
+    <div class="exercise-popup">
+        <div class="popup-header">
+            <h3 class="exercise-title">${nombre}</h3>
+        </div>
+        <div class="popup-content">
+            <div class="popup-left">
+                <div class="video-container">
+                    ${isYouTube
+                        ? `<iframe width="100%" height="315" src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>`
+                        : `<video controls width="100%">
+                            <source src="${video}" type="video/mp4">
+                            Tu navegador no soporta el formato de video.
+                        </video>`
+                    }
+                </div>
             </div>
-            <div class="popup-content">
-                <div class="popup-left">
-                    <div class="video-container">
-                        ${isYouTube
-                            ? `<iframe width="100%" height="315" src="${embedVideoUrl}" frameborder="0" allowfullscreen></iframe>`
-                            : `<video controls width="100%">
-                                <source src="${video}" type="video/mp4">
-                                Tu navegador no soporta el formato de video.
-                            </video>`
-                        }
+            <div class="popup-right">
+                <form id="exercise-form">
+                    <div class="form-group">
+                        <label for="series">Series: <span style="color: red;">*</span></label>
+                        <input type="number" id="series" min="1" placeholder="Ingrese las series" required>
                     </div>
-                    <h4>Instrucciones</h4>
-                    <p>${instrucciones.replace(/\n/g, "<br>")}</p>
-                </div>
-                <div class="popup-right">
-                    <form id="exercise-form">
-                        <div class="form-group">
-                            <label for="series">Series: <span style="color: red;">*</span></label>
-                            <input type="number" id="series" min="1" placeholder="Ingrese las series" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="repeticiones">Repeticiones: <span style="color: red;">*</span></label>
-                            <input type="text" id="repeticiones" placeholder="Ej: 8-10, 6-6-8, fallo..." required>
-                        </div>
-                        <div class="form-group">
-                            <label for="peso">Peso (kg): <span style="color: red;">*</span></label>
-                            <input type="number" id="peso" min="0" step="0.1" placeholder="Ingrese el peso" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="dias">Día de la semana:</label>
-                            <select id="dias" required>
-                                <option value="lunes">Lunes</option>
-                                <option value="martes">Martes</option>
-                                <option value="miércoles">Miércoles</option>
-                                <option value="jueves">Jueves</option>
-                                <option value="viernes">Viernes</option>
-                                <option value="sábado">Sábado</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="adicionales">Datos Adicionales:</label>
-                            <textarea id="adicionales" rows="3" placeholder="Escribe aquí alguna aclaración..."></textarea>
-                        </div>
-                    </form>
-                </div>
+                    <div class="form-group">
+                        <label for="repeticiones">Repeticiones: <span style="color: red;">*</span></label>
+                        <input type="text" id="repeticiones" placeholder="Ej: 8-10, 6-6-8, fallo..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="peso">Peso (kg): <span style="color: red;">*</span></label>
+                        <input type="number" id="peso" min="0" step="0.1" placeholder="Ingrese el peso" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dias">Día de la semana:</label>
+                        <select id="dias" required>
+                            <option value="lunes">Lunes</option>
+                            <option value="martes">Martes</option>
+                            <option value="miércoles">Miércoles</option>
+                            <option value="jueves">Jueves</option>
+                            <option value="viernes">Viernes</option>
+                            <option value="sábado">Sábado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adicionales">Datos Adicionales:</label>
+                        <textarea id="adicionales" rows="3" placeholder="Escribe aquí alguna aclaración..."></textarea>
+                    </div>
+                </form>
             </div>
-        </div>`;
+        </div>
+        <div class="popup-instructions">
+            <h4>Instrucciones</h4>
+            <p>${instrucciones.replace(/\n/g, "<br>")}</p>
+        </div>
+    </div>`;
 
             console.log("HTML generado para el popup:", contentHTML);
 
