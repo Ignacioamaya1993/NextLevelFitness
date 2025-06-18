@@ -229,16 +229,16 @@ main {
 
 /* --- Popup de detalles del ejercicio --- */
 .exercise-popup {
-    display: grid;
-    grid-template-rows: auto 1fr;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;    gap: 20px;
     padding: 20px;
     background-color: #333333;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgb(255, 254, 254);
     max-width: 800px;
-    max-height: 150vh;
+    max-height: none;
     margin: 0 auto;
+    height: auto;
     text-align: left;
     padding-top: 30px; /* Reducir espacio superior del popup */
     padding-bottom: 30px; /* Reducir espacio inferior */
@@ -257,12 +257,21 @@ main {
     margin-bottom: 5%;
 }
 
+/* 🔧 Permitir que el popup crezca según el contenido */
+.swal2-popup.custom-popup {
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  padding: 20px;
+}
+
 /* Contenido del popup */
 .popup-content {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   flex-wrap: wrap;
+  max-height: none;
   gap: 20px;
 }
 
