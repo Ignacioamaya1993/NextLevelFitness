@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administrar Precios</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/administrar-precios.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <a href="../pages/panel-admin.html">
+          <img src="../assets/images/logos/nextlevel1.png" alt="Next Level Fitness Logo" />
+        </a>
+      </div>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="panel-admin.html">Panel Administrador</a></li>
+          <li><a href="visual-usuarios.html">Usuarios Registrados</a></li>
+          <li><a href="administrar-ejercicios.html">Administrar Ejercicios</a></li>
+          <li><a href="administrar-precios.html">Administrar Precios</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-precios-container">
+    <h2>Modificar Precios</h2>
+    <form id="form-precios">
+      <fieldset>
+        <legend>Entrenamiento Online</legend>
+        <label>Mensual: <input type="number" id="online-mensual" /></label>
+        <label>Trimestral: <input type="number" id="online-trimestral" /></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Entrenamiento Presencial</legend>
+        <label>2x Semana: <input type="number" id="presencial-2x" /></label>
+        <label>3x Semana: <input type="number" id="presencial-3x" /></label>
+        <label>4x Semana: <input type="number" id="presencial-4x" /></label>
+        <label>5x Semana: <input type="number" id="presencial-5x" /></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Descuento Grupal</legend>
+        <label>Porcentaje: <input type="number" id="descuento-grupal" /></label>
+      </fieldset>
+
+      <button type="submit">Guardar Cambios</button>
+    </form>
+    <p id="mensaje"></p>
+  </main>
+
+  <script type="module" src="../scripts/administrar-precios.js"></script>
+</body>
+</html>

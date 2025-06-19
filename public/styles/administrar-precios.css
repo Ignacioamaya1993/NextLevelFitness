@@ -1,0 +1,124 @@
+.admin-precios-container {
+  max-width: 95vw;
+  background: #333333;
+  margin: 15px auto;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgb(250, 248, 248);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  color: white;
+}
+
+form {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+fieldset {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  min-width: 280px;
+  background: #444;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: white;
+}
+
+input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100px;
+}
+
+button {
+  background-color: #0b6dff;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 15px;
+  font-size: 16px;
+  width: 40%;
+}
+
+button:hover {
+  background-color: #084baf;
+}
+
+button:disabled {
+  background-color: #aaa !important;
+  color: #eee !important;
+}
+
+#mensaje {
+  margin-top: 15px;
+  color: lightgreen;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Contenedor principal del modal */
+.swal2-popup {
+    border: 1px solid #e0e0e0 !important;
+}
+
+/* Título del modal */
+.swal2-title {
+    font-size: 22px !important;
+    font-weight: bold !important;
+    color: #ffffff !important;
+    margin-top: 5px !important;
+    padding-top: 0 !important;
+}
+
+/* Botón OK */
+.swal2-confirm {
+    background-color: #0b6dff !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-radius: 8px !important;
+    padding: 10px 25px !important;
+    width: 100%;
+}
+
+.swal2-confirm:hover {
+    background-color: #084baf !important;
+}
+
+@media (max-width: 768px) {
+  form {
+    flex-direction: column;
+    align-items: center; /* Opcional, centra los fieldsets */
+  }
+
+  fieldset {
+    min-width: 90vw; /* Que ocupe casi todo el ancho */
+  }
+
+  input {
+    width: 25%; /* Inputs llenan el ancho del fieldset */
+    max-width: 300px; /* Para que no crezcan demasiado */
+  }
+
+  button {
+    width: 100%; /* Botón ancho completo */
+    max-width: 300px;
+  }
+}
