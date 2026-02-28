@@ -11,6 +11,7 @@ export function openCloudinaryWidget(callback, folder = '') {
     const widget = window.cloudinary.createUploadWidget({
         cloudName,
         uploadPreset,
+        resourceType: "auto",
         sources: [
             'local', 'url', 'camera',
             'facebook', 'instagram',

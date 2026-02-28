@@ -298,31 +298,69 @@ async function addNewExercise(db) {
                     <button id="upload-image-btn" class="swal2-confirm swal2-styled">Subir Imagen</button>
                     <img id="image-preview" src="" style="display:none; max-width:100%; border-radius:5px;" />
 
-                    <label for="new-exercise-video">URL del video (YouTube):</label>
-                    <input id="new-exercise-video" class="swal2-input" placeholder="https://www.youtube.com/watch?v=...">
+                    <label>Tipo de video:</label>
+                    <select id="video-type" class="swal2-select">
+                        <option value="youtube">YouTube</option>
+                        <option value="cloudinary">Subir video</option>
+                    </select>
+
+                    <div id="youtube-container">
+                        <label>URL del video (YouTube):</label>
+                        <input id="new-exercise-video" class="swal2-input"
+                            placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+
+                    <div id="cloudinary-container" style="display:none;">
+                        <button id="upload-video-btn" class="swal2-confirm swal2-styled">
+                            Subir video
+                        </button>
+                        <input id="video-preview-url" class="swal2-input" disabled>
+                    </div>
 
                     <label for="new-exercise-instructions">Instrucciones (opcional):</label>
                     <textarea id="new-exercise-instructions" class="swal2-textarea" placeholder="Describe cómo se realiza el ejercicio..."></textarea>
                 </div>
             `,
-            didOpen: () => {
-                const imageBtn = document.getElementById("upload-image-btn");
-                const categorySelect = document.getElementById("category-select");
-                const newCategoryInput = document.getElementById("new-exercise-category");
+                didOpen: () => {
+                    const imageBtn = document.getElementById("upload-image-btn");
+                    const videoBtn = document.getElementById("upload-video-btn");
+                    const categorySelect = document.getElementById("category-select");
+                    const newCategoryInput = document.getElementById("new-exercise-category");
+                    const typeSelect = document.getElementById("video-type");
 
-                imageBtn.addEventListener("click", () => {
-                    openCloudinaryWidget(url => {
-                        imageUrl = url;
-                        const preview = document.getElementById("image-preview");
-                        preview.src = url;
-                        preview.style.display = "block";
-                    }, "ejercicios");
-                });
+                    let uploadedVideoUrl = "";
 
-                categorySelect.addEventListener("change", () => {
-                    newCategoryInput.style.display = categorySelect.value === "other" ? "block" : "none";
-                });
-            },
+                    imageBtn.addEventListener("click", () => {
+                        openCloudinaryWidget(url => {
+                            imageUrl = url;
+                            const preview = document.getElementById("image-preview");
+                            preview.src = url;
+                            preview.style.display = "block";
+                        }, "ejercicios");
+                    });
+
+                    videoBtn.addEventListener("click", () => {
+                        openCloudinaryWidget(url => {
+                            uploadedVideoUrl = url;
+                            document.getElementById("video-preview-url").value = url;
+                        }, "ejercicios_videos");
+                    });
+
+                    typeSelect.addEventListener("change", () => {
+                        document.getElementById("youtube-container").style.display =
+                            typeSelect.value === "youtube" ? "block" : "none";
+
+                        document.getElementById("cloudinary-container").style.display =
+                            typeSelect.value === "cloudinary" ? "block" : "none";
+                    });
+
+                    categorySelect.addEventListener("change", () => {
+                        newCategoryInput.style.display =
+                            categorySelect.value === "other" ? "block" : "none";
+                    });
+
+                    window.getUploadedVideo = () => uploadedVideoUrl;
+                },
             showCancelButton: true,
             confirmButtonText: "Agregar",
             preConfirm: async () => {
@@ -330,21 +368,46 @@ async function addNewExercise(db) {
                 const newCategory = document.getElementById("new-exercise-category").value.trim();
                 const exerciseName = document.getElementById("new-exercise-name").value.trim();
                 const exerciseInstructions = document.getElementById("new-exercise-instructions").value.trim();
-                const videoUrlInput = document.getElementById("new-exercise-video").value.trim();
+                const videoType = document.getElementById("video-type").value;
 
-                if (!exerciseName) return Swal.showValidationMessage("El nombre del ejercicio es obligatorio.");
-                if (!selectedCategory && !newCategory) return Swal.showValidationMessage("Debes seleccionar o escribir una categoría.");
-                if (!imageUrl) return Swal.showValidationMessage("Debes subir una imagen.");
-                if (!videoUrlInput) return Swal.showValidationMessage("Debes ingresar la URL del video.");
+                if (!exerciseName)
+                    return Swal.showValidationMessage("El nombre del ejercicio es obligatorio.");
 
-                const embedVideoUrl = getYouTubeEmbedUrl(videoUrlInput);
-                if (!embedVideoUrl) return Swal.showValidationMessage("La URL del video no es válida.");
+                if (!selectedCategory && !newCategory)
+                    return Swal.showValidationMessage("Debes seleccionar o escribir una categoría.");
+
+                if (!imageUrl)
+                    return Swal.showValidationMessage("Debes subir una imagen.");
+
+                let finalVideo = "";
+                let videoTipoFinal = "";
+
+                if (videoType === "youtube") {
+                    const videoUrlInput = document.getElementById("new-exercise-video").value.trim();
+                    if (!videoUrlInput)
+                        return Swal.showValidationMessage("Debes ingresar la URL del video.");
+
+                    const embedVideoUrl = getYouTubeEmbedUrl(videoUrlInput);
+                    if (!embedVideoUrl)
+                        return Swal.showValidationMessage("La URL del video no es válida.");
+
+                    finalVideo = embedVideoUrl;
+                    videoTipoFinal = "youtube";
+                } else {
+                    const uploadedVideoUrl = window.getUploadedVideo();
+                    if (!uploadedVideoUrl)
+                        return Swal.showValidationMessage("Debes subir un video.");
+
+                    finalVideo = uploadedVideoUrl;
+                    videoTipoFinal = "cloudinary";
+                }
 
                 return {
                     Nombre: exerciseName,
                     Categoria: selectedCategory === "other" ? newCategory : selectedCategory,
                     Imagen: imageUrl,
-                    Video: embedVideoUrl,
+                    Video: finalVideo,
+                    VideoTipo: videoTipoFinal,
                     Instrucciones: exerciseInstructions
                 };
             }
@@ -406,13 +469,21 @@ async function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercis
                 </div>
 
                 <div class="input-group full-width">
-                    <label>URL del video (actual):</label>
-                    <input type="text" id="current-video" class="swal2-input" value="${Video || ''}" disabled>
+                    <label>Tipo de video:</label>
+                    <select id="video-type-edit" class="swal2-select">
+                        <option value="youtube" ${exercise.VideoTipo === "youtube" ? "selected" : ""}>YouTube</option>
+                        <option value="cloudinary" ${exercise.VideoTipo === "cloudinary" ? "selected" : ""}>Subir video</option>
+                    </select>
                 </div>
 
-                <div class="input-group full-width">
-                    <label>URL del nuevo video (YouTube):</label>
+                <div id="youtube-edit">
+                    <label>Nuevo video (YouTube):</label>
                     <input type="text" id="new-video-url" class="swal2-input" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+
+                <div id="cloudinary-edit" style="display:none;">
+                    <button id="upload-video-btn" class="swal2-confirm swal2-styled">Subir nuevo video</button>
+                    <input id="video-preview-edit" class="swal2-input" disabled>
                 </div>
 
                 <div class="instructions-group">
@@ -428,6 +499,23 @@ async function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercis
             </div>
         `,
         didOpen: () => {
+
+            const typeSelect = document.getElementById("video-type-edit");
+const ytDiv = document.getElementById("youtube-edit");
+const cloudDiv = document.getElementById("cloudinary-edit");
+
+typeSelect.addEventListener("change", () => {
+    ytDiv.style.display = typeSelect.value === "youtube" ? "block" : "none";
+    cloudDiv.style.display = typeSelect.value === "cloudinary" ? "block" : "none";
+});
+
+document.getElementById("upload-video-btn").addEventListener("click", () => {
+    openCloudinaryWidget(url => {
+        newVideoUrl = url;
+        document.getElementById("video-preview-edit").value = url;
+    }, "ejercicios_videos");
+});
+
             document.getElementById('upload-image-btn').addEventListener('click', () => {
                 openCloudinaryWidget((url) => {
                     newImageUrl = url;
@@ -441,52 +529,69 @@ async function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercis
         customClass: {
             popup: "swal-wide"
         },
-        preConfirm: async () => {
-            newVideoUrl = document.getElementById('new-video-url').value.trim();
-            const embedVideoUrl = newVideoUrl ? getYouTubeEmbedUrl(newVideoUrl) : Video;
+preConfirm: async () => {
 
-            if (newVideoUrl && !embedVideoUrl) {
-                Swal.fire("Error", "La URL del nuevo video no es válida.", "error");
+    const selectedType = document.getElementById("video-type-edit").value;
+    const newVideoInput = document.getElementById("new-video-url").value.trim();
+
+    let finalVideo = Video; // video actual por defecto
+    let finalVideoTipo = selectedType;
+
+    // Si es YouTube
+    if (selectedType === "youtube") {
+
+        if (newVideoInput) {
+            const embedVideoUrl = getYouTubeEmbedUrl(newVideoInput);
+
+            if (!embedVideoUrl) {
+                Swal.showValidationMessage("La URL del nuevo video no es válida.");
                 return false;
             }
 
-            const newInstructions = document.getElementById("new-instructions").value.trim() || Instrucciones;
-
-            Swal.fire({
-                title: "Guardando cambios...",
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            try {
-                const db = getFirestore();
-                const category = exercise.Categoria || exercise.categoria;
-                if (!category) throw new Error("La categoría del ejercicio no está definida.");
-
-                const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
-                const docSnapshot = await getDoc(exerciseRef);
-                if (!docSnapshot.exists()) throw new Error("No se encontró el ejercicio.");
-
-                await updateDoc(exerciseRef, {
-                    Imagen: newImageUrl || Imagen,
-                    Video: embedVideoUrl,
-                    Instrucciones: newInstructions
-                });
-
-                Swal.fire({
-                    title: "¡Actualizado!",
-                    text: "El ejercicio se ha actualizado correctamente.",
-                    icon: "success",
-                    iconColor: "#ffffff",
-                    color: "#ffffff",
-                    confirmButtonColor: "#3085d6"
-                }).then(() => window.location.reload());
-
-            } catch (error) {
-                Swal.fire("Error", `No se pudo actualizar el ejercicio: ${error.message}`, "error");
-                console.error("Error al actualizar ejercicio:", error);
-            }
+            finalVideo = embedVideoUrl;
         }
+
+    } else {
+        // Si es Cloudinary
+        if (newVideoUrl) {
+            finalVideo = newVideoUrl;
+        }
+    }
+
+    const newInstructions =
+        document.getElementById("new-instructions").value.trim() || Instrucciones;
+
+    Swal.fire({
+        title: "Guardando cambios...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    try {
+        const db = getFirestore();
+        const category = exercise.Categoria || exercise.categoria;
+
+        const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
+
+        await updateDoc(exerciseRef, {
+            Imagen: newImageUrl || Imagen,
+            Video: finalVideo,
+            VideoTipo: finalVideoTipo,
+            Instrucciones: newInstructions
+        });
+
+        Swal.fire({
+            title: "¡Actualizado!",
+            text: "El ejercicio se ha actualizado correctamente.",
+            icon: "success",
+            confirmButtonColor: "#3085d6"
+        }).then(() => window.location.reload());
+
+    } catch (error) {
+        Swal.fire("Error", `No se pudo actualizar el ejercicio: ${error.message}`, "error");
+        console.error("Error al actualizar ejercicio:", error);
+    }
+}
     });
 }
 
