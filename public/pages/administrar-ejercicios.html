@@ -55,7 +55,7 @@
     <footer>
         <div class="footer-container">
             <div class="footer-info">
-                <p>&copy; 2025 Next Level Fitness. Todos los derechos reservados.</p>
+            <p>&copy; <span id="year"></span> Next Level Fitness. Todos los derechos reservados.</p>
                 <p>Email:<a href="mailto:soutrelleagustin64@gmail.com"> soutrelleagustin64@gmail.com</a></p>
             </div>
             <div class="footer-social">
@@ -71,6 +71,10 @@
             </div>
         </div>
     </footer>
+
+    <script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 
     <script type="module" src="../scripts/cloudinary.js"></script>
     <script type="module" src="../scripts/firebaseConfig.js"></script>

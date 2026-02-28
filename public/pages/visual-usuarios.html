@@ -62,7 +62,7 @@
     <footer>
         <div class="footer-container">
             <div class="footer-info">
-                <p>&copy; 2025 Next Level Fitness. Todos los derechos reservados.</p>
+            <p>&copy; <span id="year"></span> Next Level Fitness. Todos los derechos reservados.</p>
                 <p>Email:<a href="mailto:soutrelleagustin64@gmail.com"> soutrelleagustin64@gmail.com</a></p>
             </div>
             <div class="footer-social">
@@ -83,6 +83,10 @@
     <script type="module" src="../scripts/firebaseConfig.js"></script>
     <script type="module" src="../scripts/visual-usuarios.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+
+    <script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 
 </body>
 </html>
