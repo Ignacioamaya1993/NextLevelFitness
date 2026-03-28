@@ -458,6 +458,24 @@ async function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercis
         html: `
             <link rel="stylesheet" href="popup-edit.css">
             <div class="edit-popup">
+
+            <div class="input-group">
+        <label>Nombre actual:</label>
+        <input type="text" class="swal2-input" value="${Nombre}" disabled>
+    </div>
+
+    <div class="input-group">
+        <label>Nuevo nombre:</label>
+        <input type="text" id="new-name" class="swal2-input" placeholder="Nuevo nombre">
+    </div>
+
+    <div class="input-group">
+        <label>Categoría:</label>
+        <select id="edit-category-select" class="swal2-select"></select>
+    </div>
+
+    <input id="edit-new-category" class="swal2-input" placeholder="Nueva categoría" style="display:none;">
+
                 <div class="row">
                     <div class="input-group">
                         <label>Imagen actual:</label>
@@ -498,31 +516,58 @@ async function showExerciseDetails(Nombre, Video, Instrucciones, Imagen, exercis
                 </div>
             </div>
         `,
-        didOpen: () => {
+didOpen: async () => {
 
-            const typeSelect = document.getElementById("video-type-edit");
-const ytDiv = document.getElementById("youtube-edit");
-const cloudDiv = document.getElementById("cloudinary-edit");
+    const db = getFirestore();
 
-typeSelect.addEventListener("change", () => {
-    ytDiv.style.display = typeSelect.value === "youtube" ? "block" : "none";
-    cloudDiv.style.display = typeSelect.value === "cloudinary" ? "block" : "none";
-});
+    // ===== CATEGORÍAS =====
+    const categorySelect = document.getElementById("edit-category-select");
+    const newCategoryInput = document.getElementById("edit-new-category");
 
-document.getElementById("upload-video-btn").addEventListener("click", () => {
-    openCloudinaryWidget(url => {
-        newVideoUrl = url;
-        document.getElementById("video-preview-edit").value = url;
-    }, "ejercicios_videos");
-});
+    const categoriesSnapshot = await getDocs(collection(db, "categories"));
 
-            document.getElementById('upload-image-btn').addEventListener('click', () => {
-                openCloudinaryWidget((url) => {
-                    newImageUrl = url;
-                    document.getElementById('current-image').value = url;
-                }, "gym_images");
-            });
-        },
+    categorySelect.innerHTML = `
+        <option value="">-- Seleccionar --</option>
+    `;
+
+    categoriesSnapshot.forEach(doc => {
+        const selected = doc.id === exercise.Categoria ? "selected" : "";
+        categorySelect.innerHTML += `<option value="${doc.id}" ${selected}>${doc.id}</option>`;
+    });
+
+    categorySelect.innerHTML += `<option value="other">Otra</option>`;
+
+    categorySelect.addEventListener("change", () => {
+        newCategoryInput.style.display =
+            categorySelect.value === "other" ? "block" : "none";
+    });
+
+    // ===== VIDEO =====
+    const typeSelect = document.getElementById("video-type-edit");
+    const ytDiv = document.getElementById("youtube-edit");
+    const cloudDiv = document.getElementById("cloudinary-edit");
+
+    typeSelect.addEventListener("change", () => {
+        ytDiv.style.display = typeSelect.value === "youtube" ? "block" : "none";
+        cloudDiv.style.display = typeSelect.value === "cloudinary" ? "block" : "none";
+    });
+
+    // ===== SUBIR VIDEO =====
+    document.getElementById("upload-video-btn").addEventListener("click", () => {
+        openCloudinaryWidget(url => {
+            newVideoUrl = url;
+            document.getElementById("video-preview-edit").value = url;
+        }, "ejercicios_videos");
+    });
+
+    // ===== SUBIR IMAGEN =====
+    document.getElementById('upload-image-btn').addEventListener('click', () => {
+        openCloudinaryWidget((url) => {
+            newImageUrl = url;
+            document.getElementById('current-image').value = url;
+        }, "gym_images");
+    });
+},
         showCancelButton: true,
         confirmButtonText: "Guardar cambios",
         cancelButtonText: "Cancelar",
@@ -531,33 +576,50 @@ document.getElementById("upload-video-btn").addEventListener("click", () => {
         },
 preConfirm: async () => {
 
+    const db = getFirestore();
+
+    // ===== NOMBRE Y CATEGORÍA =====
+    const newNameInput = document.getElementById("new-name").value.trim();
+    const selectedCategory = document.getElementById("edit-category-select").value;
+    const newCategoryInput = document.getElementById("edit-new-category").value.trim();
+
+    const finalName = newNameInput || Nombre;
+
+    const finalCategory =
+        selectedCategory === "other"
+            ? newCategoryInput
+            : selectedCategory || exercise.Categoria;
+
+    if (!finalCategory) {
+        Swal.showValidationMessage("Debes seleccionar una categoría.");
+        return false;
+    }
+
+    // ===== VIDEO =====
     const selectedType = document.getElementById("video-type-edit").value;
     const newVideoInput = document.getElementById("new-video-url").value.trim();
 
-    let finalVideo = Video; // video actual por defecto
+    let finalVideo = Video;
     let finalVideoTipo = selectedType;
 
-    // Si es YouTube
     if (selectedType === "youtube") {
-
         if (newVideoInput) {
             const embedVideoUrl = getYouTubeEmbedUrl(newVideoInput);
 
             if (!embedVideoUrl) {
-                Swal.showValidationMessage("La URL del nuevo video no es válida.");
+                Swal.showValidationMessage("La URL del video no es válida.");
                 return false;
             }
 
             finalVideo = embedVideoUrl;
         }
-
     } else {
-        // Si es Cloudinary
         if (newVideoUrl) {
             finalVideo = newVideoUrl;
         }
     }
 
+    // ===== INSTRUCCIONES =====
     const newInstructions =
         document.getElementById("new-instructions").value.trim() || Instrucciones;
 
@@ -568,28 +630,56 @@ preConfirm: async () => {
     });
 
     try {
-        const db = getFirestore();
-        const category = exercise.Categoria || exercise.categoria;
+        const oldCategory = exercise.Categoria;
+        const oldRef = doc(db, `categories/${oldCategory}/exercises/${exercise.id}`);
 
-        const exerciseRef = doc(db, `categories/${category}/exercises/${exercise.id}`);
+        // 🔥 SI CAMBIA LA CATEGORÍA → mover documento
+        if (finalCategory !== oldCategory) {
 
-        await updateDoc(exerciseRef, {
-            Imagen: newImageUrl || Imagen,
-            Video: finalVideo,
-            VideoTipo: finalVideoTipo,
-            Instrucciones: newInstructions
-        });
+            // crear categoría si no existe
+            const newCategoryRef = doc(db, `categories/${finalCategory}`);
+            const newCategorySnap = await getDoc(newCategoryRef);
+
+            if (!newCategorySnap.exists()) {
+                await setDoc(newCategoryRef, {});
+            }
+
+            // crear nuevo ejercicio
+            const newRef = doc(collection(db, `categories/${finalCategory}/exercises`));
+
+            await setDoc(newRef, {
+                ...exercise,
+                Nombre: finalName,
+                Categoria: finalCategory,
+                Imagen: newImageUrl || Imagen,
+                Video: finalVideo,
+                VideoTipo: finalVideoTipo,
+                Instrucciones: newInstructions
+            });
+
+            // borrar el viejo
+            await deleteDoc(oldRef);
+
+        } else {
+            // 🔥 SOLO UPDATE NORMAL
+            await updateDoc(oldRef, {
+                Nombre: finalName,
+                Imagen: newImageUrl || Imagen,
+                Video: finalVideo,
+                VideoTipo: finalVideoTipo,
+                Instrucciones: newInstructions
+            });
+        }
 
         Swal.fire({
             title: "¡Actualizado!",
             text: "El ejercicio se ha actualizado correctamente.",
-            icon: "success",
-            confirmButtonColor: "#3085d6"
+            icon: "success"
         }).then(() => window.location.reload());
 
     } catch (error) {
-        Swal.fire("Error", `No se pudo actualizar el ejercicio: ${error.message}`, "error");
-        console.error("Error al actualizar ejercicio:", error);
+        Swal.fire("Error", error.message, "error");
+        console.error(error);
     }
 }
     });
