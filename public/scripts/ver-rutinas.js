@@ -145,9 +145,9 @@ function displayUserRoutines(routines) {
             <ul class="exercise-list">
                 ${todayExercisesList}
             </ul>
-            <button class="edit-button" data-day="${day}">Editar</button>
-            <button class="delete-button" data-day="${day}">Eliminar</button>
-            <button class="reorder-button" data-day="${day}">Reordenar</button>
+            <button class="edit-button" data-day="${today}">Editar</button>
+            <button class="delete-button" data-day="${today}">Eliminar</button>
+            <button class="reorder-button" data-day="${today}">Reordenar</button>
         `;
 
         routineList.appendChild(todayRoutineCard);

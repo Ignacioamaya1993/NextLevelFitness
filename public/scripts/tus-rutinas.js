@@ -530,9 +530,6 @@ function renderEditFields(container, exercise, index, day, exercises) {
     });
 }
 
-const inputElement = document.getElementById("my-input");
-inputElement.addEventListener("input", preventNegativeValues);
-
 async function saveChanges(day, exercises) {
     try {
         const user = JSON.parse(localStorage.getItem("currentUser"));
