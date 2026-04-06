@@ -550,6 +550,117 @@ main {
     gap: 20px;
 }
 
+/* ===== MODO REORDENAR ===== */
+
+.reorder-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.reorder-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    font-weight: 500;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.reorder-list li:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.reorder-list button {
+    margin-left: 6px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+/* Botones flecha */
+.reorder-list .up,
+.reorder-list .down {
+    background-color: #e9ecef;
+    color: #333;
+}
+
+.reorder-list .up:hover,
+.reorder-list .down:hover {
+    background-color: #d6d8db;
+}
+
+/* Deshabilitados */
+.reorder-list button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.save-order {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.save-order:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.cancel-order {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.cancel-order:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+.reorder-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 6px;
+    transition: all 0.2s ease;
+}
+
+.reorder-button:hover {
+    background-color: #0056b3;
+}
+
+.dark-swal {
+    background-color: #1e1e1e !important;
+    color: white !important;
+}
+
+.dark-swal .swal2-select {
+    background-color: #2b2b2b !important;
+    color: white !important;
+}
+
 /* Responsive */
 @media screen and (max-width: 776px) {
     #routine-list {

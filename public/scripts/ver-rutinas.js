@@ -145,8 +145,9 @@ function displayUserRoutines(routines) {
             <ul class="exercise-list">
                 ${todayExercisesList}
             </ul>
-            <button class="edit-button" data-day="${today}">Editar</button>
-            <button class="delete-button" data-day="${today}">Eliminar</button>
+            <button class="edit-button" data-day="${day}">Editar</button>
+            <button class="delete-button" data-day="${day}">Eliminar</button>
+            <button class="reorder-button" data-day="${day}">Reordenar</button>
         `;
 
         routineList.appendChild(todayRoutineCard);
@@ -181,6 +182,7 @@ function displayUserRoutines(routines) {
             </ul>
             <button class="edit-button" data-day="${day}">Editar</button>
             <button class="delete-button" data-day="${day}">Eliminar</button>
+            <button class="reorder-button" data-day="${day}">Reordenar</button>
         `;       
 
         routineList.appendChild(routineCard);
@@ -188,6 +190,15 @@ function displayUserRoutines(routines) {
 
         // Asignar los event listeners después de que el contenido se haya cargado
         addEventListenersToButtons();
+
+        const reorderButtons = routineList.querySelectorAll(".reorder-button");
+
+        reorderButtons.forEach((button) =>
+            button.addEventListener("click", (e) => {
+                const day = e.target.dataset.day;
+                enableReorderMode(day, routines);
+            })
+        );
 
     // Función que agrega los event listeners
     function addEventListenersToButtons() {
@@ -544,6 +555,8 @@ moveButton.addEventListener("click", async () => {
     const { value: newDay } = await Swal.fire({
         title: "Mover ejercicio",
         input: "select",
+        customClass: {
+        popup: 'dark-swal'},
         inputOptions: {
             lunes: "Lunes",
             martes: "Martes",
@@ -639,6 +652,96 @@ async function saveChanges(day, exercises) {
         console.error("Error al guardar los cambios en la rutina:", error);
         Swal.fire("Error", "No se pudo guardar la rutina. Revisa la consola para más detalles.", "error");
      }
+    }
+}
+
+function enableReorderMode(day, routines) {
+
+    const routineCard = [...document.querySelectorAll(".routine-card")]
+        .find(card => card.innerHTML.includes(`día ${day}`) || 
+                      card.innerHTML.includes(`(${day})`));
+
+    const routine = routines.find(r => r.day === day);
+    if (!routine) return;
+
+    let exercises = [...routine.exercises];
+
+    // Render editable list
+    routineCard.innerHTML = `
+        <h3>Reordenar rutina del día ${day}</h3>
+        <ul class="reorder-list">
+            ${exercises.map((ex, i) => `
+                <li data-index="${i}">
+                    ${ex.name}
+                    <button class="up">⬆</button>
+                    <button class="down">⬇</button>
+                </li>
+            `).join("")}
+        </ul>
+
+        <button class="save-order">Guardar orden</button>
+        <button class="cancel-order">Cancelar</button>
+    `;
+
+    const listItems = routineCard.querySelectorAll("li");
+
+    listItems.forEach((li, index) => {
+
+        const upBtn = li.querySelector(".up");
+        const downBtn = li.querySelector(".down");
+
+        if (index === 0) upBtn.disabled = true;
+        if (index === exercises.length - 1) downBtn.disabled = true;
+
+        upBtn.addEventListener("click", () => {
+            if (index === 0) return;
+            [exercises[index - 1], exercises[index]] =
+                [exercises[index], exercises[index - 1]];
+            enableReorderMode(day, [{...routine, exercises}]);
+        });
+
+        downBtn.addEventListener("click", () => {
+            if (index === exercises.length - 1) return;
+            [exercises[index + 1], exercises[index]] =
+                [exercises[index], exercises[index + 1]];
+            enableReorderMode(day, [{...routine, exercises}]);
+        });
+    });
+
+    routineCard.querySelector(".cancel-order")
+        .addEventListener("click", () => location.reload());
+
+    routineCard.querySelector(".save-order")
+        .addEventListener("click", async () => {
+            await saveNewOrder(day, exercises);
+        });
+}
+
+async function saveNewOrder(day, exercises) {
+    try {
+        const selectedUserId = localStorage.getItem("selectedUserId");
+        const routinesRef = collection(db, "routines");
+
+        const q = query(
+            routinesRef,
+            where("userId", "==", selectedUserId),
+            where("day", "==", day)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (snapshot.size === 1) {
+            await updateDoc(snapshot.docs[0].ref, { exercises });
+
+            Swal.fire({
+                title: "Orden actualizado",
+                icon: "success"
+            }).then(() => location.reload());
+        }
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire("Error", "No se pudo guardar el orden.", "error");
     }
 }
 
