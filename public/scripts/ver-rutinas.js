@@ -1,5 +1,5 @@
 import app, { db } from "../scripts/firebaseConfig.js";
-import { collection, getDocs, query, where, deleteDoc, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, getDocs, query, where, deleteDoc, doc, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -221,9 +221,12 @@ function displayUserRoutines(routines) {
 
         // Llamar a la función de descarga solo después de que las rutinas estén disponibles
         const downloadButton = document.getElementById("download-pdf");
-        downloadButton.addEventListener("click", () => {
-        downloadRoutinesAsPDF(groupedRoutines); // Pasar las rutinas agrupadas como parámetro
-         });
+
+        if (downloadButton) {
+            downloadButton.addEventListener("click", () => {
+                downloadRoutinesAsPDF(groupedRoutines);
+            });
+        }
 
          function downloadRoutinesAsPDF(groupedRoutines) {
             const { jsPDF } = window.jspdf;
@@ -269,6 +272,73 @@ function displayUserRoutines(routines) {
             
         // Descargar el archivo PDF
         doc.save(fileName);
+    }
+}
+
+async function moveExerciseToAnotherDay(currentDay, newDay, index, exercises) {
+    try {
+        const selectedUserId = localStorage.getItem("selectedUserId");
+
+        const exerciseToMove = exercises[index];
+
+        const routinesRef = collection(db, "routines");
+
+        // 🔹 Buscar rutina actual
+        const qCurrent = query(
+            routinesRef,
+            where("userId", "==", selectedUserId),
+            where("day", "==", currentDay)
+        );
+
+        const currentSnapshot = await getDocs(qCurrent);
+
+        if (currentSnapshot.empty) {
+            Swal.fire("Error", "No se encontró la rutina actual.", "error");
+            return;
+        }
+
+        const currentDoc = currentSnapshot.docs[0];
+
+        // 🔹 Buscar rutina destino
+        const qNew = query(
+            routinesRef,
+            where("userId", "==", selectedUserId),
+            where("day", "==", newDay)
+        );
+
+        const newSnapshot = await getDocs(qNew);
+
+        // ===== 1️⃣ Eliminar del día actual =====
+        exercises.splice(index, 1);
+
+        if (exercises.length === 0) {
+            await deleteDoc(currentDoc.ref);
+        } else {
+            await updateDoc(currentDoc.ref, { exercises });
+        }
+
+        // ===== 2️⃣ Agregar al nuevo día =====
+        if (!newSnapshot.empty) {
+            const newDoc = newSnapshot.docs[0];
+            const newExercises = newDoc.data().exercises || [];
+            newExercises.push(exerciseToMove);
+
+            await updateDoc(newDoc.ref, { exercises: newExercises });
+        } else {
+            // Si no existe el día destino, lo creamos
+            await addDoc(routinesRef, {
+                userId: selectedUserId,
+                day: newDay,
+                exercises: [exerciseToMove]
+            });
+        }
+
+        Swal.fire("Éxito", "El ejercicio fue movido correctamente.", "success")
+            .then(() => location.reload());
+
+    } catch (error) {
+        console.error("Error al mover ejercicio:", error);
+        Swal.fire("Error", "No se pudo mover el ejercicio.", "error");
     }
 }
 
@@ -403,6 +473,8 @@ function renderEditFields(container, exercise, index, day, exercises) {
             <textarea id="additionalData-${index}" rows="4">${exercise.additionalData || ''}</textarea>
         </div>
         <button class="delete-exercise" data-index="${index}">Eliminar ejercicio</button>
+
+        <button class="move-exercise" data-index="${index}">Mover a otro día</button>
     `;
 
     // Obtener los inputs
@@ -463,38 +535,44 @@ function renderEditFields(container, exercise, index, day, exercises) {
             }
         });
     });
-}
 
-// Modificar el evento de guardar cambios para validar antes de cerrar el popup
-saveButton.addEventListener("click", () => {
-    let valid = true;
+    // Configurar evento para mover ejercicio
+const moveButton = container.querySelector(".move-exercise");
 
-    exercises.forEach((_, index) => {
-        const seriesInput = document.getElementById(`series-${index}`);
-        const repsInput = document.getElementById(`reps-${index}`);
-        const weightInput = document.getElementById(`weight-${index}`);
+moveButton.addEventListener("click", async () => {
 
-        if (parseFloat(seriesInput.value) <= 0 || parseFloat(repsInput.value) <= 0 || parseFloat(weightInput.value) <= 0) {
-            valid = false;
-        }
+    const { value: newDay } = await Swal.fire({
+        title: "Mover ejercicio",
+        input: "select",
+        inputOptions: {
+            lunes: "Lunes",
+            martes: "Martes",
+            miércoles: "Miércoles",
+            jueves: "Jueves",
+            viernes: "Viernes",
+            sábado: "Sábado"
+        },
+        inputPlaceholder: "Seleccionar día",
+        showCancelButton: true
     });
 
-    if (valid) {
-        saveChanges(day, exercises);
-        popup.classList.add("hidden");
-    } else {
-        Swal.fire("Error", "Corrige los valores en 0 o negativos antes de guardar.", "error");
+    if (newDay && newDay !== day) {
+        moveExerciseToAnotherDay(day, newDay, index, exercises);
     }
 });
-
-const inputElement = document.getElementById("my-input");
-inputElement.addEventListener("input", preventNegativeValues);
+}
 
 // 🔹 Función para guardar los cambios
 async function saveChanges(day, exercises) {
     try {
         const routinesRef = collection(db, "routines");
-        const q = query(routinesRef, where("day", "==", day));
+        const selectedUserId = localStorage.getItem("selectedUserId");
+
+        const q = query(
+            routinesRef,
+            where("userId", "==", selectedUserId),
+            where("day", "==", day)
+        );
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.size === 1) {
@@ -503,49 +581,40 @@ async function saveChanges(day, exercises) {
 
             let hasChanges = false; // Bandera para verificar si hubo cambios
 
-            exercises.forEach((exercise, index) => {
-                const additionalDataInput = document.getElementById(`additionalData-${index}`);
-                if (additionalDataInput) {
-                    exercise.additionalData = additionalDataInput.value || "";
-                }
-            
-                const seriesInput = document.getElementById(`series-${index}`);
-                const repsInput = document.getElementById(`reps-${index}`);
-                const weightInput = document.getElementById(`weight-${index}`);
-            
-                if (!seriesInput || !repsInput || !weightInput) {
-                    console.error(`No se encontraron los elementos de entrada para el ejercicio en el índice ${index}`);
-                    return; // Salta este ejercicio y pasa al siguiente
-                }
-            
-                const newSeries = parseInt(seriesInput.value, 10);
-                const newReps = parseInt(repsInput.value, 10);
-                const newWeight = parseFloat(weightInput.value);
-                const newAdditionalData = exercise.additionalData;
+        const exerciseSelect = document.getElementById("exercise-select");
+        const selectedIndex = parseInt(exerciseSelect.value, 10);
 
-                // Valores actuales en la base de datos
-                const existingExercise = existingExercises[index] || {};
-                const existingSeries = existingExercise.series || 0;
-                const existingReps = existingExercise.repetitions || 0;
-                const existingWeight = existingExercise.weight || 0;
-                const existingAdditionalData = existingExercise.additionalData || "";
+        const exercise = exercises[selectedIndex];
 
-                // Verificar si algún valor ha cambiado
-                if (
-                    newSeries !== existingSeries ||
-                    newReps !== existingReps ||
-                    newWeight !== existingWeight ||
-                    newAdditionalData !== existingAdditionalData
-                ) {
-                    hasChanges = true;
-                }
+        const seriesInput = document.getElementById(`series-${selectedIndex}`);
+        const repsInput = document.getElementById(`reps-${selectedIndex}`);
+        const weightInput = document.getElementById(`weight-${selectedIndex}`);
+        const additionalDataInput = document.getElementById(`additionalData-${selectedIndex}`);
 
-                // Actualizar los valores en el objeto exercises
-                exercise.series = newSeries;
-                exercise.repetitions = newReps;
-                exercise.weight = newWeight;
-                exercise.additionalData = newAdditionalData;
-            });
+        if (!seriesInput || !repsInput || !weightInput) {
+            console.error("No se encontraron los inputs del ejercicio seleccionado.");
+            return;
+        }
+
+        const newSeries = parseInt(seriesInput.value, 10);
+        const newReps = parseInt(repsInput.value, 10);
+        const newWeight = parseFloat(weightInput.value);
+        const newAdditionalData = additionalDataInput ? additionalDataInput.value : "";
+
+        // Verificar si hubo cambios reales
+        if (
+            exercise.series !== newSeries ||
+            exercise.repetitions !== newReps ||
+            exercise.weight !== newWeight ||
+            exercise.additionalData !== newAdditionalData
+        ) {
+            hasChanges = true;
+
+            exercise.series = newSeries;
+            exercise.repetitions = newReps;
+            exercise.weight = newWeight;
+            exercise.additionalData = newAdditionalData;
+        }
 
             if (!hasChanges) {
                 console.warn("No se detectaron cambios en los ejercicios.");
