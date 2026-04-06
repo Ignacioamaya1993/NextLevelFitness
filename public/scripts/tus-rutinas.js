@@ -530,35 +530,26 @@ function renderEditFields(container, exercise, index, day, exercises) {
     });
 }
 
-// Modificar el evento de guardar cambios para validar antes de cerrar el popup
-saveButton.addEventListener("click", () => {
-    let valid = true;
-
-    exercises.forEach((_, index) => {
-        const seriesInput = document.getElementById(`series-${index}`);
-        const repsInput = document.getElementById(`reps-${index}`);
-        const weightInput = document.getElementById(`weight-${index}`);
-
-        if (parseFloat(seriesInput.value) <= 0 || parseFloat(repsInput.value) <= 0 || parseFloat(weightInput.value) <= 0) {
-            valid = false;
-        }
-    });
-
-    if (valid) {
-        saveChanges(day, exercises);
-        popup.classList.add("hidden");
-    } else {
-        Swal.fire("Error", "Corrige los valores en 0 o negativos antes de guardar.", "error");
-    }
-});
-
 const inputElement = document.getElementById("my-input");
 inputElement.addEventListener("input", preventNegativeValues);
 
 async function saveChanges(day, exercises) {
     try {
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+
+        if (!user || !user.uid) {
+            console.error("Usuario no válido.");
+            return;
+        }
+
         const routinesRef = collection(db, "routines");
-        const q = query(routinesRef, where("day", "==", day));
+
+        const q = query(
+            routinesRef,
+            where("userId", "==", user.uid),
+            where("day", "==", day)
+        );
+
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.size === 1) {
@@ -667,8 +658,21 @@ async function deleteExerciseFromRoutine(day, index, exercises) {
     try {
         exercises.splice(index, 1);
 
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+
+        if (!user || !user.uid) {
+            console.error("Usuario no válido.");
+            return;
+        }
+
         const routinesRef = collection(db, "routines");
-        const q = query(routinesRef, where("day", "==", day));
+
+        const q = query(
+            routinesRef,
+            where("userId", "==", user.uid),
+            where("day", "==", day)
+        );
+
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.size === 1) {

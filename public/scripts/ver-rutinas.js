@@ -747,11 +747,18 @@ async function saveNewOrder(day, exercises) {
 
 async function deleteExerciseFromRoutine(day, index, exercises) {
     try {
-        // Elimina el ejercicio de la lista
         exercises.splice(index, 1);
 
+        const selectedUserId = localStorage.getItem("selectedUserId");
+
         const routinesRef = collection(db, "routines");
-        const q = query(routinesRef, where("day", "==", day));
+
+        const q = query(
+            routinesRef,
+            where("userId", "==", selectedUserId),
+            where("day", "==", day)
+        );
+
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.size === 1) {
