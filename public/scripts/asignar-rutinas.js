@@ -12,7 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const selectedUserId = localStorage.getItem("selectedUserId");
+        // 🔹 Botón para ir a armar rutina
+const goToAssignBtn = document.getElementById("go-to-assign");
 
+if (goToAssignBtn) {
+    goToAssignBtn.addEventListener("click", () => {
+        window.location.href = "ver-rutinas.html";
+    });
+}
         if (!selectedUserId) {
             console.error("No se ha encontrado el userId en localStorage.");
             return;

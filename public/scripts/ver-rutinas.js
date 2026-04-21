@@ -11,6 +11,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const userId = localStorage.getItem("selectedUserId");
+        // 🔹 Botón para ir a armar rutina
+const goToAssignBtn = document.getElementById("go-to-assign");
+
+if (goToAssignBtn) {
+    goToAssignBtn.addEventListener("click", () => {
+        window.location.href = "asignar-rutinas.html";
+    });
+}
         const routineList = document.getElementById("routine-list");
         const tituloRutinas = document.getElementById("titulo-rutinas");
 
