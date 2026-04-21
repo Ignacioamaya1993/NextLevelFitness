@@ -256,8 +256,10 @@ function displayUserRoutines(routines, db) {
 
     // Llamar a la función de descarga solo después de que las rutinas estén disponibles
     const downloadButton = document.getElementById("download-pdf");
-    downloadButton.addEventListener("click", () => {
-        downloadRoutinesAsPDF(groupedRoutines); // Pasar las rutinas agrupadas como parámetro
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+
+    downloadButton.addEventListener("click", async () => {
+        await downloadRoutinesAsPDF(groupedRoutines, user);
     });
 
     // Asignar los event listeners después de que el contenido se haya cargado
@@ -313,10 +315,7 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
     const pageWidth = doc.internal.pageSize.getWidth();
     let currentY = 20;
 
-    const userNameElement = document.getElementById("user-name");
-    const userName = userNameElement 
-        ? userNameElement.textContent.trim() 
-        : "Alumno";
+    const userName = user?.name || user?.displayName || user?.email || "Alumno";
 
     const fecha = new Date().toLocaleDateString("es-AR");
 
