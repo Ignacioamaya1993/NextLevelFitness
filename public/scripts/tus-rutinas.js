@@ -302,6 +302,7 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
 
     const { jsPDF } = window.jspdf;
 
+    // ✅ PDF con compresión activada
     const doc = new jsPDF({
         orientation: "p",
         unit: "mm",
@@ -312,40 +313,48 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
     const pageWidth = doc.internal.pageSize.getWidth();
     let currentY = 20;
 
+    const userNameElement = document.getElementById("user-name");
+    const userName = userNameElement 
+        ? userNameElement.textContent.trim() 
+        : "Alumno";
+
     const fecha = new Date().toLocaleDateString("es-AR");
 
+/* =====================================================
+   🔹 CARGAR Y REDUCIR LOGO (SIN PERDER COLORES)
+   ===================================================== */
+
+const logoUrl = "../assets/images/logos/nextlevel1.png";
+
+const img = new Image();
+img.src = logoUrl;
+
+await new Promise(resolve => img.onload = resolve);
+
+const canvas = document.createElement("canvas");
+
+// Reducimos tamaño máximo a 500px ancho
+const maxWidth = 500;
+const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+
+canvas.width = img.width * scale;
+canvas.height = img.height * scale;
+
+const ctx = canvas.getContext("2d");
+
+// 🔥 IMPORTANTE: Fondo blanco para evitar problemas
+ctx.fillStyle = "#ffffff";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+// 🔥 Mantener PNG (no JPEG)
+const compressedLogo = canvas.toDataURL("image/png");
+
+doc.addImage(compressedLogo, "PNG", 15, 10, 35, 18);
+
     /* =====================================================
-       🔹 CARGAR Y OPTIMIZAR LOGO (MISMA TÉCNICA QUE ANTES)
-       ===================================================== */
-
-    const logoUrl = "../assets/images/logos/nextlevel1.png";
-
-    const img = new Image();
-    img.src = logoUrl;
-
-    await new Promise(resolve => img.onload = resolve);
-
-    const canvas = document.createElement("canvas");
-
-    const maxWidth = 500;
-    const scale = img.width > maxWidth ? maxWidth / img.width : 1;
-
-    canvas.width = img.width * scale;
-    canvas.height = img.height * scale;
-
-    const ctx = canvas.getContext("2d");
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    const compressedLogo = canvas.toDataURL("image/png");
-
-    doc.addImage(compressedLogo, "PNG", 15, 10, 35, 18);
-
-    /* =====================================================
-       🔹 TÍTULO
+       🔹 ENCABEZADO
        ===================================================== */
 
     doc.setFontSize(18);
@@ -354,52 +363,61 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
 
     currentY = 35;
 
-    doc.setFontSize(11);
+    doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
+    doc.text(`Alumno: ${userName}`, 15, currentY);
+    currentY += 6;
     doc.text(`Fecha: ${fecha}`, 15, currentY);
 
     currentY += 10;
 
     /* =====================================================
-       🔹 CONTENIDO
+       🔹 RUTINAS POR DÍA
        ===================================================== */
 
     for (const day in groupedRoutines) {
 
         const exercises = groupedRoutines[day];
 
-        doc.setFontSize(13);
+        doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text(`Rutina para el día ${day}`, 15, currentY);
+        doc.text(day.toUpperCase(), 15, currentY);
 
+        currentY += 4;
+
+        doc.line(15, currentY, pageWidth - 15, currentY);
         currentY += 6;
 
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
+        const tableData = exercises.map(ex => [
+            ex.name || "-",
+            ex.series || "-",
+            ex.repetitions || "-",
+            ex.weight ? `${ex.weight} kg` : "-",
+            ex.additionalData || "-"
+        ]);
 
-        exercises.forEach(exercise => {
-
-            const name = exercise.name || "Ejercicio sin nombre";
-            const series = exercise.series || 0;
-            const reps = exercise.repetitions || 0;
-            const weight = exercise.weight || 0;
-            const additionalData = exercise.additionalData || "";
-
-            const text = `${name} - ${series} series, ${reps} reps, ${weight} kg ${additionalData ? `- ${additionalData}` : ""}`;
-
-            const splitText = doc.splitTextToSize(text, pageWidth - 30);
-
-            doc.text(splitText, 15, currentY);
-
-            currentY += splitText.length * 5;
-
-            if (currentY > 270) {
-                doc.addPage();
-                currentY = 20;
-            }
+        doc.autoTable({
+            startY: currentY,
+            head: [["Ejercicio", "Series", "Reps", "Peso", "Observaciones"]],
+            body: tableData,
+            theme: "grid",
+            styles: {
+                fontSize: 9,
+                cellPadding: 3
+            },
+            headStyles: {
+                fillColor: [30, 30, 30],
+                textColor: 255
+            },
+            margin: { left: 15, right: 15 }
         });
 
-        currentY += 8;
+        currentY = doc.lastAutoTable.finalY + 10;
+
+        if (currentY > 260) {
+            doc.addPage();
+            currentY = 20;
+        }
     }
 
     /* =====================================================
@@ -407,7 +425,6 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
        ===================================================== */
 
     const pageCount = doc.getNumberOfPages();
-
     for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(8);
@@ -419,7 +436,7 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
         );
     }
 
-    doc.save("Rutinas - Next Level.pdf");
+    doc.save(`Rutina - ${userName}.pdf`);
 }
 }
 
