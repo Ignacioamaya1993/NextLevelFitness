@@ -1,0 +1,41 @@
+[debug] [2026-04-21T11:20:20.378Z] ----------------------------------------------------------------------
+[debug] [2026-04-21T11:20:20.401Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Iamaya\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2026-04-21T11:20:20.402Z] CLI Version:   15.2.1
+[debug] [2026-04-21T11:20:20.402Z] Platform:      win32
+[debug] [2026-04-21T11:20:20.403Z] Node Version:  v25.2.1
+[debug] [2026-04-21T11:20:20.403Z] Time:          Tue Apr 21 2026 08:20:20 GMT-0300 (hora estándar de Argentina)
+[debug] [2026-04-21T11:20:20.404Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-21T11:20:20.408Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-04-21T11:20:44.700Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-21T11:20:44.700Z] > authorizing via signed-in user (naa87.1993@gmail.com)
+[debug] [2026-04-21T11:20:44.701Z] [iam] checking project next-level-fitness-52989 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-04-21T11:20:44.702Z] Checked if tokens are valid: false, expires at: 1768576506040
+[debug] [2026-04-21T11:20:44.702Z] Checked if tokens are valid: false, expires at: 1768576506040
+[debug] [2026-04-21T11:20:44.702Z] > refreshing access token with scopes: []
+[debug] [2026-04-21T11:20:44.704Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-04-21T11:20:44.704Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-04-21T11:20:44.855Z] *** [apiv2] error from fetch(https://www.googleapis.com/oauth2/v3/token, {"headers":{},"method":"POST","body":{"_overheadLength":545,"_valueLength":212,"_valuesToMeasure":[],"writable":false,"readable":true,"dataSize":0,"maxDataSize":2097152,"pauseStreams":true,"_released":true,"_streams":[],"_currentStream":null,"_insideLoop":false,"_pendingNext":false,"_boundary":"--------------------------f72fd15f11dd2e10291ac5ce","_events":{},"_eventsCount":1}}): FetchError: request to https://www.googleapis.com/oauth2/v3/token failed, reason: self-signed certificate in certificate chain
+[error] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2026-04-21T11:20:44.857Z] [iam] error while checking permissions, command may fail: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2026-04-21T11:20:44.859Z] Checked if tokens are valid: false, expires at: 1768576506040
+[debug] [2026-04-21T11:20:44.859Z] Checked if tokens are valid: false, expires at: 1768576506040
+[debug] [2026-04-21T11:20:44.859Z] > refreshing access token with scopes: []
+[debug] [2026-04-21T11:20:44.860Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-04-21T11:20:44.860Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-04-21T11:20:44.954Z] *** [apiv2] error from fetch(https://www.googleapis.com/oauth2/v3/token, {"headers":{},"method":"POST","body":{"_overheadLength":545,"_valueLength":212,"_valuesToMeasure":[],"writable":false,"readable":true,"dataSize":0,"maxDataSize":2097152,"pauseStreams":true,"_released":true,"_streams":[],"_currentStream":null,"_insideLoop":false,"_pendingNext":false,"_boundary":"--------------------------8e7d038627f462cd870b408e","_events":{},"_eventsCount":1}}): FetchError: request to https://www.googleapis.com/oauth2/v3/token failed, reason: self-signed certificate in certificate chain
+[error] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2026-04-21T11:20:44.955Z] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[error] 
+[error] Error: Assertion failed: resolving hosting target of a site with no site name or target name. This should have caused an error earlier
+[debug] [2026-04-21T11:20:45.065Z] *** [apiv2] error from fetch(https://firebase-public.firebaseio.com/cli.json, {"headers":{},"method":"GET"}): FetchError: request to https://firebase-public.firebaseio.com/cli.json failed, reason: self-signed certificate in certificate chain
+[warn] !  Unable to fetch the CLI MOTD and remote config. This is not a fatal error, but may indicate an issue with your network connection. 
+[debug] [2026-04-21T11:20:45.067Z] Failed to fetch MOTD FirebaseError: Failed to make request to https://firebase-public.firebaseio.com/cli.json

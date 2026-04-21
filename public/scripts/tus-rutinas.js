@@ -298,46 +298,129 @@ function displayUserRoutines(routines, db) {
         );
     }
 
-    // Función que genera y descarga el PDF
-    function downloadRoutinesAsPDF(groupedRoutines) {
-        const { jsPDF } = window.jspdf; // Usar jsPDF
+async function downloadRoutinesAsPDF(groupedRoutines) {
 
-        const doc = new jsPDF();
-        let yPosition = 10;
-        doc.setFontSize(16);
-        doc.text("Rutinas de Ejercicio", 10, yPosition);
+    const { jsPDF } = window.jspdf;
 
-        // Para cada día de la rutina
-        for (const day in groupedRoutines) {
-            const exercises = groupedRoutines[day];
+    const doc = new jsPDF({
+        orientation: "p",
+        unit: "mm",
+        format: "a4",
+        compress: true
+    });
 
-            // Título del día
-            yPosition += 10;
-            doc.setFontSize(12);
-            doc.text(`Rutina para el día ${day}`, 10, yPosition);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let currentY = 20;
 
-            // Agregar los ejercicios
-            exercises.forEach(exercise => {
-                yPosition += 8;
-                doc.setFontSize(10);
-                const name = exercise.name || "Ejercicio sin nombre";
-                const series = exercise.series || 0;
-                const reps = exercise.repetitions || 0;
-                const weight = exercise.weight || 0;
-                const additionalData = exercise.additionalData || "Sin información adicional";
-                doc.text(`${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}`, 10, yPosition);
-            });
+    const fecha = new Date().toLocaleDateString("es-AR");
 
-            // Si el contenido se está saliendo de la página, añadir una nueva página
-            if (yPosition > 270) {
+    /* =====================================================
+       🔹 CARGAR Y OPTIMIZAR LOGO (MISMA TÉCNICA QUE ANTES)
+       ===================================================== */
+
+    const logoUrl = "../assets/images/logos/nextlevel1.png";
+
+    const img = new Image();
+    img.src = logoUrl;
+
+    await new Promise(resolve => img.onload = resolve);
+
+    const canvas = document.createElement("canvas");
+
+    const maxWidth = 500;
+    const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+
+    canvas.width = img.width * scale;
+    canvas.height = img.height * scale;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    const compressedLogo = canvas.toDataURL("image/png");
+
+    doc.addImage(compressedLogo, "PNG", 15, 10, 35, 18);
+
+    /* =====================================================
+       🔹 TÍTULO
+       ===================================================== */
+
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("PLAN DE ENTRENAMIENTO", pageWidth / 2, 20, { align: "center" });
+
+    currentY = 35;
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Fecha: ${fecha}`, 15, currentY);
+
+    currentY += 10;
+
+    /* =====================================================
+       🔹 CONTENIDO
+       ===================================================== */
+
+    for (const day in groupedRoutines) {
+
+        const exercises = groupedRoutines[day];
+
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Rutina para el día ${day}`, 15, currentY);
+
+        currentY += 6;
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+
+        exercises.forEach(exercise => {
+
+            const name = exercise.name || "Ejercicio sin nombre";
+            const series = exercise.series || 0;
+            const reps = exercise.repetitions || 0;
+            const weight = exercise.weight || 0;
+            const additionalData = exercise.additionalData || "";
+
+            const text = `${name} - ${series} series, ${reps} reps, ${weight} kg ${additionalData ? `- ${additionalData}` : ""}`;
+
+            const splitText = doc.splitTextToSize(text, pageWidth - 30);
+
+            doc.text(splitText, 15, currentY);
+
+            currentY += splitText.length * 5;
+
+            if (currentY > 270) {
                 doc.addPage();
-                yPosition = 10;
+                currentY = 20;
             }
-        }
+        });
 
-        // Descargar el archivo PDF
-        doc.save("rutinas.pdf");
+        currentY += 8;
     }
+
+    /* =====================================================
+       🔹 PIE DE PÁGINA
+       ===================================================== */
+
+    const pageCount = doc.getNumberOfPages();
+
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text(
+            `Página ${i} de ${pageCount}`,
+            pageWidth / 2,
+            290,
+            { align: "center" }
+        );
+    }
+
+    doc.save("Rutinas - Next Level.pdf");
+}
 }
 
 function openEditPopup(day, routines) {

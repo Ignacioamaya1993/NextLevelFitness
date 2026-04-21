@@ -240,8 +240,16 @@ function displayUserRoutines(routines) {
         }
 
 async function downloadRoutinesAsPDF(groupedRoutines) {
+
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF("p", "mm", "a4");
+
+    // ✅ PDF con compresión activada
+    const doc = new jsPDF({
+        orientation: "p",
+        unit: "mm",
+        format: "a4",
+        compress: true
+    });
 
     const pageWidth = doc.internal.pageSize.getWidth();
     let currentY = 20;
@@ -253,24 +261,42 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
 
     const fecha = new Date().toLocaleDateString("es-AR");
 
-    /* ==============================
-       🔹 CARGAR LOGO DESDE ASSETS
-       ============================== */
+/* =====================================================
+   🔹 CARGAR Y REDUCIR LOGO (SIN PERDER COLORES)
+   ===================================================== */
 
-    const logoUrl = "/assets/images/logos/nextlevel1.png";
+const logoUrl = "../assets/images/logos/nextlevel1.png";
 
-    const img = new Image();
-    img.src = logoUrl;
+const img = new Image();
+img.src = logoUrl;
 
-    await new Promise((resolve) => {
-        img.onload = resolve;
-    });
+await new Promise(resolve => img.onload = resolve);
 
-    doc.addImage(img, "PNG", 15, 10, 35, 18);
+const canvas = document.createElement("canvas");
 
-    /* ==============================
-       ENCABEZADO
-       ============================== */
+// Reducimos tamaño máximo a 500px ancho
+const maxWidth = 500;
+const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+
+canvas.width = img.width * scale;
+canvas.height = img.height * scale;
+
+const ctx = canvas.getContext("2d");
+
+// 🔥 IMPORTANTE: Fondo blanco para evitar problemas
+ctx.fillStyle = "#ffffff";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+// 🔥 Mantener PNG (no JPEG)
+const compressedLogo = canvas.toDataURL("image/png");
+
+doc.addImage(compressedLogo, "PNG", 15, 10, 35, 18);
+
+    /* =====================================================
+       🔹 ENCABEZADO
+       ===================================================== */
 
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
@@ -287,26 +313,22 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
     currentY += 10;
 
     /* =====================================================
-       🔹 3. RUTINAS POR DÍA
+       🔹 RUTINAS POR DÍA
        ===================================================== */
 
     for (const day in groupedRoutines) {
 
         const exercises = groupedRoutines[day];
 
-        // Título del día
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
         doc.text(day.toUpperCase(), 15, currentY);
 
         currentY += 4;
 
-        // Línea separadora
-        doc.setDrawColor(0);
         doc.line(15, currentY, pageWidth - 15, currentY);
         currentY += 6;
 
-        // Armar tabla
         const tableData = exercises.map(ex => [
             ex.name || "-",
             ex.series || "-",
@@ -328,15 +350,11 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
                 fillColor: [30, 30, 30],
                 textColor: 255
             },
-            margin: { left: 15, right: 15 },
-            didDrawPage: function (data) {
-                currentY = data.cursor.y + 10;
-            }
+            margin: { left: 15, right: 15 }
         });
 
         currentY = doc.lastAutoTable.finalY + 10;
 
-        // Si se va muy abajo, nueva página
         if (currentY > 260) {
             doc.addPage();
             currentY = 20;
@@ -344,7 +362,7 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
     }
 
     /* =====================================================
-       🔹 4. PIE DE PÁGINA
+       🔹 PIE DE PÁGINA
        ===================================================== */
 
     const pageCount = doc.getNumberOfPages();
@@ -358,8 +376,6 @@ async function downloadRoutinesAsPDF(groupedRoutines) {
             { align: "center" }
         );
     }
-
-    /* ===================================================== */
 
     doc.save(`Rutina - ${userName}.pdf`);
 }
