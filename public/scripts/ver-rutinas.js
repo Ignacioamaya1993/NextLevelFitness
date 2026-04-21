@@ -239,51 +239,130 @@ function displayUserRoutines(routines) {
             });
         }
 
-         function downloadRoutinesAsPDF(groupedRoutines) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            let yPosition = 10;
-            doc.setFontSize(16);
-        
-            const userNameElement = document.getElementById("user-name");
-            const userName = userNameElement ? userNameElement.textContent.trim() : "Usuario desconocido";
-        
-            doc.setFontSize(16);
-            doc.text(`Rutinas de Ejercicios de ${userName}`, 10, yPosition);        
+async function downloadRoutinesAsPDF(groupedRoutines) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("p", "mm", "a4");
 
-        // Para cada día de la rutina
-        for (const day in groupedRoutines) {
-            const exercises = groupedRoutines[day];
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let currentY = 20;
 
-            // Título del día
-            yPosition += 10;
-            doc.setFontSize(12);
-            doc.text(`Rutina para el día ${day}`, 10, yPosition);
+    const userNameElement = document.getElementById("user-name");
+    const userName = userNameElement 
+        ? userNameElement.textContent.trim() 
+        : "Alumno";
 
-            // Agregar los ejercicios
-            exercises.forEach(exercise => {
-                yPosition += 8;
-                doc.setFontSize(10);
-                const name = exercise.name || "Ejercicio sin nombre";
-                const series = exercise.series || 0;
-                const reps = exercise.repetitions || 0;
-                const weight = exercise.weight || 0;
-                const additionalData = exercise.additionalData || "Sin información adicional";
-                doc.text(`${name} - ${series} series, ${reps} reps, ${weight} kg, ${additionalData}`, 10, yPosition);
-            });
+    const fecha = new Date().toLocaleDateString("es-AR");
 
-            // Si el contenido se está saliendo de la página, añadir una nueva página
-            if (yPosition > 270) {
-                doc.addPage();
-                yPosition = 10;
+    /* ==============================
+       🔹 CARGAR LOGO DESDE ASSETS
+       ============================== */
+
+    const logoUrl = "/assets/images/logos/nextlevel1.png";
+
+    const img = new Image();
+    img.src = logoUrl;
+
+    await new Promise((resolve) => {
+        img.onload = resolve;
+    });
+
+    doc.addImage(img, "PNG", 15, 10, 35, 18);
+
+    /* ==============================
+       ENCABEZADO
+       ============================== */
+
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("PLAN DE ENTRENAMIENTO", pageWidth / 2, 20, { align: "center" });
+
+    currentY = 35;
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Alumno: ${userName}`, 15, currentY);
+    currentY += 6;
+    doc.text(`Fecha: ${fecha}`, 15, currentY);
+
+    currentY += 10;
+
+    /* =====================================================
+       🔹 3. RUTINAS POR DÍA
+       ===================================================== */
+
+    for (const day in groupedRoutines) {
+
+        const exercises = groupedRoutines[day];
+
+        // Título del día
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text(day.toUpperCase(), 15, currentY);
+
+        currentY += 4;
+
+        // Línea separadora
+        doc.setDrawColor(0);
+        doc.line(15, currentY, pageWidth - 15, currentY);
+        currentY += 6;
+
+        // Armar tabla
+        const tableData = exercises.map(ex => [
+            ex.name || "-",
+            ex.series || "-",
+            ex.repetitions || "-",
+            ex.weight ? `${ex.weight} kg` : "-",
+            ex.additionalData || "-"
+        ]);
+
+        doc.autoTable({
+            startY: currentY,
+            head: [["Ejercicio", "Series", "Reps", "Peso", "Observaciones"]],
+            body: tableData,
+            theme: "grid",
+            styles: {
+                fontSize: 9,
+                cellPadding: 3
+            },
+            headStyles: {
+                fillColor: [30, 30, 30],
+                textColor: 255
+            },
+            margin: { left: 15, right: 15 },
+            didDrawPage: function (data) {
+                currentY = data.cursor.y + 10;
             }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 10;
+
+        // Si se va muy abajo, nueva página
+        if (currentY > 260) {
+            doc.addPage();
+            currentY = 20;
         }
-        // Nombre del archivo con el formato "Rutina de [Usuario].pdf"
-        const fileName = `Rutina de ${userName.replace(/\s+/g, " ")}.pdf`;
-            
-        // Descargar el archivo PDF
-        doc.save(fileName);
     }
+
+    /* =====================================================
+       🔹 4. PIE DE PÁGINA
+       ===================================================== */
+
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text(
+            `Página ${i} de ${pageCount}`,
+            pageWidth / 2,
+            290,
+            { align: "center" }
+        );
+    }
+
+    /* ===================================================== */
+
+    doc.save(`Rutina - ${userName}.pdf`);
+}
 }
 
 async function moveExerciseToAnotherDay(currentDay, newDay, index, exercises) {
